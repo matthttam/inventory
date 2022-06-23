@@ -1,0 +1,54 @@
+{% extends "dashboard/dashboard.html" %}
+
+{% block title %}Inventory - Devices{% endblock %}
+
+{% block head %}
+
+{% include "datatables.html"%}
+
+    <script>
+        $(document).ready(function () {
+            $('#device_list').DataTable();
+        });
+    </script>
+
+{% endblock head %}
+
+{% block content %}
+    
+{% if device_list %}
+
+    <table id="device_list" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Asset ID</th>
+                <th>Serial Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+{% for device in device_list %}
+
+            <tr>
+                <td>
+                    {{ device.asset_id }}
+                </td>
+                <td>
+                    {{ device.serial_number }}
+                </td>
+            </tr>
+
+{% endfor %}
+
+        </tbody>
+    </table>
+
+{% else %}
+
+    <p>No devices are available.</p>
+
+{% endif %}
+
+    <a class="btn btn-primary m-2" role="button"  href="{% url 'devices:new' %}">Create Device</a>
+
+{% endblock content %}

@@ -1,0 +1,21 @@
+{% extends "dashboard/dashboard.html" %}
+
+{% block title %}Inventory - Device Detail{% endblock %}
+
+{% block content %}
+    
+    {% if device %}
+    <ul>
+
+        <li>Device ID: {{device.id}}</li>
+        <li>Device Serial Number: {{device.serial_number}}</li>
+        <li>Device Asset ID: {{device.asset_id}}</li>
+
+    </ul>
+    <a class="btn btn-default m-2" role="button" href="{% url 'devices:edit' device.id%}">Edit Device</a>
+    <a class="btn btn-default m-2" role="button" href="{% url 'devices:index' %}">Device List</a>
+    {% else %}
+    <p>Device Not Found</p>
+    {% endif %}
+
+{% endblock content%}

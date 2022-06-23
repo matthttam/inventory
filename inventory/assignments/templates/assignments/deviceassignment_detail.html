@@ -1,0 +1,21 @@
+{% extends "dashboard/dashboard.html" %}
+
+{% block title %}Inventory - Assignment Detail{% endblock %}
+
+{% block content %}
+
+{% if deviceassignment %}
+
+    <ul>
+        <li>Assignment ID: {{deviceassignment.id}}</li>
+    </ul>
+    <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:edit' deviceassignment.id%}">Edit Assignment</a>
+    <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:index' %}">Assignment List</a>
+
+{% else %}
+
+    <p>Assignment Not Found</p>
+
+{% endif %}
+
+{% endblock content %}
