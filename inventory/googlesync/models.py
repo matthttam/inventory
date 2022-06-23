@@ -48,7 +48,7 @@ class GooglePersonMapping(models.Model):
     person_field = models.CharField(
         max_length=255, choices=[(f.name, f.verbose_name) for f in Person._meta.fields if f.name != 'id'])
     matching_priority = models.IntegerField(
-        choices=[(x, x) for x in range(1, 10)], unique=True)
+        choices=[(x, x) for x in range(1, 10)], unique=True, blank=True, null=True)
 
     def __str__(self):
         return f"{self.google_field} => {self.person_field}"
