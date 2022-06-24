@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import GoogleConfig, GoogleServiceAccountConfig, GooglePersonMapping
+from .models import GoogleConfig, GooglePersonTranslation, GoogleServiceAccountConfig, GooglePersonMapping
 
 
 @admin.register(GoogleConfig)
@@ -15,3 +15,9 @@ class GoogleServiceAccountConfigAdmin(admin.ModelAdmin):
 @admin.register(GooglePersonMapping)
 class GooglePersonMappingAdmin(admin.ModelAdmin):
     list_display = ('google_field', 'person_field', 'matching_priority')
+
+
+@admin.register(GooglePersonTranslation)
+class GooglePersonTranslationAdmin(admin.ModelAdmin):
+    list_display = ('person_type', 'person_field',
+                    'translate_from', 'translate_to')

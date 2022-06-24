@@ -69,3 +69,5 @@ class GooglePersonTranslation(models.Model):
         PersonType, on_delete=models.PROTECT)
     person_field = models.CharField(
         max_length=255, choices=[(f.name, f.verbose_name) for f in Person._meta.fields if f.name != 'id'])
+    translate_from = models.CharField(max_length=255)
+    translate_to = models.CharField(max_length=255)
