@@ -1,6 +1,6 @@
 from inspect import Attribute
 from django.shortcuts import render
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, ListView
 from .forms import GoogleConfigForm, GoogleServiceAccountConfig, GoogleServiceAccountConfigForm, GooglePersonMappingForm
 from .models import GoogleConfig, GoogleServiceAccountConfig, GooglePersonMapping
 
@@ -27,6 +27,10 @@ class GoogleServiceAccountConfigCreateUpdateView(UpdateView):
 
     def get_object(self, queryset=None):
         return self.model.objects.first()
+
+
+class GooglePersonMappingListView(ListView):
+    model = GooglePersonMapping
 
 
 class GooglePersonMappingCreateUpdateView(UpdateView):

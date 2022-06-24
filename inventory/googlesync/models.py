@@ -1,6 +1,7 @@
+from email.policy import default
 from django.db import models
 from django.urls import reverse
-from people.models import Person
+from people.models import Person, PersonType
 
 
 class GoogleConfig(models.Model):
@@ -35,6 +36,10 @@ class GoogleServiceAccountConfig(models.Model):
     auth_provider_x09_cert_url = models.CharField(
         max_length=255, default="https://www.googleapis.com/oauth2/v1/certs")
     client_x509_cert_url = models.CharField(max_length=255)
+    delegate = models.EmailField(max_length=255,
+                                 help_text="User account to impersonate when accessing Google. User must have rights to the resources needed.")
+    target = models.CharField(
+        max_length=255, help_text="Google domain name to connect to (e.g. my.site.com)")
 
     def __str__(self):
         return f"{self.project_id}"
@@ -44,6 +49,8 @@ class GoogleServiceAccountConfig(models.Model):
 
 
 class GooglePersonMapping(models.Model):
+    person_type = models.ForeignKey(
+        PersonType, on_delete=models.PROTECT)
     google_field = models.CharField(max_length=255)
     person_field = models.CharField(
         max_length=255, choices=[(f.name, f.verbose_name) for f in Person._meta.fields if f.name != 'id'])
@@ -55,3 +62,10 @@ class GooglePersonMapping(models.Model):
 
     def get_absolute_url(self):
         return reverse('googlesync:person_mapping', kwargs={})
+
+
+class GooglePersonTranslation(models.Model):
+    person_type = models.ForeignKey(
+        PersonType, on_delete=models.PROTECT)
+    person_field = models.CharField(
+        max_length=255, choices=[(f.name, f.verbose_name) for f in Person._meta.fields if f.name != 'id'])

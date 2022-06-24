@@ -10,7 +10,8 @@ class Person(models.Model):
     email = models.EmailField(unique=True)
     internal_id = models.CharField(max_length=255, unique=True)
     type = models.ForeignKey("PersonType", on_delete=models.PROTECT)
-    status = models.ForeignKey("PersonStatus", on_delete=models.PROTECT)
+    status = models.ForeignKey(
+        "PersonStatus", on_delete=models.PROTECT, default="Active")
     buildings = models.ManyToManyField(Building, blank=True)
     rooms = models.ManyToManyField(Room, blank=True)
     google_id = models.CharField(max_length=255, blank=True)
