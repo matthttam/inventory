@@ -90,9 +90,12 @@ class Command(GoogleSyncCommand):
             #request = None
         print(f"Number of person records: {len(person_records)}")
 
+        #active_person_status = PersonStatus.objects.filter(name='Active').first()
+        inactive_person_status = PersonStatus.objects.filter(name='Inactive').first()
         found_record_ids = []
         records_to_update = []
         records_to_create = []
+        records_to_skip = []
         for person_record in person_records:
 
             # Build a query to search through each ID specified
@@ -108,10 +111,14 @@ class Command(GoogleSyncCommand):
                 person_record.id = id
                 records_to_update.append(person_record)
             else:
-                records_to_create.append(person_record)
+                if person_record.status == inactive_person_status:
+                    records_to_skip.append(person_record)
+                else:
+                    records_to_create.append(person_record)
             
         print(f"Number of person records to update: {len(records_to_update)}")
         print(f"Number of person records to create: {len(records_to_create)}")
+        print(f"Number of person records to skip: {len(records_to_skip)}")
         
         # Update found records
         if records_to_update:
@@ -120,11 +127,12 @@ class Command(GoogleSyncCommand):
             Person.objects.bulk_update(records_to_update, fields=fields)
         
         # Inactivate Records Not Found
-            missing_records = Person.objects.exclude(google_id__isnull=True).filter(person_type=sync_profile.person_type).difference(Person.objects.filter(id__in=found_record_ids))
-            inactive_person_status = PersonStatus.objects.filter(name='Inactive')
+            missing_records = Person.objects.exclude(google_id__isnull=True).filter(type=sync_profile.person_type).difference(Person.objects.filter(id__in=found_record_ids))
+            
             with transaction.atomic():
                 for missing_record in missing_records:
-                    missing_record.update(status=inactive_person_status)
+                    missing_record.status=inactive_person_status
+                    missing_record.save()
                     self.stdout.write(self.style.WARNING(f"Person not found. Setting to Inactive: {missing_record}"))
                     #Person.objects.update(, fields=)
 
