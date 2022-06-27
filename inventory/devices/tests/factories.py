@@ -14,7 +14,7 @@ class DeviceManufacturerFactory(DjangoModelFactory):
 class DeviceStatusFactory(DjangoModelFactory):
     class Meta:
         model = DeviceStatus
-        django_get_or_create = ('name',)
+        django_get_or_create = ("name",)
 
     name = "Active"
 
@@ -30,7 +30,7 @@ class DeviceModelFactory(DjangoModelFactory):
 class DeviceFactory(DjangoModelFactory):
     class Meta:
         model = Device
-        django_get_or_create = ('serial_number', 'asset_id', 'google_id')
+        django_get_or_create = ("serial_number", "asset_id", "google_id")
 
     serial_number = factory.Sequence(lambda n: f"SN-{n}")
     asset_id = factory.Sequence(lambda n: f"ASSET-{n}")
