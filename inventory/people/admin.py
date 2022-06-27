@@ -5,7 +5,7 @@ from .models import Person, PersonType, PersonStatus
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     list_display = ("internal_id", "first_name", "middle_name",
-                    "last_name", "email", "type")
+                    "last_name", "email", "type", "status")
 
 
 @admin.register(PersonType)
