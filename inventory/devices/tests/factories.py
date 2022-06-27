@@ -1,5 +1,4 @@
 import factory
-from faker.providers import company
 from factory.django import DjangoModelFactory
 from devices.models import DeviceManufacturer, DeviceStatus, DeviceModel, Device
 
