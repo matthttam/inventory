@@ -1,0 +1,5 @@
+{
+    "provider": "autopep8",
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+    "python.terminal.activateEnvironment": true
+}
