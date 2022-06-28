@@ -1,7 +1,7 @@
-from email.policy import default
 from django.db import models
 from django.urls import reverse
 from people.models import Person, PersonType
+from devices.models import Device
 
 
 class GoogleConfig(models.Model):
@@ -57,6 +57,7 @@ class GoogleServiceAccountConfig(models.Model):
         return reverse("googlesync:service_account_config", kwargs={})
 
 
+# Person sync profile
 class GooglePersonSyncProfile(models.Model):
     name = models.CharField(max_length=255)
     person_type = models.ForeignKey(PersonType, on_delete=models.PROTECT)
@@ -67,6 +68,7 @@ class GooglePersonSyncProfile(models.Model):
         max_length=1024,
         default="orgUnitPath=/",
         help_text="Google API query to use when searching for users to sync for this profile. (e.g. 'orgUnitPath=/Staff'). Query documentation: https://developers.google.com/admin-sdk/directory/v1/guides/search-users",
+        blank=True,
     )
 
     def __str__(self):
@@ -107,11 +109,73 @@ class GooglePersonTranslation(models.Model):
     google_person_mapping = models.ForeignKey(
         GooglePersonMapping, on_delete=models.CASCADE, default=1
     )
-    # person_field = models.ForeignKey(
-    #    GooglePersonMapping, on_delete=models.PROTECT, to_field="person_field"
-    # )
     translate_from = models.CharField(max_length=255)
     translate_to = models.CharField(max_length=255)
 
     def __str__(self):
         return f"Translate {self.google_person_mapping.person_field!r} from {self.translate_from!r} to {self.translate_to!r}"
+
+
+# Device Sync Settings
+class GoogleDeviceSyncProfile(models.Model):
+    name = models.CharField(max_length=255)
+    google_service_account_config = models.ForeignKey(
+        GoogleServiceAccountConfig, on_delete=models.PROTECT
+    )
+    google_org_unit_path = google_query = models.CharField(
+        max_length=1024,
+        default="",
+        help_text="The full path of the organizational unit (minus the leading /) or its unique ID.",
+        blank=True,
+    )
+    google_query = models.CharField(
+        max_length=1024,
+        default="",
+        help_text="Google API query to use when searching for devices to sync for this profile. (e.g. 'location:seattle'). Query documentation: https://developers.google.com/admin-sdk/directory/v1/list-query-operators",
+        blank=True,
+    )
+
+    def __str__(self):
+        return f"{self.name} (Devices: {self.google_service_account_config})"
+
+
+class GoogleDeviceMapping(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["google_device_sync_profile", "device_field"],
+                name="unique_google_device_sync_profile_and_device_field",
+            )
+        ]
+
+    google_device_sync_profile = models.ForeignKey(
+        GoogleDeviceSyncProfile, on_delete=models.PROTECT
+    )
+    google_field = models.CharField(max_length=255)
+    device_field = models.CharField(
+        max_length=255,
+        choices=[
+            (f.name, f.verbose_name) for f in Device._meta.fields if f.name != "id"
+        ],
+    )
+    matching_priority = models.IntegerField(
+        choices=[(x, x) for x in range(1, 10)], unique=True, blank=True, null=True
+    )
+
+    def __str__(self):
+        return f"{self.google_field} => {self.device_field}"
+
+    def get_absolute_url(self):
+        return reverse("googlesync:device_mapping", kwargs={})
+
+
+class GoogleDeviceTranslation(models.Model):
+    google_device_mapping = models.ForeignKey(
+        GoogleDeviceMapping, on_delete=models.CASCADE, default=1
+    )
+
+    translate_from = models.CharField(max_length=255)
+    translate_to = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"Translate {self.google_device_mapping.device_field!r} from {self.translate_from!r} to {self.translate_to!r}"
