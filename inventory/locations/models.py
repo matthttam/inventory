@@ -12,6 +12,13 @@ class Building(models.Model):
 
 
 class Room(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["number", "building"], name="unique_room_per_building"
+            )
+        ]
+
     number = models.CharField(max_length=255)
     building = models.ForeignKey(
         Building, on_delete=models.CASCADE, related_name="rooms"

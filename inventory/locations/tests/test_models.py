@@ -59,19 +59,38 @@ class BuildingModelTest(TestCase):
 
 
 class RoomModelTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(self):
         RoomFactory()
 
+    def setUp(self):
+        self.room = Room.objects.get(id=1)
+
     def test_room_label(self):
-        room = Room.objects.get(id=1)
-        field_label = room._meta.get_field("number").verbose_name
+        field_label = self.room._meta.get_field("number").verbose_name
         self.assertEqual(field_label, "number")
 
     def test_room_max_length(self):
-        room = Room.objects.get(id=1)
-        max_length = room._meta.get_field("number").max_length
+        max_length = self.room._meta.get_field("number").max_length
         self.assertEqual(max_length, 255)
 
     def test_building_foreign_key(self):
-        room = Room.objects.get(id=1)
-        self.assertEqual(room._meta.get_field("building").related_model, Building)
+        self.assertEqual(self.room._meta.get_field("building").related_model, Building)
+
+    def test_room_unique_by_building(self):
+        constraints = self.room._meta.constraints
+        unique_by_building_constraint = list(
+            filter(
+                lambda constraint: constraint.name == "unique_room_per_building",
+                constraints,
+            )
+        )
+        self.assertEqual(len(unique_by_building_constraint), 1)
+        # Asserts all values are the same in both lists regardless of order
+        self.assertCountEqual(
+            unique_by_building_constraint[0].fields,
+            (
+                "building",
+                "number",
+            ),
+        )
