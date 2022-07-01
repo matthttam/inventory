@@ -2,8 +2,8 @@ from django.db import models
 
 
 class Building(models.Model):
-    name = models.CharField(max_length=255)
-    number = models.CharField(max_length=255, blank=True)
+    name = models.CharField(max_length=255, unique=True)
+    internal_id = models.CharField(max_length=255, blank=True, unique=True)
     acronym = models.CharField(max_length=255, blank=True)
     active = models.BooleanField(default=True)
 
@@ -14,7 +14,8 @@ class Building(models.Model):
 class Room(models.Model):
     number = models.CharField(max_length=255)
     building = models.ForeignKey(
-        Building, on_delete=models.CASCADE, related_name='rooms')
+        Building, on_delete=models.CASCADE, related_name="rooms"
+    )
     active = models.BooleanField(default=True)
 
     def __str__(self):

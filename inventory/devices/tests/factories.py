@@ -1,13 +1,20 @@
 import factory
+from faker import Faker
+from faker.providers import company as CompanyProvider
 from factory.django import DjangoModelFactory
 from devices.models import DeviceManufacturer, DeviceStatus, DeviceModel, Device
+
+# Faker Setup
+fake = Faker()
+Faker.seed(0)
+fake.add_provider(CompanyProvider)
 
 
 class DeviceManufacturerFactory(DjangoModelFactory):
     class Meta:
         model = DeviceManufacturer
 
-    name = factory.Faker("catch_phrase")
+    name = fake.company()  # factory.Faker("catch_phrase")
 
 
 class DeviceStatusFactory(DjangoModelFactory):
@@ -15,7 +22,7 @@ class DeviceStatusFactory(DjangoModelFactory):
         model = DeviceStatus
         django_get_or_create = ("name",)
 
-    name = "Active"
+    name = fake.random_choices(elements=("Active", "Inactive"))
 
 
 class DeviceModelFactory(DjangoModelFactory):
