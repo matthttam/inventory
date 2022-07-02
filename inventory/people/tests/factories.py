@@ -70,6 +70,16 @@ class PersonWithBuildingsFactory(PersonFactory):
         self.buildings.add(*extracted)
 
 
+class PersonWithRoomsFactory(PersonFactory):
+    @factory.post_generation
+    def rooms(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if not extracted:
+            extracted = RoomFactory.create_batch(10)
+        self.rooms.add(*extracted)
+
+
 # def rooms(self, create, extracted, **kwargs):
 #    if not create or not extracted:
 #        return

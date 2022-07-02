@@ -20,7 +20,7 @@ class BuildingModelTest(TestCase):
     def test_name_unique(self):
         building = Building.objects.get(id=1)
         unique = building._meta.get_field("name").unique
-        self.assertEqual(unique, True)
+        self.assertTrue(unique)
 
     def test_internal_id_label(self):
         building = Building.objects.get(id=1)
@@ -35,7 +35,7 @@ class BuildingModelTest(TestCase):
     def test_internal_id_unique(self):
         building = Building.objects.get(id=1)
         unique = building._meta.get_field("internal_id").unique
-        self.assertEqual(unique, True)
+        self.assertTrue(unique)
 
     def test_acronym_label(self):
         building = Building.objects.get(id=1)
@@ -50,7 +50,7 @@ class BuildingModelTest(TestCase):
     def test_acronym_not_unique(self):
         building = Building.objects.get(id=1)
         unique = building._meta.get_field("acronym").unique
-        self.assertEqual(unique, False)
+        self.assertFalse(unique)
 
     def test_active_label(self):
         building = Building.objects.get(id=1)

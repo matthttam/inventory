@@ -53,9 +53,6 @@ class Device(models.Model):
     def get_absolute_url(self):
         return reverse("devices:detail", kwargs={"pk": self.pk})
 
-    def location(self):
-        return self.room
-
     def display_name(self):
         if self.asset_id:
             return f"{self.asset_id} ({self.serial_number})"
@@ -64,8 +61,10 @@ class Device(models.Model):
 
 
 class DeviceAccessory(models.Model):
-    name = models.CharField(max_length=255)
-    device_model = models.ManyToManyField(DeviceModel)
+    name = models.CharField(max_length=255, unique=True)
+    device_models = models.ManyToManyField(DeviceModel)
 
     def __str__(self):
-        return f"{self.manufacturer} {self.name}"
+        # return f"{self.manufacturer} {self.name}"
+        device_model_names = ",".join([x.name for x in self.device_models.all()])
+        return f"{self.name} ({device_model_names})"
