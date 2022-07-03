@@ -1,7 +1,9 @@
 import factory
 from faker import Faker
 from faker.providers import company as CompanyProvider, lorem as LoremProvider
+
 from factory.django import DjangoModelFactory
+
 from devices.models import (
     DeviceManufacturer,
     DeviceStatus,
