@@ -11,4 +11,4 @@ class DeviceAssignmentForm(ModelForm):
     class Meta:
 
         model = DeviceAssignment
-        fields = ['person', 'device']
+        fields = ["person", "device"]
