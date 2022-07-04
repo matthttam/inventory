@@ -20,11 +20,11 @@ class BuildingFactory(DjangoModelFactory):
     # def __init__(self, *args, **kwargs):
     #    super(*args, **kwargs)
 
-    name = factory.Sequence(
-        lambda n: f"{fake.unique.school_name()}"
+    name = factory.LazyFunction(
+        lambda: f"{fake.unique.school_name()}"
     )  # factory.faker("")
-    internal_id = factory.Sequence(
-        lambda n: fake.unique.numerify(f"%#!")
+    internal_id = factory.LazyFunction(
+        lambda: fake.unique.numerify(f"%#!")
     )  # fake.unique.school_nces_id()
     acronym = factory.LazyAttribute(
         lambda o: "".join(re.findall("(?<![a-z])[A-Z]", o.name))

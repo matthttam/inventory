@@ -1,50 +1,70 @@
 from django.test import TestCase
-from devices.forms import DeviceForm
+from people.forms import PersonForm
 from django.forms.models import model_to_dict
-from devices.tests.factories import (
-    DeviceFactory,
-    DeviceModelFactory,
-    DeviceStatusFactory,
-)
+from people.tests.factories import PersonFactory, PersonStatusFactory, PersonTypeFactory
+from people.models import PersonStatus, PersonType
 from devices.models import DeviceModel
 from locations.models import Building, Room
 
 
-# class DeviceFormTest(TestCase):
-#    def test_valid_form(self):
-#        status = DeviceStatusFactory()
-#        device_model = DeviceModelFactory()
-#        device = DeviceFactory.build(status=status, device_model=device_model)
-#        form = DeviceForm(
-#            data=model_to_dict(
-#                device,
-#                fields=[
-#                    "serial_number",
-#                    "asset_id",
-#                    "device_model",
-#                    "status",
-#                    "building",
-#                    "room",
-#                    "notes",
-#                ],
-#            )
-#        )
-#
-#        self.assertTrue(form.is_valid())
-#        self.assertEqual(form.errors, {})
-#        self.assertQuerysetEqual(
-#            form.fields["device_model"].queryset,
-#            DeviceModel.objects.all(),
-#            ordered=False,
-#        )
-#        self.assertQuerysetEqual(
-#            form.fields["building"].queryset,
-#            Building.objects.filter(active=True),
-#            ordered=False,
-#        )
-#        self.assertQuerysetEqual(
-#            form.fields["room"].queryset,
-#            Room.objects.filter(active=True),
-#            ordered=False,
-#        )
-#
+class PersonFormTest(TestCase):
+    def test_valid_form(self):
+        person_status = PersonStatusFactory(name="status")
+        person_type = PersonTypeFactory(name="type")
+        person = PersonFactory.build(status=person_status, type=person_type)
+
+        form = PersonForm(
+            data=model_to_dict(
+                person,
+                fields=[
+                    "internal_id",
+                    "first_name",
+                    "middle_name",
+                    "last_name",
+                    "email",
+                    "type",
+                    "status",
+                ],
+            )
+        )
+        print(form.errors)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.errors, {})
+        self.assertQuerysetEqual(
+            form.fields["status"].queryset,
+            PersonStatus.objects.all(),
+            ordered=False,
+        )
+        self.assertQuerysetEqual(
+            form.fields["type"].queryset,
+            PersonType.objects.all(),
+            ordered=False,
+        )
+
+
+class PersonFormTest(TestCase):
+    def test_invalid_form(self):
+        person_status = PersonStatusFactory(name="status")
+        person_type = PersonTypeFactory(name="type")
+        person = PersonFactory(status=person_status, type=person_type)
+
+        form = PersonForm(
+            data=model_to_dict(
+                person,
+                fields=[
+                    "internal_id",
+                    "first_name",
+                    "middle_name",
+                    "last_name",
+                    "email",
+                    "type",
+                    "status",
+                ],
+            )
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors.as_json(),
+            '{"email": [{"message": "Person with this Email already exists.", "code": "unique"}], "internal_id": [{"message": "Person with this Internal id already exists.", "code": "unique"}]}',
+        )

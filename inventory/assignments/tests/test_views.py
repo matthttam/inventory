@@ -60,13 +60,6 @@ class DeviceAssignmentUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         print(response.context)
         print(timezone.localtime(current_time).strftime("%Y-%m-%d %H:%M:%S"))
-        # self.assertContains(
-        # self.assertContains(
-        #    response,
-        #    timezone.localtime(device_assignment.assignment_datetime).strftime(
-        #        "%-m/%-d/%Y %-I:%-M %p"
-        #    ),
-        # )
 
 
 class DeviceAssignmentCreateViewTest(TestCase):

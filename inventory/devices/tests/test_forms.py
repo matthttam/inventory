@@ -47,3 +47,28 @@ class DeviceFormTest(TestCase):
             Room.objects.filter(active=True),
             ordered=False,
         )
+
+    def test_invalid_form(self):
+        status = DeviceStatusFactory()
+        device_model = DeviceModelFactory()
+        device = DeviceFactory(status=status, device_model=device_model)
+        form = DeviceForm(
+            data=model_to_dict(
+                device,
+                fields=[
+                    "serial_number",
+                    "asset_id",
+                    "device_model",
+                    "status",
+                    "building",
+                    "room",
+                    "notes",
+                ],
+            )
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors.as_json(),
+            '{"serial_number": [{"message": "Device with this Serial number already exists.", "code": "unique"}], "asset_id": [{"message": "Device with this Asset id already exists.", "code": "unique"}]}',
+        )

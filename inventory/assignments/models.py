@@ -8,7 +8,6 @@ from people.models import Person
 class Assignment(models.Model):
     assignment_datetime = models.DateTimeField(verbose_name="assignment date")
     return_datetime = models.DateTimeField(
-        # widget=DateTimeInput(format="%d-%m-%Y %I:%M:%S %p"),
         blank=True,
         null=True,
         default=None,

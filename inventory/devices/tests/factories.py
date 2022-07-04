@@ -60,7 +60,7 @@ class DeviceAccessoryFactory(DjangoModelFactory):
     class Meta:
         model = DeviceAccessory
 
-    name = factory.Sequence(lambda x: fake.unique.text(max_nb_chars=10))
+    name = factory.LazyFunction(lambda: fake.unique.text(max_nb_chars=10))
 
     @factory.post_generation
     def device_models(self, create, extracted, **kwargs):

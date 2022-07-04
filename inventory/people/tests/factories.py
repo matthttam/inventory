@@ -22,7 +22,7 @@ class PersonStatusFactory(DjangoModelFactory):
         model = PersonStatus
         django_get_or_create = ("name",)
 
-    name = fake.random_choices(elements=("Active", "Inactive"))
+    name = fake.random_choices(elements=("Active", "Inactive"), length=1)[0]
 
 
 class PersonTypeFactory(DjangoModelFactory):
@@ -30,7 +30,7 @@ class PersonTypeFactory(DjangoModelFactory):
         model = PersonType
         django_get_or_create = ("name",)
 
-    name = fake.random_choices(elements=("Staff", "Student"))
+    name = fake.random_choices(elements=("Staff", "Student"), length=1)[0]
 
 
 class PersonFactory(DjangoModelFactory):
@@ -40,8 +40,8 @@ class PersonFactory(DjangoModelFactory):
     first_name = fake.first_name()
     middle_name = fake.first_name()
     last_name = fake.last_name()
-    email = factory.Sequence(lambda x: fake.unique.ascii_company_email())
-    internal_id = factory.Sequence(lambda x: fake.unique.numerify("%##!"))
+    email = factory.LazyFunction(lambda: fake.unique.ascii_company_email())
+    internal_id = factory.LazyFunction(lambda: fake.unique.numerify("%##!"))
     type = factory.SubFactory(PersonTypeFactory)
     status = factory.SubFactory(PersonStatusFactory)
 
@@ -78,16 +78,3 @@ class PersonWithRoomsFactory(PersonFactory):
         if not extracted:
             extracted = RoomFactory.create_batch(10)
         self.rooms.add(*extracted)
-
-
-# def rooms(self, create, extracted, **kwargs):
-#    if not create or not extracted:
-#        return
-#    self.rooms.add(*extracted)
-#
-## buildings = None  # buildings.set()
-## rooms = None  # factory.SubFactory(RoomFactory)
-# buildings = factory.SubFactory(BuildingFactory)
-# rooms = factory.LazyAttribute(
-#    lambda o: factory.SubFactory(RoomFactory(o.buildings))
-# )

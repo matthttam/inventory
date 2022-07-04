@@ -1,3 +1,4 @@
+from django.forms import model_to_dict
 from django.test import TestCase
 from devices.models import DeviceStatus, DeviceManufacturer, Device, DeviceModel
 from locations.models import Room, Building
@@ -8,6 +9,7 @@ from .factories import (
     DeviceFactory,
 )
 from django.urls import reverse
+from django.forms import model_to_dict
 
 
 class DeviceListViewTest(TestCase):
@@ -56,3 +58,38 @@ class DeviceUpdateViewTest(TestCase):
         response = self.client.get(reverse("devices:edit", args=[1]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, device.asset_id)
+
+
+class DeviceCreateViewTest(TestCase):
+    def test_new_deviceassignment(self):
+        response = self.client.get(reverse("devices:new", args=[]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_new_deviceassignment_post(self):
+        device_status = DeviceStatusFactory()
+        device_model = DeviceModelFactory()
+        device_dict = {
+            "serial_number": "SN-18",
+            "asset_id": "ASSET-18",
+            "notes": "",
+            "status": device_status.id,
+            "google_id": "",
+            "google_status": "",
+            "google_organization_unit": "",
+            "google_enrollment_time": "",
+            "google_last_policy_sync": "",
+            "google_location": "",
+            "google_most_recent_user": "",
+            "device_model": device_model.id,
+            "building": "",
+            "room": "",
+        }
+        response = self.client.post(reverse("devices:new"), device_dict)
+        device_object = Device.objects.last()
+        self.assertIsNotNone(device_object)
+        self.assertEqual(device_object.serial_number, device_dict["serial_number"])
+        self.assertRedirects(
+            response,
+            reverse("devices:detail", kwargs={"pk": device_object.pk}),
+            status_code=302,
+        )
