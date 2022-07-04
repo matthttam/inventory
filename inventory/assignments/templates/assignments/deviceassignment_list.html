@@ -41,10 +41,10 @@
                 {{deviceassignment.device.display_name}}
             </td>
             <td>
-                {{deviceassignment.assignment_datetime}}
+                {{deviceassignment.assignment_datetime }}
             </td>
             <td>
-                {{deviceassignment.return_datetime}}
+                {{deviceassignment.return_datetime|default_if_none:""}}
             </td>
         </tr>
         {% endfor %}

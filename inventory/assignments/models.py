@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import DateTimeInput
 from django.urls import reverse
 from devices.models import Device, DeviceAccessory
 from people.models import Person
@@ -7,7 +8,11 @@ from people.models import Person
 class Assignment(models.Model):
     assignment_datetime = models.DateTimeField(verbose_name="assignment date")
     return_datetime = models.DateTimeField(
-        null=True, default=None, verbose_name="return date"
+        # widget=DateTimeInput(format="%d-%m-%Y %I:%M:%S %p"),
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name="return date",
     )
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
 

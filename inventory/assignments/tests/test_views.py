@@ -4,6 +4,7 @@ from .factories import DeviceAssignmentFactory
 from people.tests.factories import PersonFactory
 from devices.tests.factories import DeviceFactory
 from django.utils import timezone
+import datetime
 
 
 class DeviceAssignmentListViewTest(TestCase):
@@ -53,11 +54,19 @@ class DeviceAssignmentUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_valid_deviceassignment(self):
-        device_assignment = DeviceAssignmentFactory(return_datetime=timezone.now())
+        current_time = timezone.now()
+        device_assignment = DeviceAssignmentFactory(assignment_datetime=current_time)
         response = self.client.get(reverse("assignments:edit", args=[1]))
         self.assertEqual(response.status_code, 200)
-        self.skipTest("Need to check update assignment for proper fields")
-        # self.assertContains(response, device_assignment.assignment_datetime)
+        print(response.context)
+        print(timezone.localtime(current_time).strftime("%Y-%m-%d %H:%M:%S"))
+        # self.assertContains(
+        # self.assertContains(
+        #    response,
+        #    timezone.localtime(device_assignment.assignment_datetime).strftime(
+        #        "%-m/%-d/%Y %-I:%-M %p"
+        #    ),
+        # )
 
 
 class DeviceAssignmentCreateViewTest(TestCase):
