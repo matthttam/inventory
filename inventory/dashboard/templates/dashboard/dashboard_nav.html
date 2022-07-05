@@ -15,7 +15,7 @@
                     <a class="nav-link {% if request.resolver_match.namespace == "assignments" %}active{% endif %}" aria-current="page" href="{% url "assignments:index" %}">Assignments</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link disabled">Audit</a>
+                    <a class="nav-link disabled {% if request.resolver_match.namespace == "audit" %}active{% endif %}">Audit</a>
                 </li>
             </ul>
         </div>
