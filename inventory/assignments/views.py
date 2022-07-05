@@ -2,12 +2,12 @@ from django.shortcuts import render
 from .models import DeviceAssignment, DeviceAccessoryAssignment
 from django.views.generic import ListView, DetailView, UpdateView, CreateView
 from .forms import DeviceAssignmentForm
-from datetime import datetime
+from django.utils import timezone
 
 
 class DeviceAssignmentListView(ListView):
     model = DeviceAssignment
-    #context_object_name = 'devices'
+    # context_object_name = 'devices'
 
 
 class DeviceAssignmentDetailView(DetailView):
@@ -16,7 +16,7 @@ class DeviceAssignmentDetailView(DetailView):
 
 class DeviceAssignmentUpdateView(UpdateView):
     model = DeviceAssignment
-    fields = ['assignment_datetime', 'return_datetime']
+    fields = ["assignment_datetime", "return_datetime"]
 
 
 class DeviceAssignmentCreateView(CreateView):
@@ -24,5 +24,5 @@ class DeviceAssignmentCreateView(CreateView):
     template_name = "assignments/deviceassignment_form.html"
 
     def form_valid(self, form):
-        form.instance.assignment_datetime = datetime.now()
+        form.instance.assignment_datetime = timezone.now()
         return super().form_valid(form)
