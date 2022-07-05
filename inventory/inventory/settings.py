@@ -52,6 +52,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "login_required.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
@@ -139,6 +140,20 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Default redirect after login
 LOGIN_REDIRECT_URL = "/"
+
+# Paths that do not require a logged in session
+# https://github.com/CleitonDeLima/django-login-required-middleware
+
+LOGIN_REQUIRED_IGNORE_PATHS = [
+    r"/accounts/logout/$",
+    r"/accounts/signup/$",
+    r"/accounts/login/$",
+    r"/admin/$",
+]
+
+LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
+    #'authentication'
+]
 
 # Controls if the django-debug-toolbar is displayed
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
