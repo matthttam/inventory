@@ -6,6 +6,9 @@ from people.models import Person
 
 
 class Assignment(models.Model):
+    class Meta:
+        abstract = True
+
     assignment_datetime = models.DateTimeField(verbose_name="assignment date")
     return_datetime = models.DateTimeField(
         blank=True,
@@ -14,9 +17,6 @@ class Assignment(models.Model):
         verbose_name="return date",
     )
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
-
-    class Meta:
-        abstract = True
 
 
 class DeviceAssignment(Assignment):
