@@ -61,11 +61,11 @@ class DeviceUpdateViewTest(TestCase):
 
 
 class DeviceCreateViewTest(TestCase):
-    def test_new_deviceassignment(self):
+    def test_new_device(self):
         response = self.client.get(reverse("devices:new", args=[]))
         self.assertEqual(response.status_code, 200)
 
-    def test_new_deviceassignment_post(self):
+    def test_new_device_post(self):
         device_status = DeviceStatusFactory()
         device_model = DeviceModelFactory()
         device_dict = {

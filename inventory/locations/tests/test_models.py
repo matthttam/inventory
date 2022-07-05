@@ -57,6 +57,11 @@ class BuildingModelTest(TestCase):
         field_label = building._meta.get_field("active").verbose_name
         self.assertEqual(field_label, "active")
 
+    ### Functions ###
+    def test___str__(self):
+        building = BuildingFactory(name="test_name")
+        self.assertEqual(building.__str__(), f"{building.name}")
+
 
 class RoomModelTest(TestCase):
     @classmethod
@@ -94,3 +99,9 @@ class RoomModelTest(TestCase):
                 "number",
             ),
         )
+
+    ### Functions ###
+    def test___str__(self):
+        building = BuildingFactory(name="test_building_name")
+        room = RoomFactory(number="test_room_name", building=building)
+        self.assertEqual(room.__str__(), f"{building.name} Room {room.number}")

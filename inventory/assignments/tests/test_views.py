@@ -3,6 +3,7 @@ from django.urls import reverse
 from .factories import DeviceAssignmentFactory
 from people.tests.factories import PersonFactory
 from devices.tests.factories import DeviceFactory
+from assignments.models import DeviceAssignment
 from django.utils import timezone
 import datetime
 
@@ -66,3 +67,21 @@ class DeviceAssignmentCreateViewTest(TestCase):
     def test_new_deviceassignment(self):
         response = self.client.get(reverse("assignments:new", args=[]))
         self.assertEqual(response.status_code, 200)
+
+    def test_new_device_post(self):
+        device = DeviceFactory()
+        person = PersonFactory()
+        device_assignment_dict = {
+            "device": device.id,
+            "person": person.id,
+        }
+        response = self.client.post(reverse("assignments:new"), device_assignment_dict)
+        device_assignment_object = DeviceAssignment.objects.last()
+        self.assertIsNotNone(device_assignment_object)
+        self.assertEqual(device_assignment_object.person, person)
+        self.assertEqual(device_assignment_object.device, device)
+        self.assertRedirects(
+            response,
+            reverse("assignments:detail", kwargs={"pk": device_assignment_object.pk}),
+            status_code=302,
+        )

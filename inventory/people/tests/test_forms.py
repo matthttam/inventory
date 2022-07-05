@@ -41,8 +41,6 @@ class PersonFormTest(TestCase):
             ordered=False,
         )
 
-
-class PersonFormTest(TestCase):
     def test_invalid_form(self):
         person_status = PersonStatusFactory(name="status")
         person_type = PersonTypeFactory(name="type")
@@ -64,7 +62,10 @@ class PersonFormTest(TestCase):
         )
 
         self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors.as_json(),
-            '{"email": [{"message": "Person with this Email already exists.", "code": "unique"}], "internal_id": [{"message": "Person with this Internal id already exists.", "code": "unique"}]}',
+        self.assertIn("email", form.errors.keys())
+        self.assertIn("Person with this Email already exists.", form.errors["email"][0])
+        self.assertIn("internal_id", form.errors.keys())
+        self.assertIn(
+            "Person with this Internal id already exists.",
+            form.errors["internal_id"][0],
         )

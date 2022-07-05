@@ -55,7 +55,7 @@ class PersonTest(TestCase):
         max_length = self.person._meta.get_field("internal_id").max_length
         self.assertEqual(max_length, 255)
 
-    def test_email_unique(self):
+    def test_internal_id_unique(self):
         unique = self.person._meta.get_field("internal_id").unique
         self.assertTrue(unique)
 
@@ -125,6 +125,10 @@ class PersonTypeTest(TestCase):
     def test_name_max_length(self):
         max_length = self.person._meta.get_field("name").max_length
         self.assertEqual(max_length, 255)
+
+    def test___str__(self):
+        person_type = PersonTypeFactory(name="test_person_type")
+        self.assertEqual(person_type.__str__(), person_type.name)
 
 
 class PersonStatusTest(TestCase):

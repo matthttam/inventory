@@ -56,8 +56,7 @@ class Device(models.Model):
     def display_name(self):
         if self.asset_id:
             return f"{self.asset_id} ({self.serial_number})"
-        else:
-            return f"{self.serial_number}"
+        return f"{self.serial_number}"
 
 
 class DeviceAccessory(models.Model):
