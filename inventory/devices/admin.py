@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Device, DeviceManufacturer, DeviceModel, DeviceStatus
+from .models import (
+    Device,
+    DeviceAccessory,
+    DeviceManufacturer,
+    DeviceModel,
+    DeviceStatus,
+)
 
 
 @admin.register(Device)
@@ -19,4 +25,9 @@ class DeviceModel(admin.ModelAdmin):
 
 @admin.register(DeviceStatus)
 class DeviceStatus(admin.ModelAdmin):
+    pass
+
+
+@admin.register(DeviceAccessory)
+class DeviceAccessory(admin.ModelAdmin):
     pass

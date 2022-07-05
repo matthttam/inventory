@@ -6,7 +6,7 @@ from .forms import DeviceForm
 
 class DeviceListView(ListView):
     model = Device
-    #context_object_name = 'devices'
+    # context_object_name = 'devices'
 
 
 class DeviceDetailView(DetailView):
@@ -15,7 +15,7 @@ class DeviceDetailView(DetailView):
 
 class DeviceUpdateView(UpdateView):
     model = Device
-    fields = ['serial_number', 'asset_id', 'device_model', 'notes']
+    fields = ["serial_number", "asset_id", "device_model", "notes"]
 
 
 class DeviceCreateView(CreateView):

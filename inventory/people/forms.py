@@ -9,5 +9,12 @@ class PersonForm(ModelForm):
 
     class Meta:
         model = Person
-        fields = ['internal_id', 'first_name',
-                  'middle_name', 'last_name', 'email', 'type', 'status']
+        fields = [
+            "internal_id",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "email",
+            "type",
+            "status",
+        ]
