@@ -6,6 +6,7 @@ from devices.models import (
     Device,
     DeviceModel,
 )
+from googlesync.models import GoogleDevice
 from locations.models import Room, Building
 from .factories import (
     DeviceModelFactory,
@@ -85,6 +86,11 @@ class DeviceTest(TestCase):
     def setUp(self):
         self.device = Device.objects.get(id=1)
 
+    def test_google_device_foreign_key(self):
+        self.assertEqual(
+            self.device._meta.get_field("google_device").related_model, GoogleDevice
+        )
+
     def test_serial_number_label(self):
         field_label = self.device._meta.get_field("serial_number").verbose_name
         self.assertEqual(field_label, "serial number")
@@ -136,108 +142,6 @@ class DeviceTest(TestCase):
     def test_status_foreign_key(self):
         self.assertEqual(
             self.device._meta.get_field("status").related_model, DeviceStatus
-        )
-
-    def test_google_id_label(self):
-        field_label = self.device._meta.get_field("google_id").verbose_name
-        self.assertEqual(field_label, "google id")
-
-    def test_google_id_max_length(self):
-        max_length = self.device._meta.get_field("google_id").max_length
-        self.assertEqual(max_length, 255)
-
-    def test_google_id_unique(self):
-        unique = self.device._meta.get_field("google_id").unique
-        self.assertTrue(unique)
-
-    def test_google_id_optional(self):
-        self.assertEqual(self.device._meta.get_field("google_id").blank, True)
-        self.assertEqual(self.device._meta.get_field("google_id").null, True)
-
-    def test_google_status_label(self):
-        field_label = self.device._meta.get_field("google_status").verbose_name
-        self.assertEqual(field_label, "google status")
-
-    def test_google_status_max_length(self):
-        max_length = self.device._meta.get_field("google_status").max_length
-        self.assertEqual(max_length, 255)
-
-    def test_google_status_optional(self):
-        self.assertEqual(self.device._meta.get_field("google_status").blank, True)
-        self.assertEqual(self.device._meta.get_field("google_status").null, False)
-
-    def test_google_organization_unit_label(self):
-        field_label = self.device._meta.get_field(
-            "google_organization_unit"
-        ).verbose_name
-        self.assertEqual(field_label, "google organization unit")
-
-    def test_google_organization_unit_max_length(self):
-        max_length = self.device._meta.get_field("google_organization_unit").max_length
-        self.assertEqual(max_length, 255)
-
-    def test_google_organization_unit_optional(self):
-        self.assertEqual(
-            self.device._meta.get_field("google_organization_unit").blank, True
-        )
-        self.assertEqual(
-            self.device._meta.get_field("google_organization_unit").null, False
-        )
-
-    def test_google_enrollment_time_label(self):
-        field_label = self.device._meta.get_field("google_enrollment_time").verbose_name
-        self.assertEqual(field_label, "google enrollment time")
-
-    def test_google_enrollment_time_optional(self):
-        self.assertEqual(
-            self.device._meta.get_field("google_enrollment_time").blank, True
-        )
-        self.assertEqual(
-            self.device._meta.get_field("google_enrollment_time").null, True
-        )
-
-    def test_google_last_policy_sync_label(self):
-        field_label = self.device._meta.get_field(
-            "google_last_policy_sync"
-        ).verbose_name
-        self.assertEqual(field_label, "google last policy sync")
-
-    def test_google_last_policy_sync_optional(self):
-        self.assertEqual(
-            self.device._meta.get_field("google_last_policy_sync").blank, True
-        )
-        self.assertEqual(
-            self.device._meta.get_field("google_last_policy_sync").null, True
-        )
-
-    def test_google_location_label(self):
-        field_label = self.device._meta.get_field("google_location").verbose_name
-        self.assertEqual(field_label, "google location")
-
-    def test_google_location_max_length(self):
-        max_length = self.device._meta.get_field("google_location").max_length
-        self.assertEqual(max_length, 255)
-
-    def test_google_location_optional(self):
-        self.assertEqual(self.device._meta.get_field("google_location").blank, True)
-        self.assertEqual(self.device._meta.get_field("google_location").null, False)
-
-    def test_google_most_recent_user_label(self):
-        field_label = self.device._meta.get_field(
-            "google_most_recent_user"
-        ).verbose_name
-        self.assertEqual(field_label, "google most recent user")
-
-    def test_google_most_recent_user_max_length(self):
-        max_length = self.device._meta.get_field("google_most_recent_user").max_length
-        self.assertEqual(max_length, 255)
-
-    def test_google_most_recent_user_optional(self):
-        self.assertEqual(
-            self.device._meta.get_field("google_most_recent_user").blank, True
-        )
-        self.assertEqual(
-            self.device._meta.get_field("google_most_recent_user").null, False
         )
 
     def test_device_model_foreign_key(self):

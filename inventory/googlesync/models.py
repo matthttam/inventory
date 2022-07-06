@@ -182,10 +182,8 @@ class GoogleDeviceTranslation(models.Model):
 
 
 class GoogleDevice(models.Model):
-    id = models.CharField(
-        max_length=255,
-        primary_key=True,
-    )
+    id = models.CharField(max_length=255, primary_key=True)
+    serial_number = models.CharField(max_length=255, unique=True, blank=True)
     device_model = models.CharField(max_length=255, blank=True)
     status = models.CharField(max_length=255, blank=True)
     organization_unit = models.CharField(max_length=255, blank=True)
@@ -196,4 +194,4 @@ class GoogleDevice(models.Model):
     annotated_asset_id = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return f"{self.asset_id} ({self.serial_number}) - {self.device_model}"
+        return f"{self.annotated_asset_id} ({self.serial_number}) - {self.device_model}"

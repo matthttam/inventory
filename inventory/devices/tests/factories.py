@@ -3,7 +3,7 @@ from faker import Faker
 from faker.providers import company as CompanyProvider, lorem as LoremProvider
 
 from factory.django import DjangoModelFactory
-
+from googlesync.tests.factories import GoogleDeviceFactory
 from devices.models import (
     DeviceManufacturer,
     DeviceStatus,
@@ -44,12 +44,12 @@ class DeviceModelFactory(DjangoModelFactory):
 class DeviceFactory(DjangoModelFactory):
     class Meta:
         model = Device
-        django_get_or_create = ("serial_number", "asset_id", "google_id")
+        django_get_or_create = ("serial_number", "asset_id")
 
+    google_device = factory.SubFactory(GoogleDeviceFactory)
     serial_number = factory.Sequence(lambda n: f"SN-{n}")
     asset_id = factory.Sequence(lambda n: f"ASSET-{n}")
     notes = ""
-    google_id = None
     status = factory.SubFactory(DeviceStatusFactory)
     device_model = factory.SubFactory(DeviceModelFactory)
     building = None

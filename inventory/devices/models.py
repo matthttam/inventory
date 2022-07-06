@@ -36,7 +36,11 @@ class Device(models.Model):
     )
     room = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True, blank=True)
     google_device = models.OneToOneField(
-        "googlesync.GoogleDevice", on_delete=models.CASCADE, default=None
+        "googlesync.GoogleDevice",
+        on_delete=models.CASCADE,
+        default=None,
+        blank=True,
+        null=True,
     )
 
     def __str__(self):
