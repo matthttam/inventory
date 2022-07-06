@@ -3,16 +3,16 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{% url "dashboard:view" %}">Dashboard</a>
+                    <a class="nav-link {% if request.resolver_match.namespace == "dashboard" %}active{% endif %}" aria-current="page" href="{% url "dashboard:index" %}">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{% url "devices:index" %}">Devices</a>
+                    <a class="nav-link {% if request.resolver_match.namespace == "devices" %}active{% endif %}" aria-current="page" href="{% url "devices:index" %}">Devices</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url "people:index" %}">People</a>
+                    <a class="nav-link {% if request.resolver_match.namespace == "people" %}active{% endif %}" aria-current="page" href="{% url "people:index" %}">People</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url "assignments:index" %}">Assignments</a>
+                    <a class="nav-link {% if request.resolver_match.namespace == "assignments" %}active{% endif %}" aria-current="page" href="{% url "assignments:index" %}">Assignments</a>
                 </li>
 
                 <li class="nav-item dropdown">
@@ -23,7 +23,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link disabled">Audit</a>
+                    <a class="nav-link disabled {% if request.resolver_match.namespace == "audit" %}active{% endif %}">Audit</a>
                 </li>
             </ul>
         </div>
