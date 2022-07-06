@@ -29,7 +29,7 @@ class DeviceModel(models.Model):
 
 class Device(models.Model):
     serial_number = models.CharField(max_length=255, unique=True)
-    asset_id = models.CharField(max_length=255, unique=True)
+    asset_id = models.CharField(max_length=255, unique=True, blank=True)
     notes = models.CharField(max_length=255, blank=True)
     status = models.ForeignKey(DeviceStatus, on_delete=models.PROTECT)
     google_id = models.CharField(
