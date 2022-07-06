@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "locations",
     "people",
     "assignments",
+    "profiles",
 ]
 
 MIDDLEWARE = [
@@ -154,6 +155,7 @@ LOGIN_REQUIRED_IGNORE_PATHS = [
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
     #'authentication'
 ]
+
 
 # Controls if the django-debug-toolbar is displayed
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
