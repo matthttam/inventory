@@ -17,6 +17,11 @@
                 <li class="nav-item">
                     <a class="nav-link disabled {% if request.resolver_match.namespace == "audit" %}active{% endif %}">Audit</a>
                 </li>
+                {% if user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.namespace == "googlesync" %}active{% endif %}" aria-current="page"  href="">GoogleSync</a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </div>
