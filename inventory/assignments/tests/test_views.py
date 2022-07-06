@@ -5,24 +5,34 @@ from people.tests.factories import PersonFactory
 from devices.tests.factories import DeviceFactory
 from assignments.models import DeviceAssignment
 from django.utils import timezone
-import datetime
+from authentication.tests.factories import UserFactory
+from django.contrib.auth.models import User
+from authentication.tests.decorators import assert_redirect_to_login
 
 
 class DeviceAssignmentListViewTest(TestCase):
-    def test_no_assignments(self):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory()
+
+    def setUp(self):
+        user = User.objects.get(id=1)
+        self.client.force_login(user)
+
+    def test_no_deviceassignments(self):
         response = self.client.get(reverse("assignments:index"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No assignments are available.")
         self.assertQuerysetEqual(response.context["object_list"], [])
 
-    def test_one_device(self):
+    def test_one_deviceassignment(self):
         device_assignments = DeviceAssignmentFactory()
         response = self.client.get(reverse("assignments:index"))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "No assignments are available.")
         self.assertQuerysetEqual(response.context["object_list"], [device_assignments])
 
-    def test_ten_devices(self):
+    def test_ten_deviceassignments(self):
         device_assignments = DeviceAssignmentFactory.create_batch(10)
         response = self.client.get(reverse("assignments:index"))
         self.assertEqual(response.status_code, 200)
@@ -33,6 +43,14 @@ class DeviceAssignmentListViewTest(TestCase):
 
 
 class DeviceAssignmentDetailViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory()
+
+    def setUp(self):
+        user = User.objects.get(id=1)
+        self.client.force_login(user)
+
     def test_invalid_deviceassignment(self):
         response = self.client.get(reverse("assignments:detail", args=[1]))
         self.assertEqual(response.status_code, 404)
@@ -50,6 +68,14 @@ class DeviceAssignmentDetailViewTest(TestCase):
 
 
 class DeviceAssignmentUpdateViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory()
+
+    def setUp(self):
+        user = User.objects.get(id=1)
+        self.client.force_login(user)
+
     def test_invalid_deviceassignment(self):
         response = self.client.get(reverse("assignments:edit", args=[1]))
         self.assertEqual(response.status_code, 404)
@@ -64,11 +90,19 @@ class DeviceAssignmentUpdateViewTest(TestCase):
 
 
 class DeviceAssignmentCreateViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory()
+
+    def setUp(self):
+        user = User.objects.get(id=1)
+        self.client.force_login(user)
+
     def test_new_deviceassignment(self):
         response = self.client.get(reverse("assignments:new", args=[]))
         self.assertEqual(response.status_code, 200)
 
-    def test_new_device_post(self):
+    def test_new_deviceassignment_post(self):
         device = DeviceFactory()
         person = PersonFactory()
         device_assignment_dict = {
@@ -85,3 +119,21 @@ class DeviceAssignmentCreateViewTest(TestCase):
             reverse("assignments:detail", kwargs={"pk": device_assignment_object.pk}),
             status_code=302,
         )
+
+
+class UnauthenticatedDeviceAssignmentViewTest(TestCase):
+    @assert_redirect_to_login(reverse("assignments:index"))
+    def test_device_assignment_list_redirects_to_login(self):
+        pass
+
+    @assert_redirect_to_login(reverse("assignments:detail", args=[1]))
+    def test_device_assignment_detail_redirects_to_login(self):
+        pass
+
+    @assert_redirect_to_login(reverse("assignments:edit", args=[1]))
+    def test_device_assignment_update_redirects_to_login(self):
+        pass
+
+    @assert_redirect_to_login(reverse("assignments:new"))
+    def test_device_assignment_create_redirects_to_login(self):
+        pass
