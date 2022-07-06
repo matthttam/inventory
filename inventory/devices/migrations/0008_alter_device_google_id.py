@@ -6,7 +6,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("devices", "0007_alter_device_google_id"),
+        # ("devices", "0007_alter_device_google_id"),
+        ("devices", "0007_device_google_sync_profile")
     ]
 
     operations = [
