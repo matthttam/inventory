@@ -101,8 +101,8 @@ class DeviceTest(TestCase):
         field_label = self.device._meta.get_field("asset_id").verbose_name
         self.assertEqual(field_label, "asset id")
 
-    def test_asset_id_required(self):
-        self.assertEqual(self.device._meta.get_field("asset_id").blank, False)
+    def test_asset_id_not_required(self):
+        self.assertEqual(self.device._meta.get_field("asset_id").blank, True)
         self.assertEqual(self.device._meta.get_field("asset_id").null, False)
 
     def test_asset_id_max_length(self):
