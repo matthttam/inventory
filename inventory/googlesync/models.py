@@ -122,7 +122,7 @@ class GoogleDeviceSyncProfile(models.Model):
     google_service_account_config = models.ForeignKey(
         GoogleServiceAccountConfig, on_delete=models.PROTECT
     )
-    google_org_unit_path = google_query = models.CharField(
+    google_org_unit_path = models.CharField(
         max_length=1024,
         default="",
         help_text="The full path of the organizational unit (minus the leading /) or its unique ID.",
@@ -179,3 +179,21 @@ class GoogleDeviceTranslation(models.Model):
 
     def __str__(self):
         return f"Translate {self.google_device_mapping.device_field!r} from {self.translate_from!r} to {self.translate_to!r}"
+
+
+class GoogleDevice(models.Model):
+    id = models.CharField(
+        max_length=255,
+        primary_key=True,
+    )
+    device_model = models.CharField(max_length=255, blank=True)
+    status = models.CharField(max_length=255, blank=True)
+    organization_unit = models.CharField(max_length=255, blank=True)
+    enrollment_time = models.DateTimeField(null=True, blank=True)
+    last_policy_sync = models.DateTimeField(null=True, blank=True)
+    location = models.CharField(max_length=255, blank=True)
+    most_recent_user = models.CharField(max_length=255, blank=True)
+    annotated_asset_id = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return f"{self.asset_id} ({self.serial_number}) - {self.device_model}"

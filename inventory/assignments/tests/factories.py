@@ -1,4 +1,3 @@
-from datetime import tzinfo
 import factory
 from faker import Faker
 

@@ -22,7 +22,7 @@ class DeviceManufacturerFactory(DjangoModelFactory):
     class Meta:
         model = DeviceManufacturer
 
-    name = fake.company()  # factory.Faker("catch_phrase")
+    name = fake.company()
 
 
 class DeviceStatusFactory(DjangoModelFactory):
