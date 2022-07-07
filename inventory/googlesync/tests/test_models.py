@@ -1,6 +1,6 @@
 from django.test import TestCase
 from people.tests.factories import PersonTypeFactory
-from people.models import PersonType
+from people.models import PersonType, Person
 from .factories import (
     GoogleConfigFactory,
     GoogleServiceAccountConfigFactory,
@@ -337,6 +337,89 @@ class GooglePersonMappingTest(TestCase):
 
     def setUp(self):
         self.google_person_mapping = GooglePersonMapping.objects.get(id=1)
+
+    def test_google_person_sync_profile_foreign_key(self):
+        self.assertEqual(
+            self.google_person_mapping._meta.get_field(
+                "google_person_sync_profile"
+            ).related_model,
+            GooglePersonSyncProfile,
+        )
+
+    def test_google_field_label(self):
+        field_label = self.google_person_mapping._meta.get_field(
+            "google_field"
+        ).verbose_name
+        self.assertEqual(field_label, "google field")
+
+    def test_google_field_max_length(self):
+        max_length = self.google_person_mapping._meta.get_field(
+            "google_field"
+        ).max_length
+        self.assertEqual(max_length, 255)
+
+    def test_person_field_label(self):
+        field_label = self.google_person_mapping._meta.get_field(
+            "person_field"
+        ).verbose_name
+        self.assertEqual(field_label, "person field")
+
+    def test_person_field_max_length(self):
+        max_length = self.google_person_mapping._meta.get_field(
+            "person_field"
+        ).max_length
+        self.assertEqual(max_length, 255)
+
+    def test_person_field_choices_not_contain_id(self):
+        choices = self.google_person_mapping._meta.get_field("person_field").choices
+        self.assertNotIn("id", choices)
+
+    def test_person_field_choices(self):
+        choices = self.google_person_mapping._meta.get_field("person_field").choices
+        potential_choices = [
+            (f.name, f.verbose_name) for f in Person._meta.fields if f.name != "id"
+        ]
+        self.assertCountEqual(potential_choices, choices)
+
+    def test_matching_priority_label(self):
+        field_label = self.google_person_mapping._meta.get_field(
+            "matching_priority"
+        ).verbose_name
+        self.assertEqual(field_label, "matching priority")
+
+    def test_matching_priority_choices(self):
+        choices = self.google_person_mapping._meta.get_field(
+            "matching_priority"
+        ).choices
+        potential_choices = [(x, x) for x in range(1, 10)]
+        self.assertCountEqual(potential_choices, choices)
+
+    def test_matching_priority_unique(self):
+        unique = self.google_person_mapping._meta.get_field("matching_priority").unique
+        self.assertTrue(unique)
+
+    def test_matching_priority_optional(self):
+        self.assertEqual(
+            self.google_person_mapping._meta.get_field("matching_priority").blank, True
+        )
+        self.assertEqual(
+            self.google_person_mapping._meta.get_field("matching_priority").null, True
+        )
+
+    ### Functions ###
+    def test___str__(self):
+        google_person_mapping = GooglePersonMappingFactory(
+            google_field="google field", person_field="person field"
+        )
+        self.assertEqual(
+            google_person_mapping.__str__(),
+            "google field => person field",
+        )
+
+    def test_get_absolute_url(self):
+        self.assertEqual(
+            self.google_person_mapping.get_absolute_url(), "/googlesync/personmapping/"
+        )
 
 
 class GooglePersonTranslationTest(TestCase):
