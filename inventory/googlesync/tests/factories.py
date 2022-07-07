@@ -35,9 +35,6 @@ class GoogleConfigFactory(DjangoModelFactory):
 
     client_id = fake.lexify(text="?" * 30)
     project_id = fake.lexify(text="?" * 30)
-    auth_uri = None
-    token_uri = None
-    auth_provider_x09_cert_url = None
     client_secret = fake.lexify(text="?" * 30)
 
 
@@ -45,15 +42,11 @@ class GoogleServiceAccountConfigFactory(DjangoModelFactory):
     class Meta:
         model = GoogleServiceAccountConfig
 
-    type = None
     project_id = fake.lexify(text="?" * 30)
     private_key_id = fake.lexify(text="?" * 30)
     private_key = fake.lexify(text="?" * 2000)
     client_email = fake.ascii_safe_email()
     client_id = fake.lexify(text="?" * 30)
-    auth_uri = None
-    token_uri = None
-    auth_provider_x09_cert_url = None
     client_x509_cert_url = fake.lexify(text="?" * 30)
     delegate = fake.ascii_safe_email()
     target = fake.url()
@@ -68,7 +61,6 @@ class GooglePersonSyncProfileFactory(DjangoModelFactory):
     google_service_account_config = factory.SubFactory(
         GoogleServiceAccountConfigFactory
     )
-    google_query = None
 
 
 class GooglePersonMappingFactory(DjangoModelFactory):
@@ -102,7 +94,6 @@ class GoogleDeviceSyncProfileFactory(DjangoModelFactory):
         GoogleServiceAccountConfigFactory
     )
     google_org_unit_path = fake.lexify(text="?" * 50)
-    google_query = None
 
 
 class GoogleDeviceMappingFactory(DjangoModelFactory):
@@ -114,7 +105,6 @@ class GoogleDeviceMappingFactory(DjangoModelFactory):
     device_field = fake.random_elements(
         elements=[f.name for f in Device._meta.fields if f.name != "id"],
     )[0]
-    matching_priority = None
 
 
 class GoogleDeviceTranslationFactory(DjangoModelFactory):

@@ -4,18 +4,25 @@ from people.models import Person, PersonType
 from devices.models import Device
 
 
-class GoogleConfig(models.Model):
+class GoogleConfigAbstract(models.Model):
     client_id = models.CharField(max_length=255)
     project_id = models.CharField(max_length=255)
-    auth_uri = models.CharField(
+    auth_uri = models.URLField(
         max_length=255, default="https://accounts.google.com/o/oauth2/auth"
     )
-    token_uri = models.CharField(
+    token_uri = models.URLField(
         max_length=255, default="https://oauth2.googleapis.com/token"
     )
-    auth_provider_x09_cert_url = models.CharField(
+    auth_provider_x509_cert_url = models.URLField(
         max_length=255, default="https://www.googleapis.com/oauth2/v1/certs"
     )
+
+    class Meta:
+        abstract = True
+
+
+class GoogleConfig(GoogleConfigAbstract):
+
     client_secret = models.CharField(max_length=255)
 
     def __str__(self):
@@ -25,23 +32,12 @@ class GoogleConfig(models.Model):
         return reverse("googlesync:config", kwargs={})
 
 
-class GoogleServiceAccountConfig(models.Model):
+class GoogleServiceAccountConfig(GoogleConfigAbstract):
     type = models.CharField(max_length=255, default="service_account")
-    project_id = models.CharField(max_length=255)
     private_key_id = models.CharField(max_length=255)
     private_key = models.TextField(max_length=2048)
     client_email = models.CharField(max_length=255)
-    client_id = models.CharField(max_length=255)
-    auth_uri = models.CharField(
-        max_length=255, default="https://accounts.google.com/o/oauth2/auth"
-    )
-    token_uri = models.CharField(
-        max_length=255, default="https://oauth2.googleapis.com/token"
-    )
-    auth_provider_x09_cert_url = models.CharField(
-        max_length=255, default="https://www.googleapis.com/oauth2/v1/certs"
-    )
-    client_x509_cert_url = models.CharField(max_length=255)
+    client_x509_cert_url = models.URLField(max_length=255)
     delegate = models.EmailField(
         max_length=255,
         help_text="User account to impersonate when accessing Google. User must have rights to the resources needed.",

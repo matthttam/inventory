@@ -1,11 +1,10 @@
 from django.db import models
-from django.forms import DateTimeInput
 from django.urls import reverse
 from devices.models import Device, DeviceAccessory
 from people.models import Person
 
 
-class Assignment(models.Model):
+class AssignmentAbstract(models.Model):
     assignment_datetime = models.DateTimeField(verbose_name="assignment date")
     return_datetime = models.DateTimeField(
         blank=True,
@@ -19,12 +18,12 @@ class Assignment(models.Model):
         abstract = True
 
 
-class DeviceAssignment(Assignment):
+class DeviceAssignment(AssignmentAbstract):
     device = models.ForeignKey(Device, on_delete=models.PROTECT)
 
     def get_absolute_url(self):
         return reverse("assignments:detail", kwargs={"pk": self.pk})
 
 
-class DeviceAccessoryAssignment(Assignment):
+class DeviceAccessoryAssignment(AssignmentAbstract):
     device_accessory = models.ForeignKey(DeviceAccessory, on_delete=models.PROTECT)
