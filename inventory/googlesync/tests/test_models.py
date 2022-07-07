@@ -430,6 +430,51 @@ class GooglePersonTranslationTest(TestCase):
     def setUp(self):
         self.google_person_translation = GooglePersonTranslation.objects.get(id=1)
 
+    def test_google_person_mapping_foreign_key(self):
+        self.assertEqual(
+            self.google_person_translation._meta.get_field(
+                "google_person_mapping"
+            ).related_model,
+            GooglePersonMapping,
+        )
+
+    def test_translate_from_label(self):
+        field_label = self.google_person_translation._meta.get_field(
+            "translate_from"
+        ).verbose_name
+        self.assertEqual(field_label, "translate from")
+
+    def test_translate_from_max_length(self):
+        max_length = self.google_person_translation._meta.get_field(
+            "translate_from"
+        ).max_length
+        self.assertEqual(max_length, 255)
+
+    def test_translate_to_label(self):
+        field_label = self.google_person_translation._meta.get_field(
+            "translate_to"
+        ).verbose_name
+        self.assertEqual(field_label, "translate to")
+
+    def test_translate_to_max_length(self):
+        max_length = self.google_person_translation._meta.get_field(
+            "translate_to"
+        ).max_length
+        self.assertEqual(max_length, 255)
+
+    ### Functions ###
+    def test___str__(self):
+        google_person_mapping = GooglePersonMappingFactory(person_field="person field")
+        google_person_translation = GooglePersonTranslationFactory(
+            google_person_mapping=google_person_mapping,
+            translate_from="translate from",
+            translate_to="translate to",
+        )
+        self.assertEqual(
+            google_person_translation.__str__(),
+            "Translate 'person field' from 'translate from' to 'translate to'",
+        )
+
 
 class GoogleDeviceSyncProfileTest(TestCase):
     @classmethod
