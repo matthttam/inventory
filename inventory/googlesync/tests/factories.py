@@ -130,6 +130,7 @@ class GoogleDeviceFactory(DjangoModelFactory):
         model = GoogleDevice
 
     id = factory.LazyFunction(lambda: fake.unique.numerify(text="%###################"))
+    serial_number = factory.Sequence(lambda n: f"SN-{n}")
     device_model = fake.lexify(text="?" * 30)
     status = fake.lexify(text="?" * 30)
     organization_unit = fake.lexify(text="?" * 30)
