@@ -5,11 +5,11 @@ from .factories import (
     GoogleConfigFactory,
     GoogleServiceAccountConfigFactory,
     GooglePersonSyncProfileFactory,
-    GooglePersonMappingFactory,
-    GooglePersonTranslationFactory,
-    GooglePersonTranslationFactory,
     GoogleDeviceSyncProfileFactory,
+    GooglePersonMappingFactory,
     GoogleDeviceMappingFactory,
+    GooglePersonTranslationFactory,
+    GoogleDeviceTranslationFactory,
     GoogleDeviceFactory,
 )
 from googlesync.models import (
@@ -17,11 +17,12 @@ from googlesync.models import (
     GoogleConfig,
     GoogleServiceAccountConfig,
     GooglePersonSyncProfile,
-    GooglePersonMapping,
-    GooglePersonTranslation,
-    GooglePersonTranslation,
     GoogleDeviceSyncProfile,
+    GooglePersonMapping,
     GoogleDeviceMapping,
+    TranslationAbstract,
+    GooglePersonTranslation,
+    GoogleDeviceTranslation,
     GoogleDevice,
 )
 
@@ -125,6 +126,9 @@ class GoogleConfigTest(TestCase):
     def test_client_secret_max_length(self):
         max_length = self.google_config._meta.get_field("client_secret").max_length
         self.assertEqual(max_length, 255)
+
+    def test_subclass(self):
+        self.assertTrue(issubclass(GoogleConfig, GoogleConfigAbstract))
 
 
 class GoogleServiceAccountConfigTest(TestCase):
@@ -252,6 +256,9 @@ class GoogleServiceAccountConfigTest(TestCase):
             help_text,
             "Google domain name to connect to (e.g. my.site.com)",
         )
+
+    def test_subclass(self):
+        self.assertTrue(issubclass(GoogleServiceAccountConfig, GoogleConfigAbstract))
 
     ### Functions ###
     def test___str__(self):
@@ -422,6 +429,27 @@ class GooglePersonMappingTest(TestCase):
         )
 
 
+class TranslationAbstractTest(TestCase):
+    def test_is_abstract(self):
+        self.assertTrue(TranslationAbstract._meta.abstract)
+
+    def test_translate_from_label(self):
+        field_label = TranslationAbstract._meta.get_field("translate_from").verbose_name
+        self.assertEqual(field_label, "translate from")
+
+    def test_translate_from_max_length(self):
+        max_length = TranslationAbstract._meta.get_field("translate_from").max_length
+        self.assertEqual(max_length, 255)
+
+    def test_translate_to_label(self):
+        field_label = TranslationAbstract._meta.get_field("translate_to").verbose_name
+        self.assertEqual(field_label, "translate to")
+
+    def test_translate_to_max_length(self):
+        max_length = TranslationAbstract._meta.get_field("translate_to").max_length
+        self.assertEqual(max_length, 255)
+
+
 class GooglePersonTranslationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -438,29 +466,8 @@ class GooglePersonTranslationTest(TestCase):
             GooglePersonMapping,
         )
 
-    def test_translate_from_label(self):
-        field_label = self.google_person_translation._meta.get_field(
-            "translate_from"
-        ).verbose_name
-        self.assertEqual(field_label, "translate from")
-
-    def test_translate_from_max_length(self):
-        max_length = self.google_person_translation._meta.get_field(
-            "translate_from"
-        ).max_length
-        self.assertEqual(max_length, 255)
-
-    def test_translate_to_label(self):
-        field_label = self.google_person_translation._meta.get_field(
-            "translate_to"
-        ).verbose_name
-        self.assertEqual(field_label, "translate to")
-
-    def test_translate_to_max_length(self):
-        max_length = self.google_person_translation._meta.get_field(
-            "translate_to"
-        ).max_length
-        self.assertEqual(max_length, 255)
+    def test_subclass(self):
+        self.assertTrue(issubclass(GooglePersonTranslation, TranslationAbstract))
 
     ### Functions ###
     def test___str__(self):
@@ -497,10 +504,18 @@ class GoogleDeviceMappingTest(TestCase):
 class GoogleDeviceTranslationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        GoogleDeviceFactory()
+        GoogleDeviceTranslationFactory()
 
     def setUp(self):
-        self.google_device_translation = GoogleDevice.objects.get(id=1)
+        self.google_device_translation = GoogleDeviceTranslation.objects.get(id=1)
+
+    def test_person_type_foreign_key(self):
+        self.assertEqual(
+            self.google_device_translation._meta.get_field(
+                "google_device_mapping"
+            ).related_model,
+            GoogleDeviceMapping,
+        )
 
 
 class GoogleDeviceTest(TestCase):

@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from django.db import models
 from django.urls import reverse
 from people.models import Person, PersonType
@@ -53,13 +54,20 @@ class GoogleServiceAccountConfig(GoogleConfigAbstract):
         return reverse("googlesync:service_account_config", kwargs={})
 
 
-# Person sync profile
-class GooglePersonSyncProfile(models.Model):
+class SyncProfile(models.Model):
     name = models.CharField(max_length=255)
-    person_type = models.ForeignKey(PersonType, on_delete=models.PROTECT)
+
     google_service_account_config = models.ForeignKey(
         GoogleServiceAccountConfig, on_delete=models.PROTECT
     )
+
+    class Meta:
+        abstract = True
+
+
+# Person sync profile
+class GooglePersonSyncProfile(SyncProfile):
+    person_type = models.ForeignKey(PersonType, on_delete=models.PROTECT)
     google_query = models.CharField(
         max_length=1024,
         default="orgUnitPath=/",
@@ -71,53 +79,7 @@ class GooglePersonSyncProfile(models.Model):
         return f"{self.name} ({self.person_type}: {self.google_service_account_config})"
 
 
-class GooglePersonMapping(models.Model):
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["google_person_sync_profile", "person_field"],
-                name="unique_google_person_sync_profile_and_person_field",
-            )
-        ]
-
-    google_person_sync_profile = models.ForeignKey(
-        GooglePersonSyncProfile, on_delete=models.PROTECT
-    )
-    google_field = models.CharField(max_length=255)
-    person_field = models.CharField(
-        max_length=255,
-        choices=[
-            (f.name, f.verbose_name) for f in Person._meta.fields if f.name != "id"
-        ],
-    )
-    matching_priority = models.IntegerField(
-        choices=[(x, x) for x in range(1, 10)], unique=True, blank=True, null=True
-    )
-
-    def __str__(self):
-        return f"{self.google_field} => {self.person_field}"
-
-    def get_absolute_url(self):
-        return reverse("googlesync:person_mapping", kwargs={})
-
-
-class GooglePersonTranslation(models.Model):
-    google_person_mapping = models.ForeignKey(
-        GooglePersonMapping, on_delete=models.CASCADE, default=1
-    )
-    translate_from = models.CharField(max_length=255)
-    translate_to = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"Translate {self.google_person_mapping.person_field!r} from {self.translate_from!r} to {self.translate_to!r}"
-
-
-# Device Sync Settings
-class GoogleDeviceSyncProfile(models.Model):
-    name = models.CharField(max_length=255)
-    google_service_account_config = models.ForeignKey(
-        GoogleServiceAccountConfig, on_delete=models.PROTECT
-    )
+class GoogleDeviceSyncProfile(SyncProfile):
     google_org_unit_path = models.CharField(
         max_length=1024,
         default="",
@@ -135,43 +97,77 @@ class GoogleDeviceSyncProfile(models.Model):
         return f"{self.name} (Devices: {self.google_service_account_config})"
 
 
-class GoogleDeviceMapping(models.Model):
+class MappingAbstract(models.Model):
+    from_field = models.CharField(max_length=255)
+    to_field = models.CharField(max_length=255)
+    matching_priority = models.IntegerField(
+        choices=[(x, x) for x in range(1, 10)], unique=True, blank=True, null=True
+    )
+
     class Meta:
+        abstract = True
         constraints = [
             models.UniqueConstraint(
-                fields=["google_device_sync_profile", "device_field"],
-                name="unique_google_device_sync_profile_and_device_field",
+                fields=["sync_profile", "to_field"],
+                name="unique_sync_profile_and_to_field_in_%(class)s",
             )
         ]
 
-    google_device_sync_profile = models.ForeignKey(
-        GoogleDeviceSyncProfile, on_delete=models.PROTECT
+    def __str__(self):
+        return f"{self.from_field} => {self.to_field}"
+
+
+class GooglePersonMapping(MappingAbstract):
+    sync_profile = models.ForeignKey(GooglePersonSyncProfile, on_delete=models.PROTECT)
+    to_field = models.CharField(
+        max_length=255,
+        choices=[
+            (f.name, f.verbose_name) for f in Person._meta.fields if f.name != "id"
+        ],
     )
-    google_field = models.CharField(max_length=255)
-    device_field = models.CharField(
+
+    def __str__(self):
+        return f"{self.google_field} => {self.person_field}"
+
+    def get_absolute_url(self):
+        return reverse("googlesync:person_mapping", kwargs={})
+
+
+class GoogleDeviceMapping(MappingAbstract):
+    sync_profile = models.ForeignKey(GoogleDeviceSyncProfile, on_delete=models.PROTECT)
+
+    to_field = models.CharField(
         max_length=255,
         choices=[
             (f.name, f.verbose_name) for f in Device._meta.fields if f.name != "id"
         ],
     )
-    matching_priority = models.IntegerField(
-        choices=[(x, x) for x in range(1, 10)], unique=True, blank=True, null=True
-    )
-
-    def __str__(self):
-        return f"{self.google_field} => {self.device_field}"
 
     def get_absolute_url(self):
         return reverse("googlesync:device_mapping", kwargs={})
 
 
-class GoogleDeviceTranslation(models.Model):
+class TranslationAbstract(models.Model):
+    translate_from = models.CharField(max_length=255)
+    translate_to = models.CharField(max_length=255)
+
+    class Meta:
+        abstract = True
+
+
+class GooglePersonTranslation(TranslationAbstract):
+    google_person_mapping = models.ForeignKey(
+        GooglePersonMapping, on_delete=models.CASCADE, default=1
+    )
+
+    def __str__(self):
+        return f"Translate {self.google_person_mapping.person_field!r} from {self.translate_from!r} to {self.translate_to!r}"
+
+
+class GoogleDeviceTranslation(TranslationAbstract):
     google_device_mapping = models.ForeignKey(
         GoogleDeviceMapping, on_delete=models.CASCADE, default=1
     )
-
-    translate_from = models.CharField(max_length=255)
-    translate_to = models.CharField(max_length=255)
 
     def __str__(self):
         return f"Translate {self.google_device_mapping.device_field!r} from {self.translate_from!r} to {self.translate_to!r}"

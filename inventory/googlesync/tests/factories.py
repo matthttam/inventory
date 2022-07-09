@@ -67,9 +67,9 @@ class GooglePersonMappingFactory(DjangoModelFactory):
     class Meta:
         model = GooglePersonMapping
 
-    google_person_sync_profile = factory.SubFactory(GooglePersonSyncProfileFactory)
-    google_field = fake.lexify(text="?" * 30)
-    person_field = fake.random_elements(
+    sync_profile = factory.SubFactory(GooglePersonSyncProfileFactory)
+    from_field = fake.lexify(text="?" * 30)
+    to_field = fake.random_elements(
         elements=[f.name for f in Person._meta.fields if f.name != "id"],
         length=1,
     )[0]
@@ -100,9 +100,9 @@ class GoogleDeviceMappingFactory(DjangoModelFactory):
     class Meta:
         model = GoogleDeviceMapping
 
-    google_device_sync_profile = factory.SubFactory(GoogleDeviceSyncProfileFactory)
-    google_field = fake.lexify(text="?" * 30)
-    device_field = fake.random_elements(
+    sync_profile = factory.SubFactory(GoogleDeviceSyncProfileFactory)
+    from_field = fake.lexify(text="?" * 30)
+    to_field = fake.random_elements(
         elements=[f.name for f in Device._meta.fields if f.name != "id"],
     )[0]
 
@@ -111,6 +111,7 @@ class GoogleDeviceTranslationFactory(DjangoModelFactory):
     class Meta:
         model = GoogleDeviceTranslation
 
+    google_device_mapping = factory.SubFactory(GoogleDeviceMappingFactory)
     translate_from = fake.lexify(text="?" * 30)
     translate_to = fake.lexify(text="?" * 30)
 

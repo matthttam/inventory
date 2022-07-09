@@ -25,9 +25,9 @@ class GoogleServiceAccountConfigAdmin(admin.ModelAdmin):
 @admin.register(GooglePersonMapping)
 class GooglePersonMappingAdmin(admin.ModelAdmin):
     list_display = (
-        "google_person_sync_profile",
-        "google_field",
-        "person_field",
+        "sync_profile",
+        "from_field",
+        "to_field",
         "matching_priority",
     )
 
@@ -45,9 +45,9 @@ class GooglePersonSyncProfileAdmin(admin.ModelAdmin):
 @admin.register(GoogleDeviceMapping)
 class GoogleDeviceMappingAdmin(admin.ModelAdmin):
     list_display = (
-        "google_device_sync_profile",
-        "google_field",
-        "device_field",
+        "sync_profile",
+        "from_field",
+        "to_field",
         "matching_priority",
     )
 
