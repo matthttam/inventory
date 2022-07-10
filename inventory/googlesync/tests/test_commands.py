@@ -285,7 +285,7 @@ class SyncGooglePeopleTest(TestCase):
         google_person_sync1 = GooglePersonSyncProfile.objects.get(id=1)
         google_person_sync2 = GooglePersonSyncProfile.objects.get(id=2)
 
-        ("sync_google_people", "real_sync_profile")
+        call_command("sync_google_people", "real_sync_profile")
 
         mock_sync_google_people.assert_called_with(google_person_sync1)
         mock_sync_google_people.asssert_not_called_with(google_person_sync2)
