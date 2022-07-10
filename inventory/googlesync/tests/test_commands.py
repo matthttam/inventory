@@ -169,19 +169,3 @@ class GoogleSyncTest(TestCase):
         }
         with self.assertRaises(KeyError):
             command._extract_from_dictionary(dictionary=dictionary, keys=["zz"])
-
-    # @patch("googlesync.management.commands._google_sync.GoogleSyncCommand")
-    # @patch("googlesync.management.commands._google_sync.GoogleSyncCommand.__init__")
-    # @patch("googlesync.management.commands._google_sync.GoogleSyncCommand._get_customer_service")
-    # def test__get_google_config_without_config_raises_config_not_found_error(
-    #    self, mock__get_customer_service
-    # ):
-    #    # sync_command = GoogleSyncCommand()
-    #    # with self.assertRaises(ConfigNotFound):
-    #    # mock_sync_command._get_google_config()
-    #    # dir(mock_sync_command._get_google_config)
-    #    mock__get_customer_service.return_value = {""}
-    #    mock_init._get_customer_service = None
-    #    mock_init.side_effect = lambda self: super().__init__(*args, **kwargs)
-    #    sync_command = GoogleSyncCommand()
-    #    sync_command._get_google_config()
