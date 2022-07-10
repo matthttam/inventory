@@ -18,24 +18,33 @@ class Command(GoogleSyncCommand):
     help = "Syncs google users to inventory people."
 
     def add_arguments(self, parser):
-        parser.add_argument("profiles", nargs="+")
+        parser.add_argument("profiles", nargs="+", help="list each profile to sync")
 
     def handle(self, *args, **options):
         profile_names = options.get("profiles")
 
+        # Get each sync profile based on profile names passed
+        self.sync_profiles = []
         for profile_name in profile_names:
-            self.sync_google_people(profile_name)
+            self.sync_profiles.append(self._get_person_sync_profile(profile_name))
 
-        self.stdout.write(self.style.SUCCESS("Sync Complete!"))
+        # Loop over each sync profile and sync people
+        for sync_profile in self.sync_profiles:
+            self.stdout.write(
+                self.style.NOTICE(f"Starting people sync: {sync_profile.name}")
+            )
+            self.sync_google_people(sync_profile)
 
-    def sync_google_people(self, profile_name):
-        self.stdout.write(self.style.NOTICE(f"Starting people sync: {profile_name}"))
+        self.stdout.write(self.style.SUCCESS("Done"))
 
+    def _get_person_sync_profile(self, profile_name):
         try:
             sync_profile = GooglePersonSyncProfile.objects.get(name=profile_name)
         except GooglePersonSyncProfile.DoesNotExist:
             raise SyncProfileNotFound(profile_name=profile_name)
+        return sync_profile
 
+    def sync_google_people(self, sync_profile):
         users = self._get_users_service()
         person_records = []
         request = users.list(
@@ -77,7 +86,7 @@ class Command(GoogleSyncCommand):
 
             # Use lookup ids in order of matching_priority
             lookup_ids = [
-                x.person_field
+                x.to_field
                 for x in GooglePersonMapping.objects.exclude(
                     matching_priority=None
                 ).order_by("matching_priority")
@@ -140,11 +149,11 @@ class Command(GoogleSyncCommand):
 
         for mapping in mappings:
             try:
-                person[mapping.person_field] = self._extract_from_dictionary(
-                    user, mapping.google_field.split(".")
+                person[mapping.to_field] = self._extract_from_dictionary(
+                    user, mapping.from_field.split(".")
                 )
             except KeyError:
-                person[mapping.person_field] = None
+                person[mapping.to_field] = None
 
             # Use translations to convert one value to another
             translations = GooglePersonTranslation.objects.filter(
@@ -152,8 +161,8 @@ class Command(GoogleSyncCommand):
             )
 
             for translation in translations:
-                if str(person[mapping.person_field]) == translation.translate_from:
-                    person[mapping.person_field] = translation.translate_to
+                if str(person[mapping.to_field]) == translation.translate_from:
+                    person[mapping.to_field] = translation.translate_to
 
         person["type"] = sync_profile.person_type
         person["status"] = PersonStatus.objects.filter(name=person["status"]).first()

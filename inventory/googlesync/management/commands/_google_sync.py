@@ -38,7 +38,11 @@ class GoogleSyncCommand(BaseCommand):
         return credentials_delegated
 
     def _get_my_customer(self):
+        customer_resource = self._get_customer_service()
+        request = customer_resource.get(customerKey="my_customer")
+        return request.execute()
 
+    def _get_customer_service(self):
         service = googleapiclient.discovery.build(
             "admin",
             "directory_v1",
@@ -48,9 +52,7 @@ class GoogleSyncCommand(BaseCommand):
                 ]
             ),
         )
-        customer_resource = service.customers()
-        request = customer_resource.get(customerKey="my_customer")
-        return request.execute()
+        return service.customers()
 
     def _get_chromeosdevices_service(self):
         service = googleapiclient.discovery.build(
@@ -76,6 +78,8 @@ class GoogleSyncCommand(BaseCommand):
         return service.users()
 
     def _extract_from_dictionary(self, dictionary: dict, keys: list):
+        if not keys:
+            return None
         value = dictionary
         for key in keys:
             value = value[key]
