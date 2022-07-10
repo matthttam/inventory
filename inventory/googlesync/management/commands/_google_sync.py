@@ -12,9 +12,13 @@ from googlesync.exceptions import ConfigNotFound
 class GoogleSyncCommand(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        customer_service = self._get_customer_service()
-        request = customer_service.get(customerKey="my_customer")
-        self.customer = request.execute()
+
+        # Get the google config
+        self.google_config = self._get_google_config()
+        self.DELEGATE = self.google_config.pop("delegate")
+
+        # Retreive current customer information used by other services
+        self.customer = self._get_my_customer()
 
     def _get_google_config(self) -> dict:
         try:
@@ -26,44 +30,48 @@ class GoogleSyncCommand(BaseCommand):
         return google_config
 
     def _get_google_credentials(self, scopes: list):
-        # Verify service account google config exists
-        google_config = self._get_google_config()
-
-        self.DELEGATE = google_config.pop("delegate")
         # Parse the config into a json string and load it into a json object
-        service_account_info = json.loads(json.dumps(google_config))
         credentials = service_account.Credentials.from_service_account_info(
-            service_account_info, scopes=scopes
+            json.loads(json.dumps(self.google_config)), scopes=scopes
         )
-
         credentials_delegated = credentials.with_subject(self.DELEGATE)
-
         return credentials_delegated
 
-    def _get_customer_service(self):
-        SCOPES = ["https://www.googleapis.com/auth/admin.directory.customer.readonly"]
-        credentials = self._get_google_credentials(scopes=SCOPES)
+    def _get_my_customer(self):
+
         service = googleapiclient.discovery.build(
-            "admin", "directory_v1", credentials=credentials
+            "admin",
+            "directory_v1",
+            credentials=self._get_google_credentials(
+                scopes=[
+                    "https://www.googleapis.com/auth/admin.directory.customer.readonly"
+                ]
+            ),
         )
-        return service.customers()
+        customer_resource = service.customers()
+        request = customer_resource.get(customerKey="my_customer")
+        return request.execute()
 
     def _get_chromeosdevices_service(self):
-        SCOPES = [
-            "https://www.googleapis.com/auth/admin.directory.device.chromeos.readonly",
-            "https://www.googleapis.com/auth/admin.directory.device.chromeos",
-        ]
-        credentials = self._get_google_credentials(scopes=SCOPES)
         service = googleapiclient.discovery.build(
-            "admin", "directory_v1", credentials=credentials
+            "admin",
+            "directory_v1",
+            credentials=self._get_google_credentials(
+                scopes=[
+                    "https://www.googleapis.com/auth/admin.directory.device.chromeos.readonly",
+                    "https://www.googleapis.com/auth/admin.directory.device.chromeos",
+                ]
+            ),
         )
         return service.chromeosdevices()
 
     def _get_users_service(self):
-        SCOPES = ["https://www.googleapis.com/auth/admin.directory.user.readonly"]
-        credentials = self._get_google_credentials(scopes=SCOPES)
         service = googleapiclient.discovery.build(
-            "admin", "directory_v1", credentials=credentials
+            "admin",
+            "directory_v1",
+            credentials=self._get_google_credentials(
+                scopes=["https://www.googleapis.com/auth/admin.directory.user.readonly"]
+            ),
         )
         return service.users()
 

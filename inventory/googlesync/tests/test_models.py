@@ -1,6 +1,8 @@
 from django.test import TestCase
+from unittest.mock import patch
 from people.tests.factories import PersonTypeFactory
 from people.models import PersonType, Person
+from devices.models import Device
 from .factories import (
     GoogleConfigFactory,
     GoogleServiceAccountConfigFactory,
@@ -16,8 +18,10 @@ from googlesync.models import (
     GoogleConfigAbstract,
     GoogleConfig,
     GoogleServiceAccountConfig,
+    GoogleSyncProfileAbstract,
     GooglePersonSyncProfile,
     GoogleDeviceSyncProfile,
+    MappingAbstract,
     GooglePersonMapping,
     GoogleDeviceMapping,
     TranslationAbstract,
@@ -119,6 +123,9 @@ class GoogleConfigTest(TestCase):
     def setUp(self):
         self.google_config = GoogleConfig.objects.get(id=1)
 
+    def test_subclass(self):
+        self.assertTrue(issubclass(GoogleConfig, GoogleConfigAbstract))
+
     def test_client_secret_label(self):
         field_label = self.google_config._meta.get_field("client_secret").verbose_name
         self.assertEqual(field_label, "client secret")
@@ -127,8 +134,16 @@ class GoogleConfigTest(TestCase):
         max_length = self.google_config._meta.get_field("client_secret").max_length
         self.assertEqual(max_length, 255)
 
-    def test_subclass(self):
-        self.assertTrue(issubclass(GoogleConfig, GoogleConfigAbstract))
+    ### Functions ###
+    def test___str__(self):
+        google_config = GoogleConfigFactory(project_id="TEST_PROJECT_ID")
+        self.assertEqual(google_config.__str__(), "TEST_PROJECT_ID")
+
+    def test_get_absolute_url(self):
+        self.assertEqual(
+            self.google_config.get_absolute_url(),
+            "/googlesync/config/",
+        )
 
 
 class GoogleServiceAccountConfigTest(TestCase):
@@ -140,6 +155,9 @@ class GoogleServiceAccountConfigTest(TestCase):
         self.google_service_account_config = GoogleServiceAccountConfig.objects.get(
             id=1
         )
+
+    def test_subclass(self):
+        self.assertTrue(issubclass(GoogleServiceAccountConfig, GoogleConfigAbstract))
 
     def test_type_label(self):
         field_label = self.google_service_account_config._meta.get_field(
@@ -257,9 +275,6 @@ class GoogleServiceAccountConfigTest(TestCase):
             "Google domain name to connect to (e.g. my.site.com)",
         )
 
-    def test_subclass(self):
-        self.assertTrue(issubclass(GoogleServiceAccountConfig, GoogleConfigAbstract))
-
     ### Functions ###
     def test___str__(self):
         google_service_account_config = GoogleServiceAccountConfigFactory(
@@ -271,10 +286,30 @@ class GoogleServiceAccountConfigTest(TestCase):
         )
 
     def test_get_absolute_url(self):
-        google_service_account_config = GoogleServiceAccountConfig.objects.get(id=1)
         self.assertEqual(
-            google_service_account_config.get_absolute_url(),
+            self.google_service_account_config.get_absolute_url(),
             "/googlesync/serviceaccount/",
+        )
+
+
+class GoogleSyncProfileAbstractTest(TestCase):
+    def test_is_abstract(self):
+        self.assertTrue(GoogleConfigAbstract._meta.abstract)
+
+    def test_name_label(self):
+        field_label = GoogleSyncProfileAbstract._meta.get_field("name").verbose_name
+        self.assertEqual(field_label, "name")
+
+    def test_name_max_length(self):
+        max_length = GoogleSyncProfileAbstract._meta.get_field("name").max_length
+        self.assertEqual(max_length, 255)
+
+    def test_google_service_account_config_foreign_key(self):
+        self.assertEqual(
+            GoogleSyncProfileAbstract._meta.get_field(
+                "google_service_account_config"
+            ).related_model,
+            GoogleServiceAccountConfig,
         )
 
 
@@ -286,15 +321,8 @@ class GooglePersonSyncProfileTest(TestCase):
     def setUp(self):
         self.google_person_sync_profile = GooglePersonSyncProfile.objects.get(id=1)
 
-    def test_name_label(self):
-        field_label = self.google_person_sync_profile._meta.get_field(
-            "name"
-        ).verbose_name
-        self.assertEqual(field_label, "name")
-
-    def test_name_max_length(self):
-        max_length = self.google_person_sync_profile._meta.get_field("name").max_length
-        self.assertEqual(max_length, 255)
+    def test_subclass(self):
+        self.assertTrue(issubclass(GooglePersonSyncProfile, GoogleSyncProfileAbstract))
 
     def test_person_type_foreign_key(self):
         self.assertEqual(
@@ -302,14 +330,6 @@ class GooglePersonSyncProfileTest(TestCase):
                 "person_type"
             ).related_model,
             PersonType,
-        )
-
-    def test_google_service_account_config_foreign_key(self):
-        self.assertEqual(
-            self.google_person_sync_profile._meta.get_field(
-                "google_service_account_config"
-            ).related_model,
-            GoogleServiceAccountConfig,
         )
 
     def test_google_query_label(self):
@@ -324,6 +344,30 @@ class GooglePersonSyncProfileTest(TestCase):
         ).max_length
         self.assertEqual(max_length, 1024)
 
+    def test_google_query_optional(self):
+        self.assertEqual(
+            self.google_person_sync_profile._meta.get_field("google_query").blank, True
+        )
+        self.assertEqual(
+            self.google_person_sync_profile._meta.get_field("google_query").null,
+            False,
+        )
+
+    def test_google_query_default_value(self):
+        default = self.google_person_sync_profile._meta.get_field(
+            "google_query"
+        ).default
+        self.assertEqual(default, "orgUnitPath=/")
+
+    def test_google_query_help_text(self):
+        help_text = self.google_person_sync_profile._meta.get_field(
+            "google_query"
+        ).help_text
+        self.assertEqual(
+            help_text,
+            "Google API query to use when searching for users to sync for this profile. (e.g. 'orgUnitPath=/Staff'). Query documentation: https://developers.google.com/admin-sdk/directory/v1/guides/search-users",
+        )
+
     ### Functions ###
     def test___str__(self):
         person_type = PersonTypeFactory()
@@ -337,6 +381,161 @@ class GooglePersonSyncProfileTest(TestCase):
         )
 
 
+class GoogleDeviceSyncProfileTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        GoogleDeviceSyncProfileFactory()
+
+    def setUp(self):
+        self.google_device_sync_profile = GoogleDeviceSyncProfile.objects.get(id=1)
+
+    def test_subclass(self):
+        self.assertTrue(issubclass(GoogleDeviceSyncProfile, GoogleSyncProfileAbstract))
+
+    def test_google_org_unit_path_label(self):
+        field_label = self.google_device_sync_profile._meta.get_field(
+            "google_org_unit_path"
+        ).verbose_name
+        self.assertEqual(field_label, "google org unit path")
+
+    def test_google_org_unit_path_max_length(self):
+        max_length = self.google_device_sync_profile._meta.get_field(
+            "google_org_unit_path"
+        ).max_length
+        self.assertEqual(max_length, 1024)
+
+    def test_google_org_unit_path_optional(self):
+        self.assertEqual(
+            self.google_device_sync_profile._meta.get_field(
+                "google_org_unit_path"
+            ).blank,
+            True,
+        )
+        self.assertEqual(
+            self.google_device_sync_profile._meta.get_field(
+                "google_org_unit_path"
+            ).null,
+            False,
+        )
+
+    def test_google_org_unit_path_default_value(self):
+        default = self.google_device_sync_profile._meta.get_field(
+            "google_org_unit_path"
+        ).default
+        self.assertEqual(default, "")
+
+    def test_google_org_unit_path_help_text(self):
+        help_text = self.google_device_sync_profile._meta.get_field(
+            "google_org_unit_path"
+        ).help_text
+        self.assertEqual(
+            help_text,
+            "The full path of the organizational unit (minus the leading /) or its unique ID.",
+        )
+
+    def test_google_query_label(self):
+        field_label = self.google_device_sync_profile._meta.get_field(
+            "google_query"
+        ).verbose_name
+        self.assertEqual(field_label, "google query")
+
+    def test_google_query_max_length(self):
+        max_length = self.google_device_sync_profile._meta.get_field(
+            "google_query"
+        ).max_length
+        self.assertEqual(max_length, 1024)
+
+    def test_google_query_optional(self):
+        self.assertEqual(
+            self.google_device_sync_profile._meta.get_field("google_query").blank, True
+        )
+        self.assertEqual(
+            self.google_device_sync_profile._meta.get_field("google_query").null,
+            False,
+        )
+
+    def test_google_query_default_value(self):
+        default = self.google_device_sync_profile._meta.get_field(
+            "google_query"
+        ).default
+        self.assertEqual(default, "")
+
+    def test_google_query_help_text(self):
+        help_text = self.google_device_sync_profile._meta.get_field(
+            "google_query"
+        ).help_text
+        self.assertEqual(
+            help_text,
+            "Google API query to use when searching for devices to sync for this profile. (e.g. 'location:seattle'). Query documentation: https://developers.google.com/admin-sdk/directory/v1/list-query-operators",
+        )
+
+    ### Functions ###
+    def test___str__(self):
+        GooglePersonSyncProfileFactory()
+        person_type = PersonTypeFactory()
+        google_service_account_config = GoogleServiceAccountConfigFactory()
+        google_person_sync_profile = GooglePersonSyncProfileFactory(
+            name="test_profile_name", person_type=person_type
+        )
+        self.assertEqual(
+            google_person_sync_profile.__str__(),
+            f"test_profile_name ({person_type.__str__()}: {google_service_account_config.__str__()})",
+        )
+
+
+class MappingAbstractTest(TestCase):
+    def test_is_abstract(self):
+        self.assertTrue(MappingAbstract._meta.abstract)
+
+    def test_from_field_label(self):
+        field_label = MappingAbstract._meta.get_field("from_field").verbose_name
+        self.assertEqual(field_label, "from field")
+
+    def test_from_field_max_length(self):
+        max_length = MappingAbstract._meta.get_field("from_field").max_length
+        self.assertEqual(max_length, 255)
+
+    def test_to_field_label(self):
+        field_label = MappingAbstract._meta.get_field("to_field").verbose_name
+        self.assertEqual(field_label, "to field")
+
+    def test_to_field_max_length(self):
+        max_length = MappingAbstract._meta.get_field("to_field").max_length
+        self.assertEqual(max_length, 255)
+
+    def test_matching_priority_label(self):
+        field_label = MappingAbstract._meta.get_field("matching_priority").verbose_name
+        self.assertEqual(field_label, "matching priority")
+
+    def test_matching_priority_choices(self):
+        choices = MappingAbstract._meta.get_field("matching_priority").choices
+        potential_choices = [(x, x) for x in range(1, 10)]
+        self.assertCountEqual(potential_choices, choices)
+
+    def test_matching_priority_unique(self):
+        unique = MappingAbstract._meta.get_field("matching_priority").unique
+        self.assertTrue(unique)
+
+    def test_matching_priority_optional(self):
+        self.assertEqual(
+            MappingAbstract._meta.get_field("matching_priority").blank, True
+        )
+        self.assertEqual(
+            MappingAbstract._meta.get_field("matching_priority").null, True
+        )
+
+    ### Functions ###
+    @patch("googlesync.models.MappingAbstract._meta.abstract", set())
+    def test___str__(self):
+        google_person_mapping = MappingAbstract(
+            from_field="from field", to_field="to field"
+        )
+        self.assertEqual(
+            google_person_mapping.__str__(),
+            "from field => to field",
+        )
+
+
 class GooglePersonMappingTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -345,87 +544,87 @@ class GooglePersonMappingTest(TestCase):
     def setUp(self):
         self.google_person_mapping = GooglePersonMapping.objects.get(id=1)
 
-    def test_google_person_sync_profile_foreign_key(self):
+    def test_subclass(self):
+        self.assertTrue(issubclass(GooglePersonMapping, MappingAbstract))
+
+    def test_sync_profile_foreign_key(self):
         self.assertEqual(
-            self.google_person_mapping._meta.get_field(
-                "google_person_sync_profile"
-            ).related_model,
+            self.google_person_mapping._meta.get_field("sync_profile").related_model,
             GooglePersonSyncProfile,
         )
 
-    def test_google_field_label(self):
+    def test_to_field_label(self):
         field_label = self.google_person_mapping._meta.get_field(
-            "google_field"
+            "to_field"
         ).verbose_name
-        self.assertEqual(field_label, "google field")
+        self.assertEqual(field_label, "to field")
 
-    def test_google_field_max_length(self):
-        max_length = self.google_person_mapping._meta.get_field(
-            "google_field"
-        ).max_length
+    def test_to_field_max_length(self):
+        max_length = self.google_person_mapping._meta.get_field("to_field").max_length
         self.assertEqual(max_length, 255)
 
-    def test_person_field_label(self):
-        field_label = self.google_person_mapping._meta.get_field(
-            "person_field"
-        ).verbose_name
-        self.assertEqual(field_label, "person field")
-
-    def test_person_field_max_length(self):
-        max_length = self.google_person_mapping._meta.get_field(
-            "person_field"
-        ).max_length
-        self.assertEqual(max_length, 255)
-
-    def test_person_field_choices_not_contain_id(self):
-        choices = self.google_person_mapping._meta.get_field("person_field").choices
+    def test_to_field_choices_not_contain_id(self):
+        choices = self.google_person_mapping._meta.get_field("to_field").choices
         self.assertNotIn("id", choices)
 
-    def test_person_field_choices(self):
-        choices = self.google_person_mapping._meta.get_field("person_field").choices
+    def test_to_field_choices(self):
+        choices = self.google_person_mapping._meta.get_field("to_field").choices
         potential_choices = [
             (f.name, f.verbose_name) for f in Person._meta.fields if f.name != "id"
         ]
         self.assertCountEqual(potential_choices, choices)
 
-    def test_matching_priority_label(self):
-        field_label = self.google_person_mapping._meta.get_field(
-            "matching_priority"
-        ).verbose_name
-        self.assertEqual(field_label, "matching priority")
-
-    def test_matching_priority_choices(self):
-        choices = self.google_person_mapping._meta.get_field(
-            "matching_priority"
-        ).choices
-        potential_choices = [(x, x) for x in range(1, 10)]
-        self.assertCountEqual(potential_choices, choices)
-
-    def test_matching_priority_unique(self):
-        unique = self.google_person_mapping._meta.get_field("matching_priority").unique
-        self.assertTrue(unique)
-
-    def test_matching_priority_optional(self):
-        self.assertEqual(
-            self.google_person_mapping._meta.get_field("matching_priority").blank, True
-        )
-        self.assertEqual(
-            self.google_person_mapping._meta.get_field("matching_priority").null, True
-        )
-
     ### Functions ###
-    def test___str__(self):
-        google_person_mapping = GooglePersonMappingFactory(
-            google_field="google field", person_field="person field"
-        )
-        self.assertEqual(
-            google_person_mapping.__str__(),
-            "google field => person field",
-        )
-
     def test_get_absolute_url(self):
         self.assertEqual(
-            self.google_person_mapping.get_absolute_url(), "/googlesync/personmapping/"
+            self.google_person_mapping.get_absolute_url(),
+            "/googlesync/personmapping/1/edit/",
+        )
+
+
+class GoogleDeviceMappingTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        GoogleDeviceMappingFactory()
+
+    def setUp(self):
+        self.google_device_mapping = GoogleDeviceMapping.objects.get(id=1)
+
+    def test_subclass(self):
+        self.assertTrue(issubclass(GoogleDeviceMapping, MappingAbstract))
+
+    def test_sync_profile_foreign_key(self):
+        self.assertEqual(
+            self.google_device_mapping._meta.get_field("sync_profile").related_model,
+            GoogleDeviceSyncProfile,
+        )
+
+    def test_to_field_label(self):
+        field_label = self.google_device_mapping._meta.get_field(
+            "to_field"
+        ).verbose_name
+        self.assertEqual(field_label, "to field")
+
+    def test_to_field_max_length(self):
+        max_length = self.google_device_mapping._meta.get_field("to_field").max_length
+        self.assertEqual(max_length, 255)
+
+    def test_to_field_choices_not_contain_id(self):
+        choices = self.google_device_mapping._meta.get_field("to_field").choices
+        self.assertNotIn("id", choices)
+
+    def test_to_field_choices(self):
+        choices = self.google_device_mapping._meta.get_field("to_field").choices
+        potential_choices = [
+            (f.name, f.verbose_name) for f in Device._meta.fields if f.name != "id"
+        ]
+        self.assertCountEqual(potential_choices, choices)
+
+    ### Functions ###
+    def test_get_absolute_url(self):
+        self.assertEqual(
+            self.google_device_mapping.get_absolute_url(),
+            "/googlesync/devicemapping/1/edit/",
         )
 
 
@@ -458,6 +657,9 @@ class GooglePersonTranslationTest(TestCase):
     def setUp(self):
         self.google_person_translation = GooglePersonTranslation.objects.get(id=1)
 
+    def test_subclass(self):
+        self.assertTrue(issubclass(GooglePersonTranslation, TranslationAbstract))
+
     def test_google_person_mapping_foreign_key(self):
         self.assertEqual(
             self.google_person_translation._meta.get_field(
@@ -466,12 +668,9 @@ class GooglePersonTranslationTest(TestCase):
             GooglePersonMapping,
         )
 
-    def test_subclass(self):
-        self.assertTrue(issubclass(GooglePersonTranslation, TranslationAbstract))
-
     ### Functions ###
     def test___str__(self):
-        google_person_mapping = GooglePersonMappingFactory(person_field="person field")
+        google_person_mapping = GooglePersonMappingFactory(to_field="person field")
         google_person_translation = GooglePersonTranslationFactory(
             google_person_mapping=google_person_mapping,
             translate_from="translate from",
@@ -483,24 +682,6 @@ class GooglePersonTranslationTest(TestCase):
         )
 
 
-class GoogleDeviceSyncProfileTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        GoogleDeviceSyncProfileFactory()
-
-    def setUp(self):
-        self.google_device_sync_profile = GoogleDeviceSyncProfile.objects.get(id=1)
-
-
-class GoogleDeviceMappingTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        GoogleDeviceMappingFactory()
-
-    def setUp(self):
-        self.google_device_mapping = GoogleDeviceMapping.objects.get(id=1)
-
-
 class GoogleDeviceTranslationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -509,12 +690,28 @@ class GoogleDeviceTranslationTest(TestCase):
     def setUp(self):
         self.google_device_translation = GoogleDeviceTranslation.objects.get(id=1)
 
-    def test_person_type_foreign_key(self):
+    def test_subclass(self):
+        self.assertTrue(issubclass(GoogleDeviceTranslation, TranslationAbstract))
+
+    def test_google_device_mapping_foreign_key(self):
         self.assertEqual(
             self.google_device_translation._meta.get_field(
                 "google_device_mapping"
             ).related_model,
             GoogleDeviceMapping,
+        )
+
+    ### Functions ###
+    def test___str__(self):
+        google_device_mapping = GoogleDeviceMappingFactory(to_field="device field")
+        google_device_translation = GoogleDeviceTranslationFactory(
+            google_device_mapping=google_device_mapping,
+            translate_from="translate from",
+            translate_to="translate to",
+        )
+        self.assertEqual(
+            google_device_translation.__str__(),
+            "Translate 'device field' from 'translate from' to 'translate to'",
         )
 
 

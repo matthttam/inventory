@@ -37,7 +37,7 @@ class GoogleServiceAccountConfig(GoogleConfigAbstract):
     type = models.CharField(max_length=255, default="service_account")
     private_key_id = models.CharField(max_length=255)
     private_key = models.TextField(max_length=2048)
-    client_email = models.CharField(max_length=255)
+    client_email = models.EmailField(max_length=255)
     client_x509_cert_url = models.URLField(max_length=255)
     delegate = models.EmailField(
         max_length=255,
@@ -54,7 +54,7 @@ class GoogleServiceAccountConfig(GoogleConfigAbstract):
         return reverse("googlesync:service_account_config", kwargs={})
 
 
-class SyncProfile(models.Model):
+class GoogleSyncProfileAbstract(models.Model):
     name = models.CharField(max_length=255)
 
     google_service_account_config = models.ForeignKey(
@@ -66,7 +66,7 @@ class SyncProfile(models.Model):
 
 
 # Person sync profile
-class GooglePersonSyncProfile(SyncProfile):
+class GooglePersonSyncProfile(GoogleSyncProfileAbstract):
     person_type = models.ForeignKey(PersonType, on_delete=models.PROTECT)
     google_query = models.CharField(
         max_length=1024,
@@ -79,7 +79,7 @@ class GooglePersonSyncProfile(SyncProfile):
         return f"{self.name} ({self.person_type}: {self.google_service_account_config})"
 
 
-class GoogleDeviceSyncProfile(SyncProfile):
+class GoogleDeviceSyncProfile(GoogleSyncProfileAbstract):
     google_org_unit_path = models.CharField(
         max_length=1024,
         default="",
@@ -126,11 +126,8 @@ class GooglePersonMapping(MappingAbstract):
         ],
     )
 
-    def __str__(self):
-        return f"{self.google_field} => {self.person_field}"
-
     def get_absolute_url(self):
-        return reverse("googlesync:person_mapping", kwargs={})
+        return reverse("googlesync:person_mapping", kwargs={"pk": self.pk})
 
 
 class GoogleDeviceMapping(MappingAbstract):
@@ -144,7 +141,7 @@ class GoogleDeviceMapping(MappingAbstract):
     )
 
     def get_absolute_url(self):
-        return reverse("googlesync:device_mapping", kwargs={})
+        return reverse("googlesync:device_mapping", kwargs={"pk": self.pk})
 
 
 class TranslationAbstract(models.Model):
@@ -161,7 +158,7 @@ class GooglePersonTranslation(TranslationAbstract):
     )
 
     def __str__(self):
-        return f"Translate {self.google_person_mapping.person_field!r} from {self.translate_from!r} to {self.translate_to!r}"
+        return f"Translate {self.google_person_mapping.to_field!r} from {self.translate_from!r} to {self.translate_to!r}"
 
 
 class GoogleDeviceTranslation(TranslationAbstract):
@@ -170,7 +167,7 @@ class GoogleDeviceTranslation(TranslationAbstract):
     )
 
     def __str__(self):
-        return f"Translate {self.google_device_mapping.device_field!r} from {self.translate_from!r} to {self.translate_to!r}"
+        return f"Translate {self.google_device_mapping.to_field!r} from {self.translate_from!r} to {self.translate_to!r}"
 
 
 class GoogleDevice(models.Model):
