@@ -14,6 +14,9 @@ class AssignmentAbstract(models.Model):
     )
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
 
+    class Meta:
+        abstract = True
+
 
 class DeviceAssignment(AssignmentAbstract):
     device = models.ForeignKey(Device, on_delete=models.PROTECT)
