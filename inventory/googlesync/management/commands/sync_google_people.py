@@ -44,33 +44,29 @@ class Command(GoogleSyncCommand):
             raise SyncProfileNotFound(profile_name=profile_name)
         return sync_profile
 
-    def sync_google_people(self, sync_profile):
+    def _get_google_records(self, query) -> list:
         users = self._get_users_service()
-        person_records = []
+
         request = users.list(
             domain=self.customer.get("customerDomain"),
             projection="full",
-            query=sync_profile.google_query,
+            query=query,
         )
-
+        google_user_records = []
         while request is not None:
             response = request.execute()
             google_users = response.get("users")
             if not google_users:
                 self.stdout.write(
-                    self.style.WARNING(
-                        f"No users found with google query: {sync_profile.google_query!r}"
-                    )
+                    self.style.WARNING(f"No users found with google query: {query!r}")
                 )
                 return None
-
-            for google_user in google_users:
-                person = self.convert_google_user_to_person(sync_profile, google_user)
-                if not person:
-                    continue
-                person_records.append(person)
+            google_user_records.extend(google_users)
             request = users.list_next(request, response)
 
+    def sync_google_people(self, sync_profile):
+        google_users = self._get_google_records(query=sync_profile.google_query)
+        person_records = self.convert_google_users_to_person(sync_profile, google_users)
         print(f"Number of person records: {len(person_records)}")
 
         # active_person_status = PersonStatus.objects.filter(name='Active').first()
@@ -81,16 +77,16 @@ class Command(GoogleSyncCommand):
         records_to_skip = []
         for person_record in person_records:
 
-            # Build a query to search through each ID specified
-            query = Q()
-
             # Use lookup ids in order of matching_priority
             lookup_ids = [
                 x.to_field
-                for x in GooglePersonMapping.objects.exclude(
-                    matching_priority=None
-                ).order_by("matching_priority")
+                for x in GooglePersonMapping.objects.filter(sync_profile=sync_profile)
+                .exclude(matching_priority=None)
+                .order_by("matching_priority")
             ]
+
+            # Build a query to search through each ID specified
+            query = Q()
             for id_field in lookup_ids:
                 query.add(Q(**{id_field: getattr(person_record, id_field)}), Q.OR)
             id = getattr(Person.objects.filter(query).first(), "id", None)
@@ -136,6 +132,17 @@ class Command(GoogleSyncCommand):
         # Create New Records
         if records_to_create:
             Person.objects.bulk_create(records_to_create)
+
+    def convert_google_users_to_person(
+        self, sync_profile: GooglePersonSyncProfile, google_users: list
+    ) -> list:
+        person_records = []
+        for google_user in google_users:
+            person = self.convert_google_user_to_person(sync_profile, google_user)
+            if not person:
+                continue
+            person_records.append(person)
+        return person_records
 
     def convert_google_user_to_person(
         self, sync_profile: GooglePersonSyncProfile, user: dict

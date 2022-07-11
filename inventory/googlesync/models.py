@@ -98,6 +98,7 @@ class GoogleDeviceSyncProfile(GoogleSyncProfileAbstract):
 
 
 class MappingAbstract(models.Model):
+    sync_profile = None
     from_field = models.CharField(max_length=255)
     to_field = models.CharField(max_length=255)
     matching_priority = models.IntegerField(
