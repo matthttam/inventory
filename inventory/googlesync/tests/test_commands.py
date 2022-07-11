@@ -1,3 +1,4 @@
+from typing import List
 from django.test import TestCase
 from parameterized import parameterized
 from django.core.management import call_command
@@ -17,7 +18,7 @@ from googlesync.tests.factories import (
     GooglePersonSyncProfileFactory,
     GoogleServiceAccountConfigFactory,
 )
-from unittest.mock import call, patch, Mock
+from unittest.mock import MagicMock, call, patch, Mock
 from io import StringIO
 from django.forms import model_to_dict
 import json
@@ -299,6 +300,71 @@ class SyncGooglePeopleTest(TestCase):
         mock_sync_google_people.assert_has_calls(
             [call(google_person_sync1), call(google_person_sync2)]
         )
+
+    @patch.object(GooglePeopleSyncCommand, "_get_users_service")
+    def test__get_google_records(self, mock__get_users_service):
+        response_get_sideffect = [
+            [{"a": "a", "b": "b", "c": "c"}],
+            [{"a": "a", "b": "b", "c": "c"}],
+            [{"a": "a", "b": "b", "c": "c"}],
+        ]
+        mock_response = Mock(**{"get.side_effect": response_get_sideffect})
+        mock_request = Mock(**{"execute.return_value": mock_response})
+        user_list_next_sideffect = [mock_request, mock_request, None]
+        mock_user_service = Mock(
+            **{
+                "list.return_value": mock_request,
+                "list_next.side_effect": user_list_next_sideffect,
+            }
+        )
+        mock__get_users_service.return_value = mock_user_service
+
+        # Testing with three results
+        GooglePersonSyncProfileFactory(name="staff", google_query="test_query")
+        sync_profile = GooglePersonSyncProfile.objects.get(id=1)
+        command = GooglePeopleSyncCommand()
+        query = sync_profile.google_query
+        return_value = command._get_google_records(query=query)
+
+        mock__get_users_service.assert_called_once()
+        mock_user_service.list.assert_called_with(
+            domain=command.customer.get("customerDomain"),
+            projection="full",
+            query=query,
+        )
+        mock_request.execute.assert_called()
+        mock_response.get.assert_called_with("users")
+        mock_user_service.list_next.assert_called_with(mock_request, mock_response)
+        self.assertEqual(return_value, sum(response_get_sideffect, []))
+
+    @patch.object(GooglePeopleSyncCommand, "_get_users_service")
+    def test__get_google_records_no_results(self, mock__get_users_service):
+
+        mock_response = Mock(**{"get.return_value": []})
+        mock_request = Mock(**{"execute.return_value": mock_response})
+        mock_user_service = Mock(**{"list.return_value": mock_request})
+        mock__get_users_service.return_value = mock_user_service
+
+        # Testing with three results
+        GooglePersonSyncProfileFactory(name="staff", google_query="test_query")
+        sync_profile = GooglePersonSyncProfile.objects.get(id=1)
+        command = GooglePeopleSyncCommand()
+        query = sync_profile.google_query
+        return_value = command._get_google_records(query=query)
+
+        mock__get_users_service.assert_called_once()
+        mock_user_service.list.assert_called_with(
+            domain=command.customer.get("customerDomain"),
+            projection="full",
+            query=query,
+        )
+        mock_request.execute.assert_called()
+        mock_response.get.assert_called_with("users")
+        mock_user_service.list_next.assert_not_called()
+        self.assertEqual(return_value, None)
+
+    def convert_google_users_to_person(self):
+        self.skipTest("Need to implement")
 
 
 class SyncGoogleDeviceTest(TestCase):

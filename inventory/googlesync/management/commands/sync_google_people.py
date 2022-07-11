@@ -61,8 +61,10 @@ class Command(GoogleSyncCommand):
                     self.style.WARNING(f"No users found with google query: {query!r}")
                 )
                 return None
+
             google_user_records.extend(google_users)
             request = users.list_next(request, response)
+        return google_user_records
 
     def sync_google_people(self, sync_profile):
         google_users = self._get_google_records(query=sync_profile.google_query)
