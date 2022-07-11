@@ -31,12 +31,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "authentication",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "debug_toolbar",
     "dashboard",
     "devices",
     "locations",
@@ -51,8 +53,10 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "login_required.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "inventory.urls"
@@ -134,3 +138,26 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Default redirect after login
+LOGIN_REDIRECT_URL = "/"
+
+# Paths that do not require a logged in session
+# https://github.com/CleitonDeLima/django-login-required-middleware
+
+LOGIN_REQUIRED_IGNORE_PATHS = [
+    r"/accounts/logout/$",
+    r"/accounts/signup/$",
+    r"/accounts/login/$",
+    r"/admin/$",
+]
+
+LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
+    #'authentication'
+]
+
+# Controls if the django-debug-toolbar is displayed
+# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
+INTERNAL_IPS = [
+    "127.0.0.1",
+]

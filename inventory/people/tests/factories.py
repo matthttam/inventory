@@ -23,6 +23,7 @@ class PersonStatusFactory(DjangoModelFactory):
         django_get_or_create = ("name",)
 
     name = fake.random_choices(elements=("Active", "Inactive"), length=1)[0]
+    is_inactive = False
 
 
 class PersonTypeFactory(DjangoModelFactory):

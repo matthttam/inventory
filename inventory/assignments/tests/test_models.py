@@ -9,7 +9,7 @@ from devices.models import Device, DeviceAccessory
 from .factories import DeviceAssignmentFactory, DeviceAccessoryAssignmentFactory
 
 # Test the abstract assignment class
-class AssignmentTest(TestCase):
+class AssignmentAbstractTest(TestCase):
     def test_is_abstract(self):
         self.assertTrue(AssignmentAbstract._meta.abstract)
 

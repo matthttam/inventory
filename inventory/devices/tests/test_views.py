@@ -11,9 +11,20 @@ from .factories import (
 )
 from django.urls import reverse
 from django.forms import model_to_dict
+from authentication.tests.factories import UserFactory
+from django.contrib.auth.models import User
+from authentication.tests.decorators import assert_redirect_to_login
 
 
 class DeviceListViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory()
+
+    def setUp(self):
+        user = User.objects.get(id=1)
+        self.client.force_login(user)
+
     def test_no_devices(self):
         response = self.client.get(reverse("devices:index"))
         self.assertEqual(response.status_code, 200)
@@ -38,6 +49,14 @@ class DeviceListViewTest(TestCase):
 
 
 class DeviceDetailViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory()
+
+    def setUp(self):
+        user = User.objects.get(id=1)
+        self.client.force_login(user)
+
     def test_invalid_device(self):
         response = self.client.get(reverse("devices:detail", args=[1]))
         self.assertEqual(response.status_code, 404)
@@ -50,6 +69,14 @@ class DeviceDetailViewTest(TestCase):
 
 
 class DeviceUpdateViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory()
+
+    def setUp(self):
+        user = User.objects.get(id=1)
+        self.client.force_login(user)
+
     def test_invalid_device(self):
         response = self.client.get(reverse("devices:edit", args=[1]))
         self.assertEqual(response.status_code, 404)
@@ -62,6 +89,14 @@ class DeviceUpdateViewTest(TestCase):
 
 
 class DeviceCreateViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory()
+
+    def setUp(self):
+        user = User.objects.get(id=1)
+        self.client.force_login(user)
+
     def test_new_device(self):
         response = self.client.get(reverse("devices:new", args=[]))
         self.assertEqual(response.status_code, 200)
@@ -89,3 +124,21 @@ class DeviceCreateViewTest(TestCase):
             reverse("devices:detail", kwargs={"pk": device_object.pk}),
             status_code=302,
         )
+
+
+class UnauthenticatedDeviceViewTest(TestCase):
+    @assert_redirect_to_login(reverse("devices:index"))
+    def test_device_list_redirects_to_login(self):
+        pass
+
+    @assert_redirect_to_login(reverse("devices:detail", args=[1]))
+    def test_device_detail_redirects_to_login(self):
+        pass
+
+    @assert_redirect_to_login(reverse("devices:edit", args=[1]))
+    def test_device_update_redirects_to_login(self):
+        pass
+
+    @assert_redirect_to_login(reverse("devices:new"))
+    def test_device_create_redirects_to_login(self):
+        pass

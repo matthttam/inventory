@@ -31,6 +31,7 @@ class DeviceStatusFactory(DjangoModelFactory):
         django_get_or_create = ("name",)
 
     name = fake.random_choices(elements=("Active", "Inactive"))
+    is_inactive = False
 
 
 class DeviceModelFactory(DjangoModelFactory):

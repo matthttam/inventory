@@ -18,10 +18,20 @@ from django.urls import path, include
 from dashboard import views
 
 urlpatterns = [
+<<<<<<< HEAD
     path('admin/', admin.site.urls),
     path('', include('dashboard.urls')),
     path('devices/', include('devices.urls')),
     path('people/', include('people.urls')),
     path('assignments/', include('assignments.urls')),
     path('googlesync/', include('googlesync.urls'))
+=======
+    path("__debug__/", include("debug_toolbar.urls")),
+    path("admin/", admin.site.urls),
+    path("", include("dashboard.urls")),
+    path("devices/", include("devices.urls")),
+    path("people/", include("people.urls")),
+    path("assignments/", include("assignments.urls")),
+    path("accounts/", include("authentication.urls")),
+>>>>>>> develop
 ]
