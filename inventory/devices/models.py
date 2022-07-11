@@ -7,6 +7,7 @@ from locations.models import Room, Building
 
 class DeviceStatus(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    is_inactive = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "Device statuses"

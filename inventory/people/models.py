@@ -26,6 +26,7 @@ class Person(models.Model):
 
 class PersonType(models.Model):
     name = models.CharField(max_length=255)
+    is_inactive = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name}"
