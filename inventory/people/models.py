@@ -26,7 +26,6 @@ class Person(models.Model):
 
 class PersonType(models.Model):
     name = models.CharField(max_length=255)
-    is_inactive = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name}"
@@ -34,6 +33,7 @@ class PersonType(models.Model):
 
 class PersonStatus(models.Model):
     name = models.CharField(max_length=255)
+    is_inactive = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "Person statuses"
