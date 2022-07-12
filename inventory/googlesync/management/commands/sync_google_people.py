@@ -74,7 +74,7 @@ class Command(GoogleSyncCommand):
         print(f"Number of person records: {len(person_records)}")
 
         # active_person_status = PersonStatus.objects.filter(name='Active').first()
-        inactive_person_status = PersonStatus.objects.filter(name="Inactive").first()
+        inactive_person_status = PersonStatus.objects.filter(is_inactive=True).first()
         found_record_ids = []
         records_to_update = []
         records_to_create = []
@@ -157,9 +157,14 @@ class Command(GoogleSyncCommand):
         person_dictionary["status"] = PersonStatus.objects.filter(
             name=person_dictionary["status"]
         ).first()
+        buildings = person_dictionary.pop("buildings")
+        rooms = person_dictionary.pop("rooms")
+        person = Person(**person_dictionary)
+        person._buildings = buildings or None
+        person._rooms = rooms or None
 
         try:
-            person = Person(**person_dictionary)
+
             person.clean_fields()
         except ValidationError as e:
             self.stdout.write(

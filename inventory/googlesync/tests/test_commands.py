@@ -428,11 +428,10 @@ class SyncGooglePeopleTest(TestCase):
     @patch.object(GooglePeopleSyncCommand, "_map_dictionary")
     def test_convert_google_user_to_person_valid_user(self, mock__map_dictionary):
         person_status = PersonStatusFactory(name="Active")
-        person_dictionary = model_to_dict(
-            PersonFactory.build(status=person_status, google_id="123456789")
-        )
+        person_dictionary = model_to_dict(PersonFactory.build(google_id="123456789"))
+        person_dictionary["status"] = person_status.name
         mock__map_dictionary.return_value = person_dictionary
-        person_type = PersonTypeFactory(name="staff")
+        person_type = PersonTypeFactory(name="Staff")
         sync_profile = GooglePersonSyncProfileFactory(
             name="staff", google_query="test_query", person_type=person_type
         )
@@ -444,14 +443,17 @@ class SyncGooglePeopleTest(TestCase):
             sync_profile=sync_profile, google_user={}
         )
         self.assertIsInstance(return_value, Person)
-        person_dictionary["type"] = person_type
-        person_dictionary["status"] = person_status
-        del person_dictionary["buildings"]
-        del person_dictionary["rooms"]
         person = Person(**person_dictionary)
-        person.buildings.set([])
-        person.rooms.set([])
-        self.assertEqual(person, return_value)
+        person.type = sync_profile.person_type
+        person.status = person_status
+        person._buildings = None
+        person._rooms = None
+
+        for field in [p.name for p in Person._meta.concrete_fields]:
+            self.assertEqual(getattr(person, field), getattr(return_value, field))
+
+    def test_sync_google_people(self):
+        self.skipTest("Need to test")
 
 
 class SyncGoogleDeviceTest(TestCase):
