@@ -1,9 +1,11 @@
+from typing import List
 from googlesync.exceptions import SyncProfileNotFound
 
 from googlesync.models import (
     GooglePersonMapping,
     GooglePersonTranslation,
     GooglePersonSyncProfile,
+    GoogleSyncProfileAbstract,
 )
 
 from django.core.exceptions import ValidationError
@@ -137,7 +139,7 @@ class Command(GoogleSyncCommand):
 
     def convert_google_users_to_person(
         self, sync_profile: GooglePersonSyncProfile, google_users: list
-    ) -> list:
+    ) -> List[Person]:
         person_records = []
         for google_user in google_users:
             person = self.convert_google_user_to_person(sync_profile, google_user)
@@ -147,42 +149,22 @@ class Command(GoogleSyncCommand):
         return person_records
 
     def convert_google_user_to_person(
-        self, sync_profile: GooglePersonSyncProfile, user: dict
-    ) -> dict:
+        self, sync_profile: GooglePersonSyncProfile, google_user: dict
+    ) -> Person:
 
-        person = {}
+        person_dictionary = self._map_dictionary(sync_profile, google_user)
+        person_dictionary["type"] = sync_profile.person_type
+        person_dictionary["status"] = PersonStatus.objects.filter(
+            name=person_dictionary["status"]
+        ).first()
 
-        mappings = GooglePersonMapping.objects.filter(
-            google_person_sync_profile=sync_profile
-        )
-
-        for mapping in mappings:
-            try:
-                person[mapping.to_field] = self._extract_from_dictionary(
-                    user, mapping.from_field.split(".")
-                )
-            except KeyError:
-                person[mapping.to_field] = None
-
-            # Use translations to convert one value to another
-            translations = GooglePersonTranslation.objects.filter(
-                google_person_mapping=mapping
-            )
-
-            for translation in translations:
-                if str(person[mapping.to_field]) == translation.translate_from:
-                    person[mapping.to_field] = translation.translate_to
-
-        person["type"] = sync_profile.person_type
-        person["status"] = PersonStatus.objects.filter(name=person["status"]).first()
-
-        person = Person(**person)
         try:
+            person = Person(**person_dictionary)
             person.clean_fields()
         except ValidationError as e:
             self.stdout.write(
                 self.style.WARNING(
-                    f"Validation Error when validating google user: {person}"
+                    f"Failed to convert google user data to person: {person_dictionary}"
                 )
             )
             self.stdout.write(self.style.WARNING(f"{e.message_dict}"))

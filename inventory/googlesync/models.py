@@ -119,7 +119,9 @@ class MappingAbstract(models.Model):
 
 
 class GooglePersonMapping(MappingAbstract):
-    sync_profile = models.ForeignKey(GooglePersonSyncProfile, on_delete=models.PROTECT)
+    sync_profile = models.ForeignKey(
+        GooglePersonSyncProfile, on_delete=models.PROTECT, related_name="mappings"
+    )
     to_field = models.CharField(
         max_length=255,
         choices=[
@@ -132,7 +134,9 @@ class GooglePersonMapping(MappingAbstract):
 
 
 class GoogleDeviceMapping(MappingAbstract):
-    sync_profile = models.ForeignKey(GoogleDeviceSyncProfile, on_delete=models.PROTECT)
+    sync_profile = models.ForeignKey(
+        GoogleDeviceSyncProfile, on_delete=models.PROTECT, related_name="mappings"
+    )
 
     to_field = models.CharField(
         max_length=255,
@@ -155,7 +159,10 @@ class TranslationAbstract(models.Model):
 
 class GooglePersonTranslation(TranslationAbstract):
     google_person_mapping = models.ForeignKey(
-        GooglePersonMapping, on_delete=models.CASCADE, default=1
+        GooglePersonMapping,
+        on_delete=models.CASCADE,
+        default=1,
+        related_name="translations",
     )
 
     def __str__(self):
@@ -164,7 +171,10 @@ class GooglePersonTranslation(TranslationAbstract):
 
 class GoogleDeviceTranslation(TranslationAbstract):
     google_device_mapping = models.ForeignKey(
-        GoogleDeviceMapping, on_delete=models.CASCADE, default=1
+        GoogleDeviceMapping,
+        on_delete=models.CASCADE,
+        default=1,
+        related_name="translations",
     )
 
     def __str__(self):

@@ -368,6 +368,12 @@ class GooglePersonSyncProfileTest(TestCase):
             "Google API query to use when searching for users to sync for this profile. (e.g. 'orgUnitPath=/Staff'). Query documentation: https://developers.google.com/admin-sdk/directory/v1/guides/search-users",
         )
 
+    def test_mappings_related_name(self):
+        self.assertEqual(
+            self.google_person_sync_profile._meta.get_field("mappings").related_name,
+            "mappings",
+        )
+
     ### Functions ###
     def test___str__(self):
         person_type = PersonTypeFactory()
@@ -469,6 +475,12 @@ class GoogleDeviceSyncProfileTest(TestCase):
             "Google API query to use when searching for devices to sync for this profile. (e.g. 'location:seattle'). Query documentation: https://developers.google.com/admin-sdk/directory/v1/list-query-operators",
         )
 
+    def test_mappings_related_name(self):
+        self.assertEqual(
+            self.google_device_sync_profile._meta.get_field("mappings").related_name,
+            "mappings",
+        )
+
     ### Functions ###
     def test___str__(self):
         GooglePersonSyncProfileFactory()
@@ -553,6 +565,12 @@ class GooglePersonMappingTest(TestCase):
             GooglePersonSyncProfile,
         )
 
+    def test_translations_related_name(self):
+        self.assertEqual(
+            self.google_person_mapping._meta.get_field("translations").related_name,
+            "translations",
+        )
+
     def test_to_field_label(self):
         field_label = self.google_person_mapping._meta.get_field(
             "to_field"
@@ -597,6 +615,12 @@ class GoogleDeviceMappingTest(TestCase):
         self.assertEqual(
             self.google_device_mapping._meta.get_field("sync_profile").related_model,
             GoogleDeviceSyncProfile,
+        )
+
+    def test_translations_related_name(self):
+        self.assertEqual(
+            self.google_device_mapping._meta.get_field("translations").related_name,
+            "translations",
         )
 
     def test_to_field_label(self):

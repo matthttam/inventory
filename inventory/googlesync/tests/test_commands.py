@@ -5,7 +5,7 @@ from django.core.management import call_command
 
 from googlesync.management.commands._google_sync import GoogleSyncCommand
 from googlesync.management.commands.sync_google_devices import (
-    Command as GoogleDeviceSyncCommand,
+    Command as GoogleDevicesSyncCommand,
 )
 from googlesync.management.commands.sync_google_people import (
     Command as GooglePeopleSyncCommand,
@@ -15,7 +15,9 @@ from googlesync.exceptions import ConfigNotFound, SyncProfileNotFound
 from googlesync.models import GooglePersonSyncProfile, GoogleServiceAccountConfig
 from googlesync.tests.factories import (
     GoogleConfigFactory,
+    GooglePersonMappingFactory,
     GooglePersonSyncProfileFactory,
+    GooglePersonTranslationFactory,
     GoogleServiceAccountConfigFactory,
 )
 from unittest.mock import MagicMock, call, patch, Mock
@@ -25,6 +27,9 @@ import json
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import Resource
 import pytest
+
+from people.tests.factories import PersonFactory, PersonStatusFactory, PersonTypeFactory
+from people.models import Person
 
 
 class GoogleSyncMissingConfigTest(TestCase):
@@ -238,6 +243,39 @@ class GoogleSyncTest(TestCase):
             command._extract_from_dictionary(dictionary=dictionary, keys=[])
         )
 
+    @patch.object(GoogleSyncCommand, "_get_my_customer")
+    def test__map_dictionary(self, mock__get_my_customer):
+        sync_profile = GooglePersonSyncProfileFactory()
+        GooglePersonMappingFactory(
+            sync_profile=sync_profile, from_field="fromfield", to_field="tofield"
+        )
+        google_user = {"fromfield": "fromfieldvalue"}
+        command = GooglePeopleSyncCommand()
+        return_value = command._map_dictionary(sync_profile, google_user)
+        self.assertEqual(return_value, {"tofield": "fromfieldvalue"})
+
+    @patch.object(GoogleSyncCommand, "_get_my_customer")
+    def test__map_dictionary_with_translations(self, mock__get_my_customer):
+        sync_profile = GooglePersonSyncProfileFactory()
+        # Create a mapping with a translation
+        mapping = GooglePersonMappingFactory(
+            sync_profile=sync_profile, from_field="fromfield", to_field="tofield"
+        )
+        GooglePersonTranslationFactory(
+            google_person_mapping=mapping,
+            translate_from="replace_me",
+            translate_to="with_this",
+        )
+        # Create a mapping with dot notation
+        GooglePersonMappingFactory(
+            sync_profile=sync_profile, from_field="name.first", to_field="firstname"
+        )
+
+        google_user = {"fromfield": "replace_me", "name": {"first": "Doug"}}
+        command = GoogleSyncCommand()
+        return_value = command._map_dictionary(sync_profile, google_user)
+        self.assertEqual(return_value, {"tofield": "with_this", "firstname": "Doug"})
+
 
 class SyncGooglePeopleTest(TestCase):
     @classmethod
@@ -363,15 +401,64 @@ class SyncGooglePeopleTest(TestCase):
         mock_user_service.list_next.assert_not_called()
         self.assertEqual(return_value, None)
 
-    def convert_google_users_to_person(self):
-        self.skipTest("Need to implement")
+    @patch.object(GooglePeopleSyncCommand, "convert_google_user_to_person")
+    def test_convert_google_users_to_person(self, mock_convert_google_user_to_person):
+        person1 = Mock(Person)
+        person2 = Mock(Person)
+        person3 = Mock(Person)
+        google_people = [person1, person2, person3]
+        mock_convert_google_user_to_person.side_effect = google_people
+
+        GooglePersonSyncProfileFactory(name="staff", google_query="test_query")
+        sync_profile = GooglePersonSyncProfile.objects.get(id=1)
+        google_users = [{"user": "user1"}, {"user": "user2"}, {"user": "user3"}]
+        command = GooglePeopleSyncCommand()
+        return_value = command.convert_google_users_to_person(
+            sync_profile=sync_profile, google_users=google_users
+        )
+        mock_convert_google_user_to_person.assert_has_calls(
+            [
+                call(sync_profile, {"user": "user1"}),
+                call(sync_profile, {"user": "user2"}),
+                call(sync_profile, {"user": "user3"}),
+            ]
+        )
+        self.assertEqual(return_value, google_people)
+
+    @patch.object(GooglePeopleSyncCommand, "_map_dictionary")
+    def test_convert_google_user_to_person_valid_user(self, mock__map_dictionary):
+        person_status = PersonStatusFactory(name="Active")
+        person_dictionary = model_to_dict(
+            PersonFactory.build(status=person_status, google_id="123456789")
+        )
+        mock__map_dictionary.return_value = person_dictionary
+        person_type = PersonTypeFactory(name="staff")
+        sync_profile = GooglePersonSyncProfileFactory(
+            name="staff", google_query="test_query", person_type=person_type
+        )
+        sync_profile = GooglePersonSyncProfile.objects.get(id=1)
+
+        command = GooglePeopleSyncCommand()
+        # google_user doesn't matter since we are mocking the return of _map_dictionary
+        return_value = command.convert_google_user_to_person(
+            sync_profile=sync_profile, google_user={}
+        )
+        self.assertIsInstance(return_value, Person)
+        person_dictionary["type"] = person_type
+        person_dictionary["status"] = person_status
+        del person_dictionary["buildings"]
+        del person_dictionary["rooms"]
+        person = Person(**person_dictionary)
+        person.buildings.set([])
+        person.rooms.set([])
+        self.assertEqual(person, return_value)
 
 
 class SyncGoogleDeviceTest(TestCase):
     def test_subclass(self):
-        self.assertTrue(issubclass(GoogleDeviceSyncCommand, GoogleSyncCommand))
+        self.assertTrue(issubclass(GoogleDevicesSyncCommand, GoogleSyncCommand))
 
     def test_help(self):
         self.assertEqual(
-            GoogleDeviceSyncCommand.help, "Syncs google devices to inventory devices."
+            GoogleDevicesSyncCommand.help, "Syncs google devices to inventory devices."
         )

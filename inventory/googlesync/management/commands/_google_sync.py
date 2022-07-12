@@ -5,7 +5,7 @@ import googleapiclient.discovery
 import json
 
 from django.forms import model_to_dict
-from googlesync.models import GoogleServiceAccountConfig
+from googlesync.models import GoogleServiceAccountConfig, GoogleSyncProfileAbstract
 from googlesync.exceptions import ConfigNotFound
 
 
@@ -84,3 +84,27 @@ class GoogleSyncCommand(BaseCommand):
         for key in keys:
             value = value[key]
         return value
+
+    def _map_dictionary(
+        self, sync_profile: GoogleSyncProfileAbstract, object_dictionary: dict
+    ) -> dict:
+        mappings = list(sync_profile.mappings.all())
+        new_dictionary = {}
+        for mapping in mappings:
+            try:
+                new_dictionary[mapping.to_field] = self._extract_from_dictionary(
+                    object_dictionary, mapping.from_field.split(".")
+                )
+            except KeyError:
+                new_dictionary[mapping.to_field] = None
+
+            # Use translations to convert one value to another
+            translations = list(mapping.translations.all())
+            # translations = GooglePersonTranslation.objects.filter(
+            #    google_person_mapping=mapping
+            # )
+
+            for translation in translations:
+                if str(new_dictionary[mapping.to_field]) == translation.translate_from:
+                    new_dictionary[mapping.to_field] = translation.translate_to
+        return new_dictionary
