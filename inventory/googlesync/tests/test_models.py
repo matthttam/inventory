@@ -635,12 +635,12 @@ class GoogleDeviceMappingTest(TestCase):
 
     def test_to_field_choices_not_contain_id(self):
         choices = self.google_device_mapping._meta.get_field("to_field").choices
-        self.assertNotIn("id", choices)
+        self.assertIn(("id", "id"), choices)
 
     def test_to_field_choices(self):
         choices = self.google_device_mapping._meta.get_field("to_field").choices
         potential_choices = [
-            (f.name, f.verbose_name) for f in Device._meta.fields if f.name != "id"
+            (f.name, f.verbose_name) for f in GoogleDevice._meta.fields
         ]
         self.assertCountEqual(potential_choices, choices)
 
@@ -773,7 +773,7 @@ class GoogleDeviceTest(TestCase):
 
     def test_status_optional(self):
         self.assertEqual(self.google_device._meta.get_field("status").blank, True)
-        self.assertEqual(self.google_device._meta.get_field("status").null, False)
+        self.assertEqual(self.google_device._meta.get_field("status").null, True)
 
     def test_organization_unit_label(self):
         field_label = self.google_device._meta.get_field(
@@ -790,7 +790,7 @@ class GoogleDeviceTest(TestCase):
             self.google_device._meta.get_field("organization_unit").blank, True
         )
         self.assertEqual(
-            self.google_device._meta.get_field("organization_unit").null, False
+            self.google_device._meta.get_field("organization_unit").null, True
         )
 
     def test_enrollment_time_label(self):
@@ -829,7 +829,7 @@ class GoogleDeviceTest(TestCase):
 
     def test_location_optional(self):
         self.assertEqual(self.google_device._meta.get_field("location").blank, True)
-        self.assertEqual(self.google_device._meta.get_field("location").null, False)
+        self.assertEqual(self.google_device._meta.get_field("location").null, True)
 
     def test_most_recent_user_label(self):
         field_label = self.google_device._meta.get_field(
@@ -846,5 +846,5 @@ class GoogleDeviceTest(TestCase):
             self.google_device._meta.get_field("most_recent_user").blank, True
         )
         self.assertEqual(
-            self.google_device._meta.get_field("most_recent_user").null, False
+            self.google_device._meta.get_field("most_recent_user").null, True
         )

@@ -9,7 +9,13 @@ from .models import (
     GoogleDeviceSyncProfile,
     GoogleDeviceTranslation,
     GoogleDeviceMapping,
+    GoogleDevice,
 )
+
+
+@admin.register(GoogleDevice)
+class GoogleDevice(admin.ModelAdmin):
+    list_display = [field.name for field in GoogleDevice._meta.get_fields()]
 
 
 @admin.register(GoogleConfig)

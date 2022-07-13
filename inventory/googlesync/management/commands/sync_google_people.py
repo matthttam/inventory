@@ -1,4 +1,3 @@
-from typing import List
 from googlesync.exceptions import SyncProfileNotFound
 
 from googlesync.models import (
@@ -66,6 +65,7 @@ class Command(GoogleSyncCommand):
 
             google_user_records.extend(google_users)
             request = users.list_next(request, response)
+            # request = None
         return google_user_records
 
     def sync_google_people(self, sync_profile):
@@ -73,7 +73,10 @@ class Command(GoogleSyncCommand):
         person_records = self.convert_google_users_to_person(sync_profile, google_users)
         print(f"Number of person records: {len(person_records)}")
 
-        # active_person_status = PersonStatus.objects.filter(name='Active').first()
+        self.stdout.write(
+            self.style.SUCCESS(f"Total Number of person records: {len(person_records)}")
+        )
+        # active_person_status = PersonStatus.objects.filter(is_inactive=False).first()
         inactive_person_status = PersonStatus.objects.filter(is_inactive=True).first()
         found_record_ids = []
         records_to_update = []
@@ -139,7 +142,7 @@ class Command(GoogleSyncCommand):
 
     def convert_google_users_to_person(
         self, sync_profile: GooglePersonSyncProfile, google_users: list
-    ) -> List[Person]:
+    ) -> list[Person]:
         person_records = []
         for google_user in google_users:
             person = self.convert_google_user_to_person(sync_profile, google_user)
@@ -157,8 +160,8 @@ class Command(GoogleSyncCommand):
         person_dictionary["status"] = PersonStatus.objects.filter(
             name=person_dictionary["status"]
         ).first()
-        buildings = person_dictionary.pop("buildings")
-        rooms = person_dictionary.pop("rooms")
+        buildings = person_dictionary.pop("buildings", None)
+        rooms = person_dictionary.pop("rooms", None)
         person = Person(**person_dictionary)
         person._buildings = buildings or None
         person._rooms = rooms or None

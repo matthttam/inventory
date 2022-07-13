@@ -5,6 +5,22 @@ from people.models import Person, PersonType
 from devices.models import Device
 
 
+class GoogleDevice(models.Model):
+    id = models.CharField(max_length=255, primary_key=True)
+    serial_number = models.CharField(max_length=255, unique=True, blank=True, null=True)
+    device_model = models.CharField(max_length=255, blank=True, null=True)
+    status = models.CharField(max_length=255, blank=True, null=True)
+    organization_unit = models.CharField(max_length=255, blank=True, null=True)
+    enrollment_time = models.DateTimeField(null=True, blank=True)
+    last_policy_sync = models.DateTimeField(null=True, blank=True)
+    location = models.CharField(max_length=255, blank=True, null=True)
+    most_recent_user = models.CharField(max_length=255, blank=True, null=True)  #
+    annotated_asset_id = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.annotated_asset_id} ({self.serial_number}) - {self.device_model}"
+
+
 class GoogleConfigAbstract(models.Model):
     client_id = models.CharField(max_length=255)
     project_id = models.CharField(max_length=255)
@@ -140,9 +156,7 @@ class GoogleDeviceMapping(MappingAbstract):
 
     to_field = models.CharField(
         max_length=255,
-        choices=[
-            (f.name, f.verbose_name) for f in Device._meta.fields if f.name != "id"
-        ],
+        choices=[(f.name, f.verbose_name) for f in GoogleDevice._meta.fields],
     )
 
     def get_absolute_url(self):
@@ -179,19 +193,3 @@ class GoogleDeviceTranslation(TranslationAbstract):
 
     def __str__(self):
         return f"Translate {self.google_device_mapping.to_field!r} from {self.translate_from!r} to {self.translate_to!r}"
-
-
-class GoogleDevice(models.Model):
-    id = models.CharField(max_length=255, primary_key=True)
-    serial_number = models.CharField(max_length=255, unique=True, blank=True)
-    device_model = models.CharField(max_length=255, blank=True)
-    status = models.CharField(max_length=255, blank=True)
-    organization_unit = models.CharField(max_length=255, blank=True)
-    enrollment_time = models.DateTimeField(null=True, blank=True)
-    last_policy_sync = models.DateTimeField(null=True, blank=True)
-    location = models.CharField(max_length=255, blank=True)
-    most_recent_user = models.CharField(max_length=255, blank=True)
-    annotated_asset_id = models.CharField(max_length=255, blank=True)
-
-    def __str__(self):
-        return f"{self.annotated_asset_id} ({self.serial_number}) - {self.device_model}"
