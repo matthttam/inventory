@@ -37,7 +37,9 @@ class DeviceAssignmentTest(TestCase):
         DeviceAssignmentFactory(person=person)
 
     def setUp(self):
-        self.device_assignment = DeviceAssignment.objects.get(id=1)
+        self.device_assignment = DeviceAssignment.objects.get(
+            person__email="test@example.com"
+        )
 
     def test_subclass(self):
         self.assertTrue(issubclass(DeviceAssignment, Assignment))
