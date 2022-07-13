@@ -57,7 +57,7 @@ class DeviceAssignmentTest(TestCase):
 class DeviceAccessoryAssignmentTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        DeviceAccessoryAssignmentFactory()
+        DeviceAccessoryAssignmentFactory(id=1)
 
     def setUp(self):
         self.device_accessory_assignment = DeviceAccessoryAssignment.objects.get(id=1)

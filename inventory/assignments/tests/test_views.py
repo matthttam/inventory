@@ -13,7 +13,7 @@ from authentication.tests.decorators import assert_redirect_to_login
 class DeviceAssignmentListViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        UserFactory()
+        UserFactory(id=1)
 
     def setUp(self):
         user = User.objects.get(id=1)
@@ -26,7 +26,7 @@ class DeviceAssignmentListViewTest(TestCase):
         self.assertQuerysetEqual(response.context["object_list"], [])
 
     def test_one_deviceassignment(self):
-        device_assignments = DeviceAssignmentFactory()
+        device_assignments = DeviceAssignmentFactory(id=1)
         response = self.client.get(reverse("assignments:index"))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "No assignments are available.")
@@ -45,7 +45,7 @@ class DeviceAssignmentListViewTest(TestCase):
 class DeviceAssignmentDetailViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        UserFactory()
+        UserFactory(id=1)
 
     def setUp(self):
         user = User.objects.get(id=1)
@@ -70,7 +70,7 @@ class DeviceAssignmentDetailViewTest(TestCase):
 class DeviceAssignmentUpdateViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        UserFactory()
+        UserFactory(id=1)
 
     def setUp(self):
         user = User.objects.get(id=1)
@@ -92,7 +92,7 @@ class DeviceAssignmentUpdateViewTest(TestCase):
 class DeviceAssignmentCreateViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        UserFactory()
+        UserFactory(id=1)
 
     def setUp(self):
         user = User.objects.get(id=1)
@@ -103,8 +103,8 @@ class DeviceAssignmentCreateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_new_deviceassignment_post(self):
-        device = DeviceFactory()
-        person = PersonFactory()
+        device = DeviceFactory(id=1)
+        person = PersonFactory(id=1)
         device_assignment_dict = {
             "device": device.id,
             "person": person.id,

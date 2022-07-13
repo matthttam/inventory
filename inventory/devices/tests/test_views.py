@@ -18,7 +18,7 @@ from authentication.tests.decorators import assert_redirect_to_login
 class DeviceListViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        UserFactory()
+        UserFactory(id=1)
 
     def setUp(self):
         user = User.objects.get(id=1)
@@ -31,7 +31,7 @@ class DeviceListViewTest(TestCase):
         self.assertQuerysetEqual(response.context["object_list"], [])
 
     def test_one_device(self):
-        device = DeviceFactory()
+        device = DeviceFactory(id=1)
         response = self.client.get(reverse("devices:index"))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "No devices are available.")
@@ -50,7 +50,7 @@ class DeviceListViewTest(TestCase):
 class DeviceDetailViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        UserFactory()
+        UserFactory(id=1)
 
     def setUp(self):
         user = User.objects.get(id=1)
@@ -70,7 +70,7 @@ class DeviceDetailViewTest(TestCase):
 class DeviceUpdateViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        UserFactory()
+        UserFactory(id=1)
 
     def setUp(self):
         user = User.objects.get(id=1)
@@ -81,7 +81,7 @@ class DeviceUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_valid_device(self):
-        device = DeviceFactory()
+        device = DeviceFactory(id=1)
         response = self.client.get(reverse("devices:edit", args=[1]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, device.asset_id)
@@ -90,7 +90,7 @@ class DeviceUpdateViewTest(TestCase):
 class DeviceCreateViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        UserFactory()
+        UserFactory(id=1)
 
     def setUp(self):
         user = User.objects.get(id=1)
@@ -101,8 +101,8 @@ class DeviceCreateViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_new_device_post(self):
-        device_status = DeviceStatusFactory()
-        device_model = DeviceModelFactory()
+        device_status = DeviceStatusFactory(name="test_status")
+        device_model = DeviceModelFactory(id=1)
         device_dict = {
             "serial_number": "SN-18",
             "asset_id": "ASSET-18",

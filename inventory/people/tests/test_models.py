@@ -14,7 +14,7 @@ from locations.models import Building, Room
 class PersonTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        PersonFactory()
+        PersonFactory(id=1)
 
     def setUp(self):
         self.person = Person.objects.get(id=1)
@@ -92,7 +92,7 @@ class PersonTest(TestCase):
 
 class PersonWithBuildingsTest(TestCase):
     def setUp(self):
-        PersonWithBuildingsFactory()
+        PersonWithBuildingsFactory(id=1)
 
     def test_buildings_many_to_many(self):
         person = Person.objects.get(id=1)
@@ -102,7 +102,7 @@ class PersonWithBuildingsTest(TestCase):
 
 class PersonWithRoomsTest(TestCase):
     def setUp(self):
-        PersonWithRoomsFactory()
+        PersonWithRoomsFactory(id=1)
 
     def test_rooms_many_to_many(self):
         person = Person.objects.get(id=1)
@@ -113,7 +113,7 @@ class PersonWithRoomsTest(TestCase):
 class PersonTypeTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        PersonTypeFactory()
+        PersonTypeFactory(id=1)
 
     def setUp(self):
         self.person = PersonType.objects.get(id=1)
@@ -134,7 +134,7 @@ class PersonTypeTest(TestCase):
 class PersonStatusTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        PersonStatusFactory()
+        PersonStatusFactory(id=1)
 
     def setUp(self):
         self.person = PersonStatus.objects.get(id=1)
