@@ -179,6 +179,11 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool("SECURE_HSTS_INCLUDE_SUBDOMAINS")
 
 SECURE_HSTS_PRELOAD = env.bool("SECURE_HSTS_PRELOAD")
 
+# Setup Logging
+# Create log folder(s) in project folder based on environment config
+LOG_PATH = Path(BASE_DIR.parent).joinpath(env("LOG_PATH"))
+os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -186,7 +191,7 @@ LOGGING = {
         "file": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
-            "filename": Path(BASE_DIR.parent).joinpath(env("LOG_PATH")),
+            "filename": LOG_PATH,
         },
     },
     "loggers": {
