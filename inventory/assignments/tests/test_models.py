@@ -33,12 +33,12 @@ class AssignmentTest(TestCase):
 class DeviceAssignmentTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        person = PersonFactory(email="test@example.com")
-        DeviceAssignmentFactory(person=person)
+        # person = PersonFactory(email="test@example.com")
+        DeviceAssignmentFactory(id=1)  # person=person)
 
     def setUp(self):
         self.device_assignment = DeviceAssignment.objects.get(
-            person__email="test@example.com"
+            id=1  # person__email="test@example.com"
         )
 
     def test_subclass(self):
