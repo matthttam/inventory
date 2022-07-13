@@ -86,7 +86,7 @@ class Command(GoogleSyncCommand):
 
         # active_device_status = DeviceStatus.objects.filter(is_inactive=False).first()
         inactive_device_status = DeviceStatus.objects.filter(is_inactive=True).first()
-        found_record_ids = []
+        # found_record_ids = []
         records_to_update = []
         records_to_create = []
         records_to_skip = []
@@ -106,21 +106,22 @@ class Command(GoogleSyncCommand):
 
         for device_record in device_records:
 
-            # Build a query to search through each ID specified
-            query = Q()
-
-            # Use lookup ids in order of matching_priority
-            lookup_ids = [
-                x.to_field
-                for x in sync_profile.mappings.exclude(matching_priority=None).order_by(
-                    "matching_priority"
-                )
-            ]
-            for id_field in lookup_ids:
-                query.add(Q(**{id_field: getattr(device_record, id_field)}), Q.OR)
-            id = getattr(GoogleDevice.objects.filter(query).first(), "id", None)
+            ## Build a query to search through each ID specified
+            # query = Q()
+            #
+            ## Use lookup ids in order of matching_priority
+            # lookup_ids = [
+            #    x.to_field
+            #    for x in sync_profile.mappings.exclude(matching_priority=None).order_by(
+            #        "matching_priority"
+            #    )
+            # ]
+            # for id_field in lookup_ids:
+            #    query.add(Q(**{id_field: getattr(device_record, id_field)}), Q.OR)
+            # id = getattr(GoogleDevice.objects.filter(query).first(), "id", None)
+            id = GoogleDevice.objects.filter(id=device_record.id).only("id").first().id
             if id:
-                found_record_ids.append(id)
+                # found_record_ids.append(id)
                 device_record.id = id
                 records_to_update.append(device_record)
             else:

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import GoogleConfig, GoogleServiceAccountConfig
+from .models import GoogleConfig, GoogleDeviceLinkMapping, GoogleServiceAccountConfig
 from .models import (
     GooglePersonSyncProfile,
     GooglePersonTranslation,
@@ -50,6 +50,15 @@ class GooglePersonSyncProfileAdmin(admin.ModelAdmin):
 
 @admin.register(GoogleDeviceMapping)
 class GoogleDeviceMappingAdmin(admin.ModelAdmin):
+    list_display = (
+        "sync_profile",
+        "from_field",
+        "to_field",
+    )
+
+
+@admin.register(GoogleDeviceLinkMapping)
+class GoogleDeviceLinkMappingAdmin(admin.ModelAdmin):
     list_display = (
         "sync_profile",
         "from_field",

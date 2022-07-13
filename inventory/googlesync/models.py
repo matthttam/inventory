@@ -149,6 +149,28 @@ class GooglePersonMapping(MappingAbstract):
         return reverse("googlesync:person_mapping", kwargs={"pk": self.pk})
 
 
+class GoogleDeviceLinkMapping(MappingAbstract):
+    sync_profile = models.ForeignKey(
+        GoogleDeviceSyncProfile, on_delete=models.PROTECT, related_name="link_mappings"
+    )
+
+    from_field = models.CharField(
+        max_length=255,
+        choices=[
+            (f.name, f.verbose_name)
+            for f in GoogleDevice._meta.fields
+            if f.name != "id"
+        ],
+    )
+
+    to_field = models.CharField(
+        max_length=255,
+        choices=[
+            (f.name, f.verbose_name) for f in Device._meta.fields if f.name != "id"
+        ],
+    )
+
+
 class GoogleDeviceMapping(MappingAbstract):
     sync_profile = models.ForeignKey(
         GoogleDeviceSyncProfile, on_delete=models.PROTECT, related_name="mappings"
