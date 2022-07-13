@@ -192,7 +192,7 @@ LOGGING = {
             "format": "{asctime} {levelname} {message}",
             "style": "{",
             }
-        }
+        },
     "handlers": {
         "file": {
             "level": "DEBUG",
