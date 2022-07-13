@@ -25,8 +25,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = env.str("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
-# ALLOWED_HOSTS = ["staging.inventory.tradition1871.com","www.staging.inventory.tradition1871.com"]
-# ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = ["staging.inventory.tradition1871.com","www.staging.inventory.tradition1871.com"]
+#ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
@@ -187,11 +187,18 @@ os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "timestamp": {
+            "format": "{asctime} {levelname} {message}",
+            "style": "{",
+            }
+        }
     "handlers": {
         "file": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
             "filename": LOG_PATH,
+            "formatter":"timestamp",
         },
     },
     "loggers": {
