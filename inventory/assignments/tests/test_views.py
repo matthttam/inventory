@@ -58,7 +58,7 @@ class DeviceAssignmentDetailViewTest(TestCase):
     def test_valid_deviceassignment(self):
         person = PersonFactory(first_name="TestName123")
         device = DeviceFactory(serial_number="TestSerial123", asset_id="TestAssetID123")
-        device_assignment = DeviceAssignmentFactory(device=device, person=person)
+        device_assignment = DeviceAssignmentFactory(id=1, device=device, person=person)
         response = self.client.get(reverse("assignments:detail", args=[1]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "TestName123")
@@ -82,7 +82,9 @@ class DeviceAssignmentUpdateViewTest(TestCase):
 
     def test_valid_deviceassignment(self):
         current_time = timezone.now()
-        device_assignment = DeviceAssignmentFactory(assignment_datetime=current_time)
+        device_assignment = DeviceAssignmentFactory(
+            id=1, assignment_datetime=current_time
+        )
         response = self.client.get(reverse("assignments:edit", args=[1]))
         self.assertEqual(response.status_code, 200)
         print(response.context)
