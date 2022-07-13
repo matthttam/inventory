@@ -1,5 +1,6 @@
 from django.test import TestCase
 from assignments.models import Assignment, DeviceAssignment, DeviceAccessoryAssignment
+from people.tests.factories import PersonFactory
 from people.models import Person
 from devices.models import Device, DeviceAccessory
 from .factories import DeviceAssignmentFactory, DeviceAccessoryAssignmentFactory
@@ -32,7 +33,8 @@ class AssignmentTest(TestCase):
 class DeviceAssignmentTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        DeviceAssignmentFactory()
+        person = PersonFactory(email="test@example.com")
+        DeviceAssignmentFactory(person=person)
 
     def setUp(self):
         self.device_assignment = DeviceAssignment.objects.get(id=1)
