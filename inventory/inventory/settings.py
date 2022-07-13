@@ -19,13 +19,15 @@ environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-PROJECT_ROOT = environ.Path(__file__) - 3
+#PROJECT_ROOT = environ.Path(__file__) - 3
 
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = env.str("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+#ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+# ALLOWED_HOSTS = ["staging.inventory.tradition1871.com","www.staging.inventory.tradition1871.com"]
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
@@ -61,7 +63,7 @@ ROOT_URLCONF = "inventory.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ["inventory/templates"],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -86,7 +88,13 @@ WSGI_APPLICATION = "inventory.wsgi.application"
 #        "NAME": BASE_DIR / "db.sqlite3",
 #    }
 # }
-DATABASES = {"default": env.db("DATABASE_URL")}
+DATABASES = {
+            "default": env.db("DATABASE_URL")
+            #,"TEST": {
+            #    "ENGINE": 'django.db.backends.sqlite3',
+            #    'NAME': 'test_database',
+            #}
+        }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -130,7 +138,7 @@ FORMAT_MODULE_PATH = [
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = env("STATIC_URL")
-STATIC_ROOT = Path(PROJECT_ROOT - 1).joinpath(env("STATIC_PATH"))
+STATIC_ROOT = Path(BASE_DIR.parent).joinpath(env("STATIC_PATH"))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -159,3 +167,34 @@ LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+SECURE_SSL_REDIRECT=env.bool("SECURE_SSL_REDIRECT")
+
+SESSION_COOKIE_SECURE=env.bool("SESSION_COOKIE_SECURE")
+
+CSRF_COOKIE_SECURE=env.bool("CSRF_COOKIE_SECURE")
+
+SECURE_HSTS_SECONDS=env.int("SECURE_HSTS_SECONDS")
+
+SECURE_HSTS_INCLUDE_SUBDOMAINS=env.bool("SECURE_HSTS_INCLUDE_SUBDOMAINS")
+
+SECURE_HSTS_PRELOAD=env.bool("SECURE_HSTS_PRELOAD")
+
+LOGGING = {
+            'version': 1,
+            'disable_existing_loggers': False,
+            'handlers': {
+                'file': {
+                    'level': 'DEBUG',
+                    'class': 'logging.FileHandler',
+                    'filename': Path(BASE_DIR.parent).joinpath("logs/debug_log.log"),
+                },
+            },
+            'loggers': {
+                'django': {
+                    'handlers': ['file'],
+                    'level': 'DEBUG',
+                    'propagate': True,
+                },
+            },
+}
