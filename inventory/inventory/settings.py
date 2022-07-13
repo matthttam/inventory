@@ -61,7 +61,7 @@ ROOT_URLCONF = "inventory.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ["inventory/templates"],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -130,7 +130,7 @@ FORMAT_MODULE_PATH = [
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = env("STATIC_URL")
-STATIC_ROOT = Path(PROJECT_ROOT - 1).joinpath(env("STATIC_PATH"))
+STATIC_ROOT = Path(BASE_DIR.parent).joinpath(env("STATIC_PATH"))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
