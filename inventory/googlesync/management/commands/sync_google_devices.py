@@ -112,9 +112,9 @@ class Command(GoogleSyncCommand):
             # Use lookup ids in order of matching_priority
             lookup_ids = [
                 x.to_field
-                for x in GoogleDeviceMapping.objects.exclude(
-                    matching_priority=None
-                ).order_by("matching_priority")
+                for x in sync_profile.mappings.exclude(matching_priority=None).order_by(
+                    "matching_priority"
+                )
             ]
             for id_field in lookup_ids:
                 query.add(Q(**{id_field: getattr(device_record, id_field)}), Q.OR)

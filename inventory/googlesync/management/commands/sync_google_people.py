@@ -87,9 +87,9 @@ class Command(GoogleSyncCommand):
             # Use lookup ids in order of matching_priority
             lookup_ids = [
                 x.to_field
-                for x in GooglePersonMapping.objects.filter(sync_profile=sync_profile)
-                .exclude(matching_priority=None)
-                .order_by("matching_priority")
+                for x in sync_profile.mappings.exclude(matching_priority=None).order_by(
+                    "matching_priority"
+                )
             ]
 
             # Build a query to search through each ID specified
