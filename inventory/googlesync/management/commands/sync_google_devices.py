@@ -51,8 +51,8 @@ class Command(GoogleSyncCommand):
         request = devices.list(
             customerId=self.customer.get("id"),
             projection="FULL",
-            orgUnitPath=org_unit_path or None,
             query=query or None,
+            orgUnitPath=org_unit_path or None,
         )
 
         google_device_records = []
@@ -62,7 +62,7 @@ class Command(GoogleSyncCommand):
             if not google_devices:
                 self.stdout.write(
                     self.style.WARNING(
-                        f"No users found with google query: {sync_profile.google_query!r}"
+                        f"No users found with google query: {query!r} within org path: {org_unit_path!r}"
                     )
                 )
                 return None
@@ -185,10 +185,10 @@ class Command(GoogleSyncCommand):
             GoogleDevice.objects.bulk_create(records_to_create)
 
     def convert_google_devices_to_google_devices(
-        self, sync_profile: GoogleDeviceSyncProfile, google_users: list
+        self, sync_profile: GoogleDeviceSyncProfile, google_devices: list
     ) -> list[GoogleDevice]:
         device_records = []
-        for google_user in google_users:
+        for google_user in google_devices:
             device = self.convert_google_device_to_google_device(
                 sync_profile, google_user
             )

@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo
 from django.utils import timezone
 from googlesync.models import (
     GoogleConfig,
+    GoogleDeviceLinkMapping,
     GoogleServiceAccountConfig,
     GooglePersonSyncProfile,
     GooglePersonMapping,
@@ -102,6 +103,19 @@ class GoogleDeviceMappingFactory(DjangoModelFactory):
 
     sync_profile = factory.SubFactory(GoogleDeviceSyncProfileFactory)
     from_field = fake.lexify(text="?" * 30)
+    to_field = fake.random_elements(
+        elements=[f.name for f in Device._meta.fields if f.name != "id"],
+    )[0]
+
+
+class GoogleDeviceLinkMappingFactory(DjangoModelFactory):
+    class Meta:
+        model = GoogleDeviceLinkMapping
+
+    sync_profile = factory.SubFactory(GoogleDeviceSyncProfileFactory)
+    from_field = fake.random_elements(
+        elements=[f.name for f in GoogleDevice._meta.fields if f.name != "id"],
+    )[0]
     to_field = fake.random_elements(
         elements=[f.name for f in Device._meta.fields if f.name != "id"],
     )[0]

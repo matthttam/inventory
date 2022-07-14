@@ -6,7 +6,7 @@ from django.db.models import Q
 
 
 class Command(BaseCommand):
-    help = "Syncs google devices to inventory devices."
+    help = "Associate imported device to their Google device counterpart."
 
     def add_arguments(self, parser):
         parser.add_argument("profile", nargs="?")

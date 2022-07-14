@@ -5,6 +5,7 @@ from people.models import PersonType, Person
 from devices.models import Device
 from .factories import (
     GoogleConfigFactory,
+    GoogleDeviceLinkMappingFactory,
     GoogleServiceAccountConfigFactory,
     GooglePersonSyncProfileFactory,
     GoogleDeviceSyncProfileFactory,
@@ -17,6 +18,7 @@ from .factories import (
 from googlesync.models import (
     GoogleConfigAbstract,
     GoogleConfig,
+    GoogleDeviceLinkMapping,
     GoogleServiceAccountConfig,
     GoogleSyncProfileAbstract,
     GooglePersonSyncProfile,
@@ -650,6 +652,58 @@ class GoogleDeviceMappingTest(TestCase):
             self.google_device_mapping.get_absolute_url(),
             "/googlesync/devicemapping/1/edit/",
         )
+
+
+class GoogleDeviceLinkMappingTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        GoogleDeviceLinkMappingFactory()
+
+    def setUp(self):
+        self.google_device_link_mapping = GoogleDeviceLinkMapping.objects.get(id=1)
+
+    def test_subclass(self):
+        self.assertTrue(issubclass(GoogleDeviceLinkMapping, MappingAbstract))
+
+    def test_sync_profile_foreign_key(self):
+        self.assertEqual(
+            self.google_device_link_mapping._meta.get_field(
+                "sync_profile"
+            ).related_model,
+            GoogleDeviceSyncProfile,
+        )
+
+    def test_to_field_label(self):
+        field_label = self.google_device_link_mapping._meta.get_field(
+            "to_field"
+        ).verbose_name
+        self.assertEqual(field_label, "to field")
+
+    def test_to_field_max_length(self):
+        max_length = self.google_device_link_mapping._meta.get_field(
+            "to_field"
+        ).max_length
+        self.assertEqual(max_length, 255)
+
+    def test_to_field_choices(self):
+        choices = self.google_device_link_mapping._meta.get_field("to_field").choices
+        potential_choices = [
+            (f.name, f.verbose_name) for f in Device._meta.fields if f.name != "id"
+        ]
+        self.assertCountEqual(potential_choices, choices)
+
+    def test_from_field_choices_not_contain_id(self):
+        choices = self.google_device_link_mapping._meta.get_field("from_field").choices
+        self.assertNotIn(("id", "id"), choices)
+
+    def test_from_field_choices(self):
+        choices = self.google_device_link_mapping._meta.get_field("from_field").choices
+        potential_choices = [
+            (f.name, f.verbose_name)
+            for f in GoogleDevice._meta.fields
+            if f.name != "id"
+        ]
+        self.assertCountEqual(potential_choices, choices)
 
 
 class TranslationAbstractTest(TestCase):
