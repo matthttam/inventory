@@ -8,7 +8,7 @@ from .factories import DeviceAssignmentFactory
 
 class DeviceAssignmentFormTest(TestCase):
     def test_valid_form(self):
-        device_assignment = DeviceAssignmentFactory()
+        device_assignment = DeviceAssignmentFactory(id=1)
         form = DeviceAssignmentForm(data=model_to_dict(device_assignment))
         self.assertTrue(form.is_valid())
         self.assertEqual(form.errors, {})

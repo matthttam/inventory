@@ -19,7 +19,6 @@ environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-PROJECT_ROOT = environ.Path(__file__) - 3
 
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -87,7 +86,13 @@ WSGI_APPLICATION = "inventory.wsgi.application"
 #        "NAME": BASE_DIR / "db.sqlite3",
 #    }
 # }
-DATABASES = {"default": env.db("DATABASE_URL")}
+DATABASES = {
+    "default": env.db("DATABASE_URL")
+    # ,"TEST": {
+    #    "ENGINE": 'django.db.backends.sqlite3',
+    #    'NAME': 'test_database',
+    # }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -160,3 +165,46 @@ LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT")
+
+SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE")
+
+CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE")
+
+SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS")
+
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool("SECURE_HSTS_INCLUDE_SUBDOMAINS")
+
+SECURE_HSTS_PRELOAD = env.bool("SECURE_HSTS_PRELOAD")
+
+# Setup Logging
+# Create log folder(s) in project folder based on environment config
+LOG_PATH = Path(BASE_DIR.parent).joinpath(env("LOG_PATH"))
+os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "timestamp": {
+            "format": "{asctime} {levelname} {message}",
+            "style": "{",
+            }
+        },
+    "handlers": {
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": LOG_PATH,
+            "formatter":"timestamp",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    },
+}

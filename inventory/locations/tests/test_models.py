@@ -5,7 +5,7 @@ from .factories import BuildingFactory, RoomFactory
 
 class BuildingModelTest(TestCase):
     def setUp(self):
-        BuildingFactory()
+        BuildingFactory(id=1)
 
     def test_name_label(self):
         building = Building.objects.get(id=1)
@@ -66,7 +66,7 @@ class BuildingModelTest(TestCase):
 class RoomModelTest(TestCase):
     @classmethod
     def setUpTestData(self):
-        RoomFactory()
+        RoomFactory(id=1)
 
     def setUp(self):
         self.room = Room.objects.get(id=1)

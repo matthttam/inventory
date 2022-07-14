@@ -6,15 +6,22 @@ from devices.tests.factories import (
     DeviceModelFactory,
     DeviceStatusFactory,
 )
-from devices.models import DeviceModel
+from devices.models import DeviceModel, DeviceStatus
 from locations.models import Building, Room
 
 
 class DeviceFormTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        status = DeviceStatusFactory(name="test_status")
+        device_model = DeviceModelFactory(id=1)
+
+    def setUp(self):
+        self.status = DeviceStatus.objects.get(name="test_status")
+        self.device_model = DeviceModel.objects.get(id=1)
+
     def test_valid_form(self):
-        status = DeviceStatusFactory()
-        device_model = DeviceModelFactory()
-        device = DeviceFactory.build(status=status, device_model=device_model)
+        device = DeviceFactory.build(status=self.status, device_model=self.device_model)
         form = DeviceForm(
             data=model_to_dict(
                 device,
@@ -33,6 +40,11 @@ class DeviceFormTest(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.errors, {})
         self.assertQuerysetEqual(
+            form.fields["status"].queryset,
+            DeviceStatus.objects.all(),
+            ordered=False,
+        )
+        self.assertQuerysetEqual(
             form.fields["device_model"].queryset,
             DeviceModel.objects.all(),
             ordered=False,
@@ -49,9 +61,7 @@ class DeviceFormTest(TestCase):
         )
 
     def test_invalid_form(self):
-        status = DeviceStatusFactory()
-        device_model = DeviceModelFactory()
-        device = DeviceFactory(status=status, device_model=device_model)
+        device = DeviceFactory(status=self.status, device_model=self.device_model)
         form = DeviceForm(
             data=model_to_dict(
                 device,
