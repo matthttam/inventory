@@ -75,6 +75,9 @@ class PersonTest(TestCase):
     def test_rooms_foreign_key(self):
         self.assertEqual(self.person._meta.get_field("rooms").related_model, Room)
 
+    def test_post_save_signal(self):
+        self.skipTest("Need to test")
+
     ### Functions ###
     def test___str__(self):
         person = PersonFactory(

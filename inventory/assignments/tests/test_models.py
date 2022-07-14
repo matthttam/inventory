@@ -1,32 +1,40 @@
 from django.test import TestCase
-from assignments.models import Assignment, DeviceAssignment, DeviceAccessoryAssignment
+from assignments.models import (
+    AssignmentAbstract,
+    DeviceAssignment,
+    DeviceAccessoryAssignment,
+)
 from people.models import Person
 from devices.models import Device, DeviceAccessory
 from .factories import DeviceAssignmentFactory, DeviceAccessoryAssignmentFactory
 
 # Test the abstract assignment class
-class AssignmentTest(TestCase):
+class AssignmentAbstractTest(TestCase):
     def test_is_abstract(self):
-        self.assertTrue(Assignment._meta.abstract)
+        self.assertTrue(AssignmentAbstract._meta.abstract)
 
     def test_datetime_label(self):
-        field_label = Assignment._meta.get_field("assignment_datetime").verbose_name
+        field_label = AssignmentAbstract._meta.get_field(
+            "assignment_datetime"
+        ).verbose_name
         self.assertEqual(field_label, "assignment date")
 
     def test_return_datetime_label(self):
-        field_label = Assignment._meta.get_field("return_datetime").verbose_name
+        field_label = AssignmentAbstract._meta.get_field("return_datetime").verbose_name
         self.assertEqual(field_label, "return date")
 
     def test_return_datetime_default(self):
-        default = Assignment._meta.get_field("return_datetime").default
+        default = AssignmentAbstract._meta.get_field("return_datetime").default
         self.assertIsNone(default)
 
     def test_return_datetime_null(self):
-        null = Assignment._meta.get_field("return_datetime").null
+        null = AssignmentAbstract._meta.get_field("return_datetime").null
         self.assertTrue(null)
 
     def test_person_foreign_key(self):
-        self.assertEqual(Assignment._meta.get_field("person").related_model, Person)
+        self.assertEqual(
+            AssignmentAbstract._meta.get_field("person").related_model, Person
+        )
 
 
 class DeviceAssignmentTest(TestCase):
@@ -38,7 +46,7 @@ class DeviceAssignmentTest(TestCase):
         self.device_assignment = DeviceAssignment.objects.get(id=1)
 
     def test_subclass(self):
-        self.assertTrue(issubclass(DeviceAssignment, Assignment))
+        self.assertTrue(issubclass(DeviceAssignment, AssignmentAbstract))
 
     def test_device_foreign_key(self):
         self.assertEqual(
@@ -59,7 +67,7 @@ class DeviceAccessoryAssignmentTest(TestCase):
         self.device_accessory_assignment = DeviceAccessoryAssignment.objects.get(id=1)
 
     def test_subclass(self):
-        self.assertTrue(issubclass(DeviceAssignment, Assignment))
+        self.assertTrue(issubclass(DeviceAssignment, AssignmentAbstract))
 
     def test_device_foreign_key(self):
         self.assertEqual(
