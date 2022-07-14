@@ -1,21 +1,28 @@
-{% extends "dashboard/dashboard.html" %}
+{% extends "dashboard/dashboard.html" %} {% block title %}Inventory - Assignment
+Detail{% endblock %} {% block content %} {% if deviceassignment %} {% load tz %}
+<ul>
+  <li>Assignment ID: {{deviceassignment.id}}</li>
+  <li>Person: {{deviceassignment.person}}</li>
+  <li>Device: {{deviceassignment.device}}</li>
+  <li>Assignment Date: {{deviceassignment.assignment_datetime|localtime}}</li>
+  <li>Return Date: {{deviceassignment.return_datetime|default:""}}</li>
+</ul>
 
-{% block title %}Inventory - Assignment Detail{% endblock %}
-
-{% block content %}
-
-{% if deviceassignment %}
-
-    <ul>
-        <li>Assignment ID: {{deviceassignment.id}}</li>
-    </ul>
-    <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:edit' deviceassignment.id%}">Edit Assignment</a>
-    <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:index' %}">Assignment List</a>
+<a
+  class="btn btn-primary m-2"
+  role="button"
+  href="{% url 'assignments:edit' deviceassignment.id%}"
+  >Edit Assignment</a
+>
+<a
+  class="btn btn-primary m-2"
+  role="button"
+  href="{% url 'assignments:index' %}"
+  >Assignment List</a
+>
 
 {% else %}
 
-    <p>Assignment Not Found</p>
+<p>Assignment Not Found</p>
 
-{% endif %}
-
-{% endblock content %}
+{% endif %} {% endblock content %}

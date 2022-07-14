@@ -18,7 +18,7 @@ class Person(models.Model):
         return f"{self.first_name} {self.last_name} ({self.internal_id})"
 
     def get_absolute_url(self):
-        return reverse('people:detail', kwargs={'pk': self.pk})
+        return reverse("people:detail", kwargs={"pk": self.pk})
 
     def display_name(self):
         return f"{self.first_name} {self.last_name}"
@@ -33,6 +33,7 @@ class PersonType(models.Model):
 
 class PersonStatus(models.Model):
     name = models.CharField(max_length=255)
+    is_inactive = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "Person statuses"
