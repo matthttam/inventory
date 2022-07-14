@@ -1,6 +1,7 @@
 from django.forms import model_to_dict
 from django.test import TestCase
 from devices.models import DeviceStatus, DeviceManufacturer, Device, DeviceModel
+from googlesync.tests.factories import GoogleDeviceFactory
 from locations.models import Room, Building
 from .factories import (
     DeviceModelFactory,
@@ -103,19 +104,14 @@ class DeviceCreateViewTest(TestCase):
     def test_new_device_post(self):
         device_status = DeviceStatusFactory()
         device_model = DeviceModelFactory()
+        google_device = GoogleDeviceFactory
         device_dict = {
             "serial_number": "SN-18",
             "asset_id": "ASSET-18",
             "notes": "",
             "status": device_status.id,
-            "google_id": "",
-            "google_status": "",
-            "google_organization_unit": "",
-            "google_enrollment_time": "",
-            "google_last_policy_sync": "",
-            "google_location": "",
-            "google_most_recent_user": "",
             "device_model": device_model.id,
+            "google_device": google_device.id,
             "building": "",
             "room": "",
         }

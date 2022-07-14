@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "locations",
     "people",
     "assignments",
+    "googlesync",
 ]
 
 MIDDLEWARE = [
