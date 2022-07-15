@@ -22,10 +22,10 @@ from .factories import (
 class DeviceStatusTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        DeviceStatusFactory()
+        DeviceStatusFactory(name="test_status")
 
     def setUp(self):
-        self.device_status = DeviceStatus.objects.get(id=1)
+        self.device_status = DeviceStatus.objects.get(name="test_status")
 
     def test_name_label(self):
         field_label = self.device_status._meta.get_field("name").verbose_name
@@ -46,7 +46,7 @@ class DeviceStatusTest(TestCase):
 
 class DeviceManufacturerTest(TestCase):
     def setUp(self):
-        DeviceManufacturerFactory()
+        DeviceManufacturerFactory(id=1)
 
     def test_name_label(self):
         device_manufacturer = DeviceManufacturer.objects.get(id=1)
@@ -65,7 +65,7 @@ class DeviceManufacturerTest(TestCase):
 
 class DeviceModelTest(TestCase):
     def setUp(self):
-        DeviceModelFactory()
+        DeviceModelFactory(id=1)
 
     def test_name_label(self):
         device_model = DeviceModel.objects.get(id=1)
@@ -81,7 +81,7 @@ class DeviceModelTest(TestCase):
 class DeviceTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        DeviceFactory()
+        DeviceFactory(id=1)
 
     def setUp(self):
         self.device = Device.objects.get(id=1)
@@ -202,7 +202,7 @@ class DeviceTest(TestCase):
 class DeviceAccessoryTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        DeviceAccessoryFactory()
+        DeviceAccessoryFactory(id=1)
 
     def setUp(self):
         self.device_accessory = DeviceAccessory.objects.get(id=1)

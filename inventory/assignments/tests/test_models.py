@@ -1,9 +1,6 @@
 from django.test import TestCase
-from assignments.models import (
-    AssignmentAbstract,
-    DeviceAssignment,
-    DeviceAccessoryAssignment,
-)
+from assignments.models import Assignment, DeviceAssignment, DeviceAccessoryAssignment
+from people.tests.factories import PersonFactory
 from people.models import Person
 from devices.models import Device, DeviceAccessory
 from .factories import DeviceAssignmentFactory, DeviceAccessoryAssignmentFactory
@@ -40,10 +37,13 @@ class AssignmentAbstractTest(TestCase):
 class DeviceAssignmentTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        DeviceAssignmentFactory()
+        # person = PersonFactory(email="test@example.com")
+        DeviceAssignmentFactory(id=1)  # person=person)
 
     def setUp(self):
-        self.device_assignment = DeviceAssignment.objects.get(id=1)
+        self.device_assignment = DeviceAssignment.objects.get(
+            id=1  # person__email="test@example.com"
+        )
 
     def test_subclass(self):
         self.assertTrue(issubclass(DeviceAssignment, AssignmentAbstract))
@@ -61,7 +61,7 @@ class DeviceAssignmentTest(TestCase):
 class DeviceAccessoryAssignmentTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        DeviceAccessoryAssignmentFactory()
+        DeviceAccessoryAssignmentFactory(id=1)
 
     def setUp(self):
         self.device_accessory_assignment = DeviceAccessoryAssignment.objects.get(id=1)

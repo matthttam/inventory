@@ -187,3 +187,9 @@ cython_debug/
 
 # Pycharm
 .idea
+
+# Ignore passenger files
+passenger_wsgi.py
+
+# Ignore static files
+pubilc/static/*
