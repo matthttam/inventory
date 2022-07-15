@@ -1,0 +1,9 @@
+-r common.txt
+pytest==7.1.2
+pytest-django==4.5.2
+pytest-forked==1.4.0
+pytest-xdist==2.5.0
+factory-boy==3.2.1
+Faker==13.14.0
+faker_education==1.1
+django-debug-toolbar==3.5.0
