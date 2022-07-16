@@ -1,5 +1,9 @@
 from django.test import TestCase
-from assignments.models import Assignment, DeviceAssignment, DeviceAccessoryAssignment
+from assignments.models import (
+    AssignmentAbstract,
+    DeviceAssignment,
+    DeviceAccessoryAssignment,
+)
 from people.tests.factories import PersonFactory
 from people.models import Person
 from devices.models import Device, DeviceAccessory
