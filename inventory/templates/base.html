@@ -26,8 +26,13 @@
     <title>{% block title %}Inventory{% endblock title %}</title>
   </head>
   <body>
-    {% block dashboard %} {% endblock dashboard %} {% block content %} No
-    Content To Display {% endblock content%}
+    {% block dashboard %} 
+    {% endblock dashboard %} 
+    {% block content %}
+    <div class="container">
+      {% include 'no_content.html' %}
+    </div>
+    {% endblock content%}
     <!-- Jquery and Bootstrap Javascript Bundle -->
 
     <script

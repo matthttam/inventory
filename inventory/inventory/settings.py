@@ -192,21 +192,21 @@ LOGGING = {
         "timestamp": {
             "format": "{asctime} {levelname} {message}",
             "style": "{",
-            }
-        },
+        }
+    },
     "handlers": {
         "file": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
             "filename": LOG_PATH,
-            "formatter":"timestamp",
+            "formatter": "timestamp",
         },
     },
     "loggers": {
         "django": {
             "handlers": ["file"],
             "level": "DEBUG",
-            "propagate": True,
+            "propagate": False,
         },
     },
 }

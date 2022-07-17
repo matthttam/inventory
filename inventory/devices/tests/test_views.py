@@ -104,6 +104,7 @@ class DeviceCreateViewTest(TestCase):
     def test_new_device_post(self):
         device_status = DeviceStatusFactory(name="test_status")
         device_model = DeviceModelFactory(id=1)
+        google_device = GoogleDeviceFactory()
         device_dict = {
             "serial_number": "SN-18",
             "asset_id": "ASSET-18",

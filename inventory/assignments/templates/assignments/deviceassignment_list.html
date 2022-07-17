@@ -53,7 +53,7 @@
 
 {% else %}
 
-    <p>No assignments are available.</p>
+    {% include 'no_content.html' with message="No assignments are available." %}
 
 {% endif %}
 
