@@ -48,14 +48,22 @@ class Person(models.Model):
     #        print("nope_here")
     #        super(Person, self).__setattr__(attrname, val)
 
+    class Meta:
+        verbose_name_plural = "People"
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.internal_id})"
 
     def get_absolute_url(self):
         return reverse("people:detail", kwargs={"pk": self.pk})
 
+    @property
     def display_name(self):
         return f"{self.first_name} {self.last_name}"
+
+    @property
+    def building_list(self):
+        return ", ".join([b.name for b in list(self.buildings.all())])
 
 
 @receiver(post_save, sender=Person)

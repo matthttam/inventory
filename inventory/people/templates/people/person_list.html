@@ -6,11 +6,8 @@
 
 {% include "datatables.html"%}
 
-    <script>
-        $(document).ready(function () {
-            $('#person_list').DataTable();
-        });
-    </script>
+{% load static %}
+<script src="{% static 'people/person_list.js'%}"></script>
 
 {% endblock head %}
 
@@ -28,7 +25,7 @@
                 <th>Internal ID</th>
                 <th>Type</th>
                 <th>Status</th>
-                <th>Buildings?</th>
+                <th>Buildings</th>
             </tr>
         </thead>
         <tbody>
@@ -58,7 +55,7 @@
                     {{ person.status }}
                 </td>
                 <td>
-                    ?
+                    {{ person.building_list|default:"-"}}
                 </td>
             </tr>
 

@@ -16,23 +16,25 @@
     />
 
     <!-- jquery -->
-    <script
+    <!--<script
       src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
       integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
       crossorigin="anonymous"
-    ></script>
-
+    ></script>-->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     {% block head %}{% endblock head %}
     <title>{% block title %}Inventory{% endblock title %}</title>
   </head>
   <body>
     {% block dashboard %} 
     {% endblock dashboard %} 
-    {% block content %}
     <div class="container">
+    {% block content %}
+    
       {% include 'no_content.html' %}
-    </div>
+    
     {% endblock content%}
+  </div>
     <!-- Jquery and Bootstrap Javascript Bundle -->
 
     <script
