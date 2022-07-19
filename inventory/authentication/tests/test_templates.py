@@ -50,7 +50,6 @@ class LoginFormTest(StaticLiveServerTestCase):
         password = "PA$$w0rd"
         user = UserFactory(password=password)
         page = self.web_browser.browser.new_page()
-        self.web_browser.login(page, self.live_server_url)
         page.goto(f"{self.live_server_url}/")
         self.assertEqual(
             page.url, f"{self.live_server_url}{reverse('authentication:login')}?next=/"
