@@ -6,17 +6,12 @@
 
 {% include "datatables.html"%}
 
-  <script>
-    $(document).ready(function () {
-      $("#device_list").DataTable();
-    });
-  </script>
+{% load static %}
+<script src="{% static 'devices/device_list.js'%}"></script>
 
-{% endblock head %} 
+{% endblock head %}
 
 {% block content %} 
-
-{% if device_list %}
 
   <table id="device_list" class="table table-striped table-bordered">
     <thead>
@@ -26,24 +21,8 @@
       </tr>
     </thead>
     <tbody>
-      {% for device in device_list %}
-
-      <tr>
-        <td>
-          <a href="{% url 'devices:detail' device.id %}">{{ device.asset_id }}</a>
-        </td>
-        <td>{{ device.serial_number }}</td>
-      </tr>
-
-      {% endfor %}
     </tbody>
   </table>
-
-{% else %}
-
-  {% include 'no_content.html' with message="No devices are available." %}
-  
-{% endif %}
 
 <a class="btn btn-primary m-2" role="button" href="{% url 'devices:new' %}">Create Device</a>
 

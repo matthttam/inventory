@@ -1,13 +1,34 @@
 from django.shortcuts import render
-from .models import DeviceAssignment, DeviceAccessoryAssignment
+from .models import DeviceAssignment
 from django.views.generic import ListView, DetailView, UpdateView, CreateView
+from django.views.generic.base import TemplateView
 from .forms import DeviceAssignmentForm
 from django.utils import timezone
+from inventory.views.django_serverside_datatable.views import ServerSideDatatableMixin
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
-class DeviceAssignmentListView(ListView):
-    model = DeviceAssignment
-    # context_object_name = 'devices'
+@method_decorator(csrf_exempt, name="dispatch")
+class DeviceAssignmentDatatableServerSideProcessingView(
+    PermissionRequiredMixin, ServerSideDatatableMixin
+):
+    permission_required = "deviceassignments.view_deviceassignment"
+    queryset = DeviceAssignment.objects.all()
+    # .annotate( building_name_list=GroupConcat("buildings__name", ", ") )
+    columns = [
+        "id",
+        "person__first_name",
+        "device__asset_id",
+        "assignment_datetime",
+        "return_datetime",
+    ]
+
+
+class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
+    permission_required = "deviceassignments.view_deviceassignment"
+    template_name = "assignments/deviceassignment_list.html"
 
 
 class DeviceAssignmentDetailView(DetailView):

@@ -1,7 +1,3 @@
-// $(document).ready(function () {
-//     $('#person_list').DataTable();
-// });
-
 $(document).ready(function () {
     $('#person_list').DataTable({
         processing: true,
@@ -9,20 +5,22 @@ $(document).ready(function () {
         ajax: {
             url: "/people/dt/",
         },
+        searchDelay: 350,
         columns: [
-            { data: 'first_name', searchable: true},
-            { data: 'middle_name', searchable: false},
-            { data: 'last_name', searchable: false},
-            { data: 'email', searchable: false},
-            { data: 'internal_id'},
-            { data: 'type__name', searchable: false},
-            { data: 'status__name', searchable: false},
-            { data: 'building_name_list', orderable: false},
+            { name: 'first_name' },
+            { name: 'last_name'},
+            { 
+                name: 'email', 
+                data: 'email', 
+                render:function(data, type, row, meta){
+                    console.log(row)
+                    return '<a href="' + row.id + '/">' + data.toLowerCase() + '</a>';
+                }
+            },
+            { name: 'internal_id', data: 'internal_id'},
+            { name: 'type__name', data: 'type__name'},
+            { name: 'status__name', data: 'status__name'},
+            { name: 'building_name_list', data: 'building_name_list', orderable: false},
         ]
     });
 });
-
-/*,
-        "serverSide": true,
-        
-        */

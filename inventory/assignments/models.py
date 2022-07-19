@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from devices.models import Device, DeviceAccessory
 from people.models import Person
+from django.db.models.functions import Concat
 
 
 class AssignmentAbstract(models.Model):

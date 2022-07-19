@@ -13,13 +13,10 @@
 
 {% block content %}
 
-{% if person_list %}
-
     <table id="person_list" class="table table-striped table-bordered">
         <thead>
             <tr>
                 <th>First Name</th>
-                <th>Middle Name</th>
                 <th>Last Name</th>
                 <th>Email</th>
                 <th>Internal ID</th>
@@ -29,47 +26,8 @@
             </tr>
         </thead>
         <tbody>
-            
-{% for person in person_list %}
-
-            <tr>
-                <td>
-                    <a href="/people/{{ person.id }}/">{{ person.first_name }}</a>
-                </td>
-                <td>
-                    {{ person.middle_name }}
-                </td>
-                <td>
-                    {{ person.last_name }}
-                </td>
-                <td>
-                    {{ person.email }}
-                </td>
-                <td>
-                    {{ person.internal_id }}
-                </td>
-                <td>
-                    {{ person.type }}
-                </td>
-                <td>
-                    {{ person.status }}
-                </td>
-                <td>
-                    {{ person.building_list|default:"-"}}
-                </td>
-            </tr>
-
-{% endfor %}
-
         </tbody>
     </table>
-
-{% else %}
-
-    {% include 'no_content.html' with message="No people are available." %}
-
-{% endif %}
-
 <a class="btn btn-primary m-2" role="button" href="{% url 'people:new' %}">Create Person</a>
 
 {% endblock content %}

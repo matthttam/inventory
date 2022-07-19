@@ -1,24 +1,19 @@
-from django.http import JsonResponse
-from django.shortcuts import render
-from .models import Person, PersonType
-from django.views.generic import ListView, DetailView, UpdateView, CreateView
+from .models import Person
+from django.views.generic import DetailView, UpdateView, CreateView
+from django.views.generic.base import TemplateView
 from .forms import PersonForm
-from django.views.generic.base import View
-import json
-from django.core.serializers import serialize
-from django.db.models import CharField, Value as V, F, Subquery
-from django.db.models.functions import Concat
-from locations.models import Building
 from inventory.aggregates import GroupConcat
-
-# from django_serverside_datatable.views import ServerSideDatatableView
-from inventory.views.django_serverside_datatable.views import ServerSideDatatableView
+from inventory.views.django_serverside_datatable.views import ServerSideDatatableMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class DatatableServerSideProcessingView(ServerSideDatatableView):
+class PersonDatatableServerSideProcessingView(
+    PermissionRequiredMixin, ServerSideDatatableMixin
+):
+    permission_required = "people.view_person"
     queryset = Person.objects.all().annotate(
         building_name_list=GroupConcat("buildings__name", ", ")
     )
@@ -35,39 +30,18 @@ class DatatableServerSideProcessingView(ServerSideDatatableView):
     ]
 
 
-class old_DatatableServerSideProcessingView(View):
-    def get(self, *args, **kwargs):
-        params = self.request.GET.dict()
-
-        people = Person.objects.values(
-            "id",
-            "first_name",
-            "middle_name",
-            "last_name",
-            "email",
-            "internal_id",
-            "type__name",
-            "status__name",
-        ).annotate(building_name_list=GroupConcat("buildings__name", ", "))
-        breakpoint()
-        return JsonResponse({"data": list(people)})
+class PersonListView(PermissionRequiredMixin, TemplateView):
+    permission_required = "people.view_person"
+    template_name = "people/person_list.html"
 
 
-class PersonListView(ListView):
-    model = Person
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # context.person.building_list = "a,b,c"
-        return context
-
-
-class PersonDetailView(DetailView):
+class PersonDetailView(PermissionRequiredMixin, DetailView):
+    permission_required = "people.view_person"
     model = Person
 
 
-class PersonUpdateView(UpdateView):
+class PersonUpdateView(PermissionRequiredMixin, UpdateView):
+    permission_required = "people.update_person"
     model = Person
     fields = [
         "internal_id",
