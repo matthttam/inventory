@@ -11,9 +11,34 @@ from django.db.models.functions import Concat
 from locations.models import Building
 from inventory.aggregates import GroupConcat
 
+# from django_serverside_datatable.views import ServerSideDatatableView
+from inventory.views.django_serverside_datatable.views import ServerSideDatatableView
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
-class DatatableServerSideProcessingView(View):
+
+@method_decorator(csrf_exempt, name="dispatch")
+class DatatableServerSideProcessingView(ServerSideDatatableView):
+    queryset = Person.objects.all().annotate(
+        building_name_list=GroupConcat("buildings__name", ", ")
+    )
+    columns = [
+        "id",
+        "first_name",
+        "middle_name",
+        "last_name",
+        "email",
+        "internal_id",
+        "type__name",
+        "status__name",
+        "building_name_list",
+    ]
+
+
+class old_DatatableServerSideProcessingView(View):
     def get(self, *args, **kwargs):
+        params = self.request.GET.dict()
+
         people = Person.objects.values(
             "id",
             "first_name",
