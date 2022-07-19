@@ -7,3 +7,5 @@ factory-boy==3.2.1
 Faker==13.14.0
 faker_education==1.1
 django-debug-toolbar==3.5.0
+playwright==1.23.1
+querystring-parser==1.2.4
