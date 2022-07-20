@@ -25,6 +25,9 @@ class DeviceAssignment(AssignmentAbstract):
     def get_absolute_url(self):
         return reverse("assignments:detail", kwargs={"pk": self.pk})
 
+    def __str__(self):
+        return f"Assignment {self.id}"
+
 
 class DeviceAccessoryAssignment(AssignmentAbstract):
     device_accessory = models.ForeignKey(DeviceAccessory, on_delete=models.PROTECT)
