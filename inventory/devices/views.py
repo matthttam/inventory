@@ -2,7 +2,9 @@ from django.shortcuts import render
 from .models import Device
 from django.views.generic import ListView, DetailView, UpdateView, CreateView
 from .forms import DeviceForm
-from inventory.views.django_serverside_datatable.views import ServerSideDatatableMixin
+from django_datatable_serverside_mixin.views import (
+    ServerSideDatatableMixin,
+)
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import PermissionRequiredMixin

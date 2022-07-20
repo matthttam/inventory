@@ -3,7 +3,9 @@ from django.views.generic import DetailView, UpdateView, CreateView
 from django.views.generic.base import TemplateView
 from .forms import PersonForm
 from inventory.aggregates import GroupConcat
-from inventory.views.django_serverside_datatable.views import ServerSideDatatableMixin
+from django_datatable_serverside_mixin.views import (
+    ServerSideDatatableMixin,
+)
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import PermissionRequiredMixin

@@ -4,7 +4,9 @@ from django.views.generic import ListView, DetailView, UpdateView, CreateView
 from django.views.generic.base import TemplateView
 from .forms import DeviceAssignmentForm
 from django.utils import timezone
-from inventory.views.django_serverside_datatable.views import ServerSideDatatableMixin
+from django_datatable_serverside_mixin.views import (
+    ServerSideDatatableMixin,
+)
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import PermissionRequiredMixin
