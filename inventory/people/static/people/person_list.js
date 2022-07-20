@@ -13,7 +13,6 @@ $(document).ready(function () {
                 name: 'email', 
                 data: 'email', 
                 render:function(data, type, row, meta){
-                    console.log(row)
                     return '<a href="' + row.id + '/">' + data.toLowerCase() + '</a>';
                 }
             },
