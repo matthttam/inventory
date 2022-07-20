@@ -1,0 +1,17 @@
+{% extends "dashboard/dashboard.html" %}
+
+{% block title %}Inventory - Assignment Confirm Delete{% endblock %}
+
+{% block content %}
+
+    <form method="post">{% csrf_token %}
+        <p>Are you sure you want to delete "{{ object }}"?</p>
+        {% block infobox %}
+        {% include 'assignments/deviceassignment_infobox.html'%}
+        {% endblock infobox %}
+        
+        {{ form }}
+        <input type="submit" value="Confirm">
+    </form>
+
+{% endblock content %}

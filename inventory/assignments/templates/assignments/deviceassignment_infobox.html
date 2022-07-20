@@ -1,0 +1,8 @@
+{% load tz %}
+<ul>
+    <li>Assignment ID: {{deviceassignment.id}}</li>
+    <li>Person: {{deviceassignment.person}}</li>
+    <li>Device: {{deviceassignment.device}}</li>
+    <li>Assignment Date: {{deviceassignment.assignment_datetime|localtime}}</li>
+    <li>Return Date: {{deviceassignment.return_datetime|default:""}}</li>
+  </ul>
