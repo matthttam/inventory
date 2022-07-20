@@ -1,10 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
 from authentication.tests.factories import SuperuserUserFactory, User, UserFactory
-
 from assignments.models import DeviceAssignment
 from assignments.tests.factories import DeviceAssignmentFactory
-
 from inventory.tests.helpers import get_permission
 
 list_link = '<a class="btn btn-primary m-2" role="button" href="/assignments/" >Assignment List</a>'

@@ -1,11 +1,8 @@
 import factory
 from faker import Faker
-
 from zoneinfo import ZoneInfo
 from django.utils import timezone
-
 from factory.django import DjangoModelFactory
-
 from assignments.models import DeviceAssignment, DeviceAccessoryAssignment
 from devices.tests.factories import DeviceFactory
 from people.tests.factories import PersonFactory
@@ -15,8 +12,6 @@ from devices.tests.factories import DeviceFactory, DeviceAccessoryFactory
 fake = Faker()
 Faker.seed(0)
 
-# tz = timezone.settings.TIME_ZONE
-# tz = timezone.timezone()
 tz = ZoneInfo(timezone.settings.TIME_ZONE)
 
 
