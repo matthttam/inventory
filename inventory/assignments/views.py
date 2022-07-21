@@ -16,7 +16,7 @@ from django_datatable_serverside_mixin.views import (
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.db.models.functions import Concat
 from django.db.models import CharField, Value as V
 
@@ -46,12 +46,33 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        temp_id = 12345
+        placeholder = "__id_placeholder__"
         context["actions"] = {
-            "update": self.request.user.has_perm("assignments.change_deviceassignment"),
-            "view": self.request.user.has_perm("assignments.view_deviceassignment"),
-            "delete": self.request.user.has_perm("assignments.delete_deviceassignment"),
-            "update_url": "",
-            "view_url": "",
+            "view": {
+                "allowed": self.request.user.has_perm(
+                    "assignments.view_deviceassignment"
+                ),
+                "path": reverse("assignments:detail", args=[temp_id]).replace(
+                    str(temp_id), placeholder
+                ),
+            },
+            "change": {
+                "allowed": self.request.user.has_perm(
+                    "assignments.change_deviceassignment"
+                ),
+                "path": reverse("assignments:edit", args=[temp_id]).replace(
+                    str(temp_id), placeholder
+                ),
+            },
+            "delete": {
+                "allowed": self.request.user.has_perm(
+                    "assignments.delete_deviceassignment"
+                ),
+                "path": reverse("assignments:delete", args=[temp_id]).replace(
+                    str(temp_id), placeholder
+                ),
+            },
         }
         return context
 
