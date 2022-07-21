@@ -90,7 +90,7 @@ class DeviceAssignmentDetailWithoutPermissionTest(TestCase):
             self.response.content.decode(),
         )
 
-    def test_assignment_link(self):
+    def test_index_link(self):
         self.assertInHTML(
             list_link,
             self.response.content.decode(),
@@ -130,7 +130,7 @@ class DeviceAssignmentDetailWithPermissionTest(TestCase):
             self.response.content.decode(),
         )
 
-    def test_assignment_link(self):
+    def test_index_link(self):
         self.user.user_permissions.add(
             get_permission(DeviceAssignment, "add_deviceassignment")
         )
