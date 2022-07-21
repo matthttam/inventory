@@ -33,7 +33,7 @@ class DashboardNavTestSuperuserUser(TestCase):
     def setUp(self):
         user = User.objects.get(username="my_superuser@example.com")
         self.client.force_login(user)
-        self.response = self.client.get(reverse("dashboard:index"))
+        self.response = self.client.get(reverse("dashboard:dashboard"))
 
     def test_default_links_exist(self):
         for link in DEFAULT_LINKS:
@@ -68,40 +68,40 @@ class DashboardNavTestRegularUser(TestCase):
         self.client.force_login(self.user)
 
     def test_google_sync_missing(self):
-        self.response = self.client.get(reverse("dashboard:index"))
+        self.response = self.client.get(reverse("dashboard:dashboard"))
         self.assertNotIn(
             google_sync_link,
             self.response.content.decode(),
         )
 
     def test_devices_requires_device_view_permission(self):
-        self.response = self.client.get(reverse("dashboard:index"))
+        self.response = self.client.get(reverse("dashboard:dashboard"))
         self.assertNotIn(
             devices_link,
             self.response.content.decode(),
         )
         self.user.user_permissions.add(get_permission(Device, "view_device"))
-        self.response = self.client.get(reverse("dashboard:index"))
+        self.response = self.client.get(reverse("dashboard:dashboard"))
         self.assertIn(
             devices_link,
             self.response.content.decode(),
         )
 
     def test_people_requires_person_view_permission(self):
-        self.response = self.client.get(reverse("dashboard:index"))
+        self.response = self.client.get(reverse("dashboard:dashboard"))
         self.assertNotIn(
             people_link,
             self.response.content.decode(),
         )
         self.user.user_permissions.add(get_permission(Person, "view_person"))
-        self.response = self.client.get(reverse("dashboard:index"))
+        self.response = self.client.get(reverse("dashboard:dashboard"))
         self.assertIn(
             people_link,
             self.response.content.decode(),
         )
 
     def test_assignment_requires_deviceassignment_view_permission(self):
-        self.response = self.client.get(reverse("dashboard:index"))
+        self.response = self.client.get(reverse("dashboard:dashboard"))
         self.assertNotIn(
             assignments_link,
             self.response.content.decode(),
@@ -109,14 +109,14 @@ class DashboardNavTestRegularUser(TestCase):
         self.user.user_permissions.add(
             get_permission(DeviceAssignment, "view_deviceassignment")
         )
-        self.response = self.client.get(reverse("dashboard:index"))
+        self.response = self.client.get(reverse("dashboard:dashboard"))
         self.assertIn(
             assignments_link,
             self.response.content.decode(),
         )
 
     def test_default_links_exist(self):
-        self.response = self.client.get(reverse("dashboard:index"))
+        self.response = self.client.get(reverse("dashboard:dashboard"))
         for link in DEFAULT_LINKS:
             self.assertInHTML(
                 link,
