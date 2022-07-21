@@ -44,6 +44,17 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
     permission_required = "assignments.view_deviceassignment"
     template_name = "assignments/deviceassignment_list.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["actions"] = {
+            "update": self.request.user.has_perm("assignments.change_deviceassignment"),
+            "view": self.request.user.has_perm("assignments.view_deviceassignment"),
+            "delete": self.request.user.has_perm("assignments.delete_deviceassignment"),
+            "update_url": "",
+            "view_url": "",
+        }
+        return context
+
 
 class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):
     permission_required = "assignments.view_deviceassignment"

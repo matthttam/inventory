@@ -4,6 +4,7 @@
 
 {% block head %}
 
+{{ actions|json_script:"actions" }}
 {% include "datatables.html"%}
 
 {% load static %}
@@ -21,6 +22,7 @@
                 <th>Device</th>
                 <th>Assignment Date</th>
                 <th>Return Date</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
