@@ -1,9 +1,12 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-2">
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-2">
     <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.namespace == "dashboard" %}active{% endif %}" aria-current="page" href="{% url "dashboard:index" %}">Dashboard</a>
+                    <a class="nav-link {% if request.resolver_match.namespace == "dashboard" %}active{% endif %}" aria-current="page" href="{% url "dashboard:dashboard" %}">Dashboard</a>
                 </li>
                 {% if perms.devices.view_device %}
                     <li class="nav-item">
@@ -37,3 +40,6 @@
         </div>
     </div>
 </nav>
+
+
+    
