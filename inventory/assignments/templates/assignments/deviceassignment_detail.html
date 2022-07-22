@@ -7,8 +7,9 @@
 {% if deviceassignment %}
 
 {% block infobox %}
-{% include 'assignments/deviceassignment_infobox.html' with bottom_infobox_card='assignments/deviceassignment_control_buttons.html'%}
+{% include './partials/deviceassignment_infobox.html' with bottom_infobox_card='./deviceassignment_control_buttons.html' %}
 {% endblock infobox %}
+
 
 {% else %}
 
