@@ -4,7 +4,6 @@ from assignments.models import (
     DeviceAssignment,
     DeviceAccessoryAssignment,
 )
-
 from people.models import Person
 from devices.models import Device, DeviceAccessory
 from .factories import DeviceAssignmentFactory, DeviceAccessoryAssignmentFactory
