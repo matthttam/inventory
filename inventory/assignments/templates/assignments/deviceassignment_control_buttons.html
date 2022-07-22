@@ -1,0 +1,10 @@
+{% if perms.assignments.change_deviceassignment %}
+  <a class="btn btn-primary mx-3 p-3" role="button" href="{% url 'assignments:edit' deviceassignment.id%}">Edit Assignment</a>
+{% endif %}
+
+{% if perms.assignments.delete_deviceassignment %}
+  <a class="btn btn-danger mx-3 p-3" role="button" href="{% url 'assignments:delete' deviceassignment.id%}">Delete Assignment</a>
+{% endif %}
+{% if perms.assignments.view_deviceassignment %}
+  <a class="btn btn-primary mx-3 p-3" role="button" href="{% url 'assignments:index' %}" >Assignment List</a>
+{% endif %}

@@ -11,6 +11,7 @@ function getActionButtons(row){
     console.log(actions)
     action_buttons = 
     `
+    <div class="container">
         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
             <div class="btn-group me-2" role="group" aria-label="First group">
     `
@@ -27,6 +28,7 @@ function getActionButtons(row){
     `
             </div>
         </div>
+    </div>
     `
     return action_buttons
 }
@@ -38,15 +40,32 @@ $(document).ready(function () {
         ajax: {
             url: "/assignments/dt/",
         },
+        
+        colReorder: {
+            fixedColumnsRight:1
+        },
+        fixedHeader: true,
         searchDelay: 350,
         columns: [
-            { name: 'id', data: 'id', render:function(data, type, row, meta){
-                return '<a href="' + row.id + '/">' + String(data).toLowerCase() + '</a>';
-            }},
-            { name: 'person_name' },
-            { name: 'device__asset_id' },
-            { name: 'assignment_datetime' },
-            { name: 'return_datetime'},
+            { name: 'id', data: 'id', visible: false},
+            { name: 'person_name', data: 'person_name' },
+            { name: 'device__asset_id', data: 'device__asset_id' },
+            { 
+                name: 'assignment_datetime', 
+                data: 'assignment_datetime',
+                render: function(data, type, row, meta){
+                    if(!data) return ''
+                    return new Date(data).toLocaleDateString()
+                }
+            },
+            { 
+                name: 'return_datetime', 
+                data: 'return_datetime',
+                render: function(data, type, row, meta){
+                    if(!data) return ''
+                    return new Date(data).toLocaleDateString()
+                }
+            },
             { 
                 name: 'actions', 
                 data: 'id', 

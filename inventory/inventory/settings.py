@@ -139,6 +139,10 @@ FORMAT_MODULE_PATH = [
 STATIC_URL = env("STATIC_URL")
 STATIC_ROOT = Path(BASE_DIR.parent).joinpath(env("STATIC_PATH"))
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 

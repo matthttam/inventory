@@ -9,9 +9,9 @@
         {% block infobox %}
         {% include 'assignments/deviceassignment_infobox.html'%}
         {% endblock infobox %}
-        
         {{ form }}
-        <input type="submit" value="Confirm">
+        <a class="button btn btn-danger mx-3 p-3" type="submit">Delete {{ object }}</a>
+        <a class="button btn btn-primary mx-3 p-3" href="{%url 'assignments:detail' object.id%}">Cancel</a>
     </form>
 
 {% endblock content %}

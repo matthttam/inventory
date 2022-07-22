@@ -7,19 +7,8 @@
 {% if deviceassignment %}
 
 {% block infobox %}
-{% include 'assignments/deviceassignment_infobox.html'%}
+{% include 'assignments/deviceassignment_infobox.html' with bottom_infobox_card='assignments/deviceassignment_control_buttons.html'%}
 {% endblock infobox %}
-
-{% if perms.assignments.change_deviceassignment %}
-  <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:edit' deviceassignment.id%}">Edit Assignment</a>
-{% endif %}
-
-{% if perms.assignments.delete_deviceassignment %}
-  <a class="btn btn-danger m-2" role="button" href="{% url 'assignments:delete' deviceassignment.id%}">Delete Assignment</a>
-{% endif %}
-{% if perms.assignments.view_deviceassignment %}
-  <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:index' %}" >Assignment List</a>
-{% endif %}
 
 {% else %}
 
