@@ -1,17 +1,10 @@
 from django.test import TestCase, SimpleTestCase
-from django.urls import reverse
-from authentication.tests.factories import SuperuserUserFactory, User, UserFactory
-from assignments.models import DeviceAssignment
-from assignments.tests.factories import DeviceAssignmentFactory
 from inventory.tests.helpers import get_permission
 
 from django.template import Context, Template
 from bs4 import BeautifulSoup
 import copy
 
-list_link = '<a class="btn btn-primary m-2" role="button" href="/assignments/">Assignment List</a>'
-update_link = '<a class="btn btn-primary m-2" role="button" href="/assignments/1/edit/">Edit Assignment</a>'
-delete_link = '<a class="btn btn-danger m-2" role="button" href="/assignments/1/delete/">Delete Assignment</a>'
 list_link_selector = 'a[href="/assignments/"]'
 update_link_selector = 'a[href="/assignments/1/edit/"]'
 delete_link_selector = 'a[href="/assignments/1/delete/"]'
@@ -54,7 +47,7 @@ class DeviceAssignmentControlButtonsSuperuserTest(SimpleTestCase):
         self.assertEqual(delete_link[0].contents[0], "Delete Assignment")
 
 
-class DeviceAssignmentControlButtonsWithoutPermissionTest(TestCase):
+class DeviceAssignmentControlButtonsWithoutPermissionTest(SimpleTestCase):
     def setUp(self):
         self.context = copy.deepcopy(default_context)
         self.template = copy.deepcopy(default_template)
