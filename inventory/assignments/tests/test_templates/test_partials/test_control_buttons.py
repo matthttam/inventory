@@ -1,6 +1,4 @@
-from django.test import TestCase, SimpleTestCase
-from inventory.tests.helpers import get_permission
-
+from django.test import SimpleTestCase
 from django.template import Context, Template
 from bs4 import BeautifulSoup
 import copy
