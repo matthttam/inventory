@@ -36,5 +36,5 @@ class DeviceAssignmentConfirmDeleteTest(TestCase):
         cancel_buttons = soup.select('a[href="/assignments/1/"]')
         self.assertEqual(len(submit_buttons), 1)
         self.assertEqual(len(cancel_buttons), 1)
-        self.assertEqual(submit_buttons[0].contents[0], "Delete Assignment 1")
-        self.assertEqual(cancel_buttons[0].contents[0], "Cancel")
+        self.assertInHTML(submit_buttons[0].contents[0], "Delete Assignment 1")
+        self.assertInHTML(cancel_buttons[0].contents[0], "Cancel")

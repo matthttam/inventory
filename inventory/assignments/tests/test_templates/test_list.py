@@ -45,7 +45,7 @@ class DeviceAssignmenListSuperuserTest(TestCase):
     def test_template_used(self):
         self.assertTemplateUsed(self.response, "assignments/deviceassignment_list.html")
         self.assertTemplateUsed(self.response, "dashboard/dashboard.html")
-        self.assertTemplateUsed(self.response, "datatables.html")
+        self.assertTemplateUsed(self.response, "partials/datatables.html")
 
     def test_title(self):
         self.assertInHTML("Inventory - Assignments", self.response.content.decode())

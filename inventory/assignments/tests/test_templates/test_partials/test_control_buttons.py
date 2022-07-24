@@ -25,7 +25,7 @@ default_template = Template(
 )
 
 
-class DeviceAssignmentControlButtonsSuperuserTest(SimpleTestCase):
+class DeviceAssignmentControlButtonsTest(SimpleTestCase):
     def test_all_links_exist(self):
         context = copy.deepcopy(default_context)
         template = copy.deepcopy(default_template)
@@ -40,9 +40,9 @@ class DeviceAssignmentControlButtonsSuperuserTest(SimpleTestCase):
         self.assertEqual(len(update_link), 1)
         self.assertEqual(len(delete_link), 1)
 
-        self.assertEqual(list_link[0].contents[0], "Assignment List")
-        self.assertEqual(update_link[0].contents[0], "Edit Assignment")
-        self.assertEqual(delete_link[0].contents[0], "Delete Assignment")
+        self.assertInHTML(list_link[0].contents[0], "Assignment List")
+        self.assertInHTML(update_link[0].contents[0], "Edit Assignment")
+        self.assertInHTML(delete_link[0].contents[0], "Delete Assignment")
 
 
 class DeviceAssignmentControlButtonsWithoutPermissionTest(SimpleTestCase):
@@ -68,7 +68,6 @@ class DeviceAssignmentControlButtonsWithoutPermissionTest(SimpleTestCase):
         list_link = soup.select(list_link_selector)
         update_link = soup.select(update_link_selector)
         delete_link = soup.select(delete_link_selector)
-        print(self.context)
         self.assertEqual(len(list_link), 1)
         self.assertEqual(len(update_link), 0)
         self.assertEqual(len(delete_link), 1)
