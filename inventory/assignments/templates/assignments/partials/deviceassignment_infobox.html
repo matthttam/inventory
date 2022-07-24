@@ -18,18 +18,8 @@
             <div class="col-md-4 fw-bold text-end">Assignment Date :</div><div class="col md-1 text-start">{{deviceassignment.assignment_datetime|localtime|date:"SHORT_DATETIME_FORMAT"}}</div>
           </div>
           <div class="row mb-2">
-            
             <div class="col-md-4 fw-bold text-end">Return Date :</div><div class="col md-1 text-start">{{deviceassignment.return_datetime|localtime|date:"SHORT_DATETIME_FORMAT"|default:""}}</div>
           </div>
-          <!--
-          <div class="row">
-            <div class="col-md-4 fw-bold text-end">Assignment ID :</div><div class="col md-1 text-start">{{deviceassignment.id}}</div><p></p>
-            <div class="col-md-4 fw-bold text-end">Person :</div><div class="col md-1 text-start">{{deviceassignment.person}}</div></p>
-            <div class="col-md-4 fw-bold text-end">Device :</div><div class="col md-1 text-start">{{deviceassignment.device}}</div></p>
-            <div class="col-md-4 fw-bold text-end">Assignment Date :</div><div class="col md-1 text-start">{{deviceassignment.assignment_datetime|localtime|date:"SHORT_DATETIME_FORMAT"}}</div></p>
-            <div class="col-md-4 fw-bold text-end">Return Date :</div><div class="col md-1 text-start">{{deviceassignment.return_datetime|localtime|date:"SHORT_DATETIME_FORMAT"|default:""}}</div></p>
-          </div>
-          -->
           {% if bottom_infobox_card %}
             {% include bottom_infobox_card %}
           {% endif %}
