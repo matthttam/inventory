@@ -67,18 +67,6 @@ class DeviceAssignmentListWithoutPermissionTest(TestCase):
         self.client.force_login(self.user)
         self.response = self.client.get(reverse("assignments:index"))
 
-    # def test_update_link_missing(self):
-    #    self.assertNotIn(
-    #        update_link,
-    #        self.response.content.decode(),
-    #    )
-    #
-    # def test_delete_link_missing(self):
-    #    self.assertNotIn(
-    #        delete_link,
-    #        self.response.content.decode(),
-    #    )
-
     def test_new_link(self):
         self.assertNotIn(
             new_link,
