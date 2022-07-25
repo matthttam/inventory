@@ -37,17 +37,6 @@ default_template = Template(
 )
 
 
-class TestTest(TestCase):
-    def test_something(self):
-        self.user = SuperuserUserFactory(username="my_superuser@example.com")
-        self.client.force_login(self.user)
-        DeviceAssignmentFactory(id=1)
-        response = self.client.get(reverse("assignments:detail", args=[1]))
-        # print(response)
-        print(response.context)
-        # print(response.context["TIME_ZONE"])
-
-
 class DeviceAssignmentInfoboxTest(SimpleTestCase):
     def setUp(self):
         self.context = copy.deepcopy(default_context)

@@ -29,13 +29,13 @@ class DeviceAssignmentListViewAuthenticatedWithPermissionTest(TestCase):
         self.assertTemplateUsed("deviceassignment_list.html")
 
     def test_one_deviceassignment(self):
-        device_assignment = DeviceAssignmentFactory(id=1)
+        DeviceAssignmentFactory(id=1)
         response = self.client.get(reverse("assignments:index"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed("deviceassignment_list.html")
 
     def test_ten_deviceassignments(self):
-        device_assignments = DeviceAssignmentFactory.create_batch(10)
+        DeviceAssignmentFactory.create_batch(10)
         response = self.client.get(reverse("assignments:index"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed("deviceassignment_list.html")

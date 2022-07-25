@@ -1,10 +1,11 @@
 from django.test import TestCase
 from django.urls import reverse
-from authentication.tests.factories import SuperuserUserFactory, User, UserFactory
-from assignments.models import DeviceAssignment
-from assignments.tests.factories import DeviceAssignmentFactory
-from inventory.tests.helpers import get_permission
+
+from authentication.tests.factories import SuperuserUserFactory, User
+
 from bs4 import BeautifulSoup
+
+from assignments.tests.factories import DeviceAssignmentFactory
 
 
 class DeviceAssignmentConfirmDeleteTest(TestCase):
@@ -30,7 +31,6 @@ class DeviceAssignmentConfirmDeleteTest(TestCase):
         )
 
     def test_buttons(self):
-        print(self.response.content.decode())
         soup = BeautifulSoup(self.response.content.decode(), "html.parser")
         submit_buttons = soup.select('button[type="submit"]')
         cancel_buttons = soup.select('a[href="/assignments/1/"]')
