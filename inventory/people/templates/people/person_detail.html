@@ -6,20 +6,13 @@
 
 {% if person %}
 
-    <ul>
-
-        <li>Person Type: {{person.type}}</li>
-        <li>Person Internal ID: {{person.internal_id}}</li>
-        <li>Person First Name: {{person.first_name}}</li>
-        <li>Person Last Name: {{person.last_name}}</li>
-
-    </ul>
-    <a class="btn btn-primary m-2" role="button" href="{% url 'people:edit' person.id%}">Edit Person</a>
-    <a class="btn btn-primary m-2" role="button" href="{% url 'people:index' %}">Person List</a>
+{% block infobox %}
+{% include './partials/person_infobox.html' with bottom_infobox_card='./person_control_buttons.html' %}
+{% endblock infobox %}
 
 {% else %}
 
-    <p>Person Not Found</p>
+<p>Person Not Found</p>
 
 {% endif %}
 

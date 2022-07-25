@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from devices.models import Device, DeviceAccessory
 from people.models import Person
+from django.db.models.functions import Concat
 
 
 class AssignmentAbstract(models.Model):
@@ -23,6 +24,9 @@ class DeviceAssignment(AssignmentAbstract):
 
     def get_absolute_url(self):
         return reverse("assignments:detail", kwargs={"pk": self.pk})
+
+    def __str__(self):
+        return f"Assignment {self.id}"
 
 
 class DeviceAccessoryAssignment(AssignmentAbstract):

@@ -4,59 +4,34 @@
 
 {% block head %}
 
-{% include "datatables.html"%}
+{{ actions|json_script:"actions" }}
+{% include "partials/datatables.html"%}
 
-    <script>
-        $(document).ready(function () {
-            $('#person_list').DataTable();
-        });
-    </script>
+{% load static %}
+<script src="{% static 'assignments/deviceassignment_list.js'%}"></script>
 
 {% endblock head %}
 
 {% block content %}
 
-{% if deviceassignment_list %}
-    <table id="person_list" class="table table-striped table-bordered">
+    <table id="assignment_list" class="table table-striped table-bordered nowrap" style="width:100%">
         <thead>
             <tr>
-                <th>*</th>
+                <th>ID</th>
                 <th>Person</th>
                 <th>Device</th>
                 <th>Assignment Date</th>
                 <th>Return Date</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-        <ul>
-        {% for deviceassignment in deviceassignment_list %}
-        <tr>
-            <td>
-                <a href="/assignments/{{ deviceassignment.id }}/">{{ deviceassignment.id }}</a></li>
-            </td>
-            <td>
-                {{deviceassignment.person.display_name}}
-            </td>
-            <td>
-                {{deviceassignment.device.display_name}}
-            </td>
-            <td>
-                {{deviceassignment.assignment_datetime }}
-            </td>
-            <td>
-                {{deviceassignment.return_datetime|default_if_none:""}}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </tbody>
+    </table>
 
-{% else %}
 
-    <p>No assignments are available.</p>
-
-{% endif %}
-
+{% if perms.assignments.add_deviceassignment %}
     <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:new' %}">Create Assignment</a>
+{% endif %}
 
 {% endblock content %}

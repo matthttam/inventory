@@ -1,28 +1,20 @@
-{% extends "dashboard/dashboard.html" %} {% block title %}Inventory - Assignment
-Detail{% endblock %} {% block content %} {% if deviceassignment %} {% load tz %}
-<ul>
-  <li>Assignment ID: {{deviceassignment.id}}</li>
-  <li>Person: {{deviceassignment.person}}</li>
-  <li>Device: {{deviceassignment.device}}</li>
-  <li>Assignment Date: {{deviceassignment.assignment_datetime|localtime}}</li>
-  <li>Return Date: {{deviceassignment.return_datetime|default:""}}</li>
-</ul>
+{% extends "dashboard/dashboard.html" %}
 
-<a
-  class="btn btn-primary m-2"
-  role="button"
-  href="{% url 'assignments:edit' deviceassignment.id%}"
-  >Edit Assignment</a
->
-<a
-  class="btn btn-primary m-2"
-  role="button"
-  href="{% url 'assignments:index' %}"
-  >Assignment List</a
->
+{% block title %}Inventory - Assignment Detail{% endblock %}
+
+{% block content %}
+
+{% if deviceassignment %}
+
+{% block infobox %}
+{% include './partials/deviceassignment_infobox.html' with bottom_infobox_card='./deviceassignment_control_buttons.html' %}
+{% endblock infobox %}
+
 
 {% else %}
 
 <p>Assignment Not Found</p>
 
-{% endif %} {% endblock content %}
+{% endif %}
+
+{% endblock content %}

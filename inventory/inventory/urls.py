@@ -26,4 +26,5 @@ urlpatterns = [
     path("assignments/", include("assignments.urls")),
     path("accounts/", include("authentication.urls")),
     path("googlesync/", include("googlesync.urls")),
+    path("profile/", include("profiles.urls")),
 ]
