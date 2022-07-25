@@ -1,20 +1,21 @@
-from django.shortcuts import render
-from .models import Device
 from django.views.generic import (
-    ListView,
+    TemplateView,
     DetailView,
     UpdateView,
     CreateView,
     DeleteView,
 )
-from .forms import DeviceForm
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.urls import reverse_lazy
+
 from django_datatable_serverside_mixin.views import (
     ServerSideDatatableMixin,
 )
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.urls import reverse, reverse_lazy
+
+from .forms import DeviceForm
+from .models import Device
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -30,9 +31,9 @@ class DeviceDatatableServerSideProcessingView(
     ]
 
 
-class DeviceListView(PermissionRequiredMixin, ListView):
+class DeviceListView(PermissionRequiredMixin, TemplateView):
     permission_required = "devices.view_device"
-    model = Device
+    template_name = "devices/device_list.html"
 
 
 class DeviceDetailView(PermissionRequiredMixin, DetailView):

@@ -24,6 +24,8 @@
     </tbody>
   </table>
 
-<a class="btn btn-primary m-2" role="button" href="{% url 'devices:new' %}">Create Device</a>
+{% if perms.devices.add_device %}
+  <a class="btn btn-primary m-2" role="button" href="{% url 'devices:new' %}">Create Device</a>
+{% endif %}
 
 {% endblock content %}
