@@ -17,10 +17,12 @@ default_context = Context(
         "TIME_ZONE": "America/Chicago",
         "device": {
             "id": 1,
-            "person": "Test Person",
-            "device": "Test Device",
-            "assignment_datetime": datetime(2022, 7, 1, 2, 0, 0, 0),
-            "return_datetime": "",
+            "serial_number": "Test Serial",
+            "asset_id": "Test Asset ID",
+            "status": "Test Status",
+            "device_model": "Test Model",
+            "building": "Test Building",
+            "room": "Test Room",
         },
         "perms": {
             "devices": {
@@ -44,24 +46,32 @@ class DeviceInfoboxTest(SimpleTestCase):
         """Verify the infobox loads the assignment data expected"""
         expected_fields = [
             {
-                "label": "Assignment ID :",
+                "label": "Device ID :",
                 "value": self.context["device"]["id"],
             },
             {
-                "label": "Person :",
-                "value": self.context["device"]["person"],
+                "label": "Serial :",
+                "value": self.context["device"]["serial_number"],
             },
             {
-                "label": "Device :",
-                "value": self.context["device"]["device"],
+                "label": "Asset :",
+                "value": self.context["device"]["asset_id"],
             },
             {
-                "label": "Assignment Date :",
-                "value": "07/01/2022 2 a.m.",
+                "label": "Status :",
+                "value": self.context["device"]["status"],
             },
             {
-                "label": "Return Date :",
-                "value": "",
+                "label": "Model :",
+                "value": self.context["device"]["device_model"],
+            },
+            {
+                "label": "Building :",
+                "value": self.context["device"]["building"],
+            },
+            {
+                "label": "Room :",
+                "value": self.context["device"]["room"],
             },
         ]
         context = copy.deepcopy(default_context)
@@ -69,14 +79,22 @@ class DeviceInfoboxTest(SimpleTestCase):
         rendered = template.render(context)
         soup = BeautifulSoup(rendered, "html.parser")
 
-        info_divs = soup.select_one('p[name="assignment_card_body"]').find_all_next(
+        info_divs = soup.select_one('p[name="device_card_body"]').find_all_next(
             "div", class_="row"
         )
-
         self.assertEqual(len(info_divs), len(expected_fields))
         for index, info_div in enumerate(info_divs):
-            self.assertIn(str(expected_fields[index]["label"]), str(info_div))
-            self.assertIn(str(expected_fields[index]["value"]), str(info_div))
+            print(info_div.select("div"))
+            label = info_div.select("div")[0].contents[0]
+            value = info_div.select("div")[1].contents[0]
+            self.assertEqual(
+                str(expected_fields[index]["label"]),
+                str(label),
+            )
+            self.assertEqual(
+                str(expected_fields[index]["value"]),
+                str(value),
+            )
 
     def test_bottom_infobox_card(self):
         """Verify providing a template for bottom_infobox_card loads that template"""

@@ -76,9 +76,16 @@ class DeviceAssignmentInfoboxTest(SimpleTestCase):
         )
 
         self.assertEqual(len(info_divs), len(expected_fields))
-        for index, info_div in enumerate(info_divs):
-            self.assertIn(str(expected_fields[index]["label"]), str(info_div))
-            self.assertIn(str(expected_fields[index]["value"]), str(info_div))
+        label = info_div.select("div")[0].contents[0]
+            value = info_div.select("div")[1].contents[0]
+            self.assertEqual(
+                str(expected_fields[index]["label"]),
+                str(label),
+            )
+            self.assertEqual(
+                str(expected_fields[index]["value"]),
+                str(value),
+            )
 
     def test_bottom_infobox_card(self):
         """Verify providing a template for bottom_infobox_card loads that template"""

@@ -82,16 +82,18 @@ class PersonInfoboxTest(SimpleTestCase):
         info_divs = soup.select_one('p[name="person_card_body"]').find_all_next(
             "div", class_="row"
         )
-        print()
+
         self.assertEqual(len(info_divs), len(expected_fields))
         for index, info_div in enumerate(info_divs):
+            label = info_div.select("div")[0].contents[0]
+            value = info_div.select("div")[1].contents[0]
             self.assertEqual(
                 str(expected_fields[index]["label"]),
-                str(info_div.select("div")[0].contents[0]),
+                str(label),
             )
             self.assertEqual(
                 str(expected_fields[index]["value"]),
-                str(info_div.select("div")[1].contents[0]),
+                str(value),
             )
 
     def test_bottom_infobox_card(self):
