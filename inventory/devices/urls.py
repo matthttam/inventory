@@ -5,6 +5,7 @@ from .views import (
     DeviceDetailView,
     DeviceCreateView,
     DeviceUpdateView,
+    DeviceDeleteView,
     DeviceDatatableServerSideProcessingView,
 )
 
@@ -15,4 +16,5 @@ urlpatterns = [
     path("<int:pk>/", DeviceDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", DeviceUpdateView.as_view(), name="edit"),
     path("new/", DeviceCreateView.as_view(), name="new"),
+    path("<int:pk>/delete/", DeviceDeleteView.as_view(), name="delete"),
 ]
