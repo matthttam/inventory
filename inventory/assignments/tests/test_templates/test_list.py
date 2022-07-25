@@ -45,7 +45,7 @@ class DeviceAssignmenListSuperuserTest(TestCase):
     def test_template_used(self):
         self.assertTemplateUsed(self.response, "assignments/deviceassignment_list.html")
         self.assertTemplateUsed(self.response, "dashboard/dashboard.html")
-        self.assertTemplateUsed(self.response, "datatables.html")
+        self.assertTemplateUsed(self.response, "partials/datatables.html")
 
     def test_title(self):
         self.assertInHTML("Inventory - Assignments", self.response.content.decode())
@@ -67,18 +67,6 @@ class DeviceAssignmentListWithoutPermissionTest(TestCase):
         self.client.force_login(self.user)
         self.response = self.client.get(reverse("assignments:index"))
 
-    # def test_update_link_missing(self):
-    #    self.assertNotIn(
-    #        update_link,
-    #        self.response.content.decode(),
-    #    )
-    #
-    # def test_delete_link_missing(self):
-    #    self.assertNotIn(
-    #        delete_link,
-    #        self.response.content.decode(),
-    #    )
-
     def test_new_link(self):
         self.assertNotIn(
             new_link,
@@ -98,26 +86,6 @@ class DeviceAssignmentListWithPermissionTest(TestCase):
         self.user.user_permissions.add(
             get_permission(DeviceAssignment, "view_deviceassignment")
         )
-
-    # def test_update_link(self):
-    #    self.user.user_permissions.add(
-    #        get_permission(DeviceAssignment, "change_deviceassignment")
-    #    )
-    #    self.response = self.client.get(reverse("assignments:index"))
-    #    self.assertInHTML(
-    #        update_link,
-    #        self.response.content.decode(),
-    #    )
-    #
-    # def test_delete_link(self):
-    #    self.user.user_permissions.add(
-    #        get_permission(DeviceAssignment, "delete_deviceassignment")
-    #    )
-    #    self.response = self.client.get(reverse("assignments:index"))
-    #    self.assertInHTML(
-    #        delete_link,
-    #        self.response.content.decode(),
-    #    )
 
     def test_new_link(self):
         self.user.user_permissions.add(

@@ -5,7 +5,7 @@
 {% block head %}
 
 {{ actions|json_script:"actions" }}
-{% include "datatables.html"%}
+{% include "partials/datatables.html"%}
 
 {% load static %}
 <script src="{% static 'assignments/deviceassignment_list.js'%}"></script>

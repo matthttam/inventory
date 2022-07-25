@@ -4,18 +4,17 @@
 
 {% block content %}
     
-    {% if device %}
-    <ul>
+{% if device %}
 
-        <li>Device ID: {{device.id}}</li>
-        <li>Device Serial Number: {{device.serial_number}}</li>
-        <li>Device Asset ID: {{device.asset_id}}</li>
+{% block infobox %}
+{% include './partials/device_infobox.html' with bottom_infobox_card='./device_control_buttons.html' %}
+{% endblock infobox %}
 
-    </ul>
-    <a class="btn btn-default m-2" role="button" href="{% url 'devices:edit' device.id%}">Edit Device</a>
-    <a class="btn btn-default m-2" role="button" href="{% url 'devices:index' %}">Device List</a>
-    {% else %}
-    <p>Device Not Found</p>
-    {% endif %}
+
+{% else %}
+
+<p>Device Not Found</p>
+
+{% endif %}
 
 {% endblock content%}

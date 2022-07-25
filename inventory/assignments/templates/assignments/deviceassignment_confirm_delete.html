@@ -10,7 +10,7 @@
         {% include './partials/deviceassignment_infobox.html'%}
         {% endblock infobox %}
         {{ form }}
-        <a class="button btn btn-danger mx-3 p-3" type="submit">Delete {{ object }}</a>
+        <button class="button btn btn-danger mx-3 p-3" type="submit">Delete {{ object }}</button>
         <a class="button btn btn-primary mx-3 p-3" href="{%url 'assignments:detail' object.id%}">Cancel</a>
     </form>
 

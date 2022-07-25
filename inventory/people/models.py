@@ -30,24 +30,6 @@ class Person(models.Model):
     _buildings: list[Building] = None
     _rooms: list[Room] = None
 
-    # def __init__(self, *args, **kwargs):
-    #    print(kwargs)
-    #    # self.buildings.add(*kwargs.pop("buildings"))
-    #    self.buildings.add(*[Building(name="test")])
-    #    # if kwargs["buildings"]:
-    #    #    del kwargs["buildings"]
-    #    super(Person, self).__init__(*args, **kwargs)
-
-    # def __setattr__(self, attrname, val):
-    #    print(attrname)
-    #    print("blah")
-    #    if attrname == "buildings":
-    #        print("here")
-    #        super(Person, self).buildings.add(*val)
-    #    else:
-    #        print("nope_here")
-    #        super(Person, self).__setattr__(attrname, val)
-
     class Meta:
         verbose_name_plural = "People"
 
