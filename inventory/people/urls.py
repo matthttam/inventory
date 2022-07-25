@@ -1,10 +1,11 @@
-from django.urls import path, include
-from .views import *
+from django.urls import path
 
-# , PersonCreateView, PersonUpdateView
 from .views import (
     PersonListView,
     PersonDetailView,
+    PersonCreateView,
+    PersonUpdateView,
+    PersonDeleteView,
     PersonDatatableServerSideProcessingView,
 )
 
@@ -15,4 +16,5 @@ urlpatterns = [
     path("<int:pk>/", PersonDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", PersonUpdateView.as_view(), name="edit"),
     path("new/", PersonCreateView.as_view(), name="new"),
+    path("<int:pk>/delete/", PersonDeleteView.as_view(), name="delete"),
 ]

@@ -28,6 +28,9 @@
         <tbody>
         </tbody>
     </table>
-<a class="btn btn-primary m-2" role="button" href="{% url 'people:new' %}">Create Person</a>
+
+{% if perms.people.add_person %}
+    <a class="btn btn-primary m-2" role="button" href="{% url 'people:new' %}">Create Person</a>
+{% endif %}
 
 {% endblock content %}
