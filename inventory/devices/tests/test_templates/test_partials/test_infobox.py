@@ -2,20 +2,20 @@ from django.test import SimpleTestCase, TestCase
 from django.template import Context, Template
 from bs4 import BeautifulSoup
 import copy
-from assignments.tests.factories import DeviceAssignmentFactory
+from devices.tests.factories import DeviceFactory
 from django.urls import reverse
 from zoneinfo import ZoneInfo
 from authentication.tests.factories import SuperuserUserFactory
 from datetime import datetime
 
-list_link_selector = 'a[href="/assignments/"]'
-update_link_selector = 'a[href="/assignments/1/edit/"]'
-delete_link_selector = 'a[href="/assignments/1/delete/"]'
+list_link_selector = 'a[href="/devices/"]'
+update_link_selector = 'a[href="/devices/1/edit/"]'
+delete_link_selector = 'a[href="/devices/1/delete/"]'
 
 default_context = Context(
     {
         "TIME_ZONE": "America/Chicago",
-        "deviceassignment": {
+        "device": {
             "id": 1,
             "person": "Test Person",
             "device": "Test Device",
@@ -23,21 +23,19 @@ default_context = Context(
             "return_datetime": "",
         },
         "perms": {
-            "assignments": {
-                "view_deviceassignment": True,
-                "delete_deviceassignment": True,
-                "change_deviceassignment": True,
+            "devices": {
+                "view_device": True,
+                "delete_device": True,
+                "change_device": True,
             }
         },
     }
 )
 
-default_template = Template(
-    "{% include  'assignments/partials/deviceassignment_infobox.html'%}"
-)
+default_template = Template("{% include  'devices/partials/device_infobox.html'%}")
 
 
-class DeviceAssignmentInfoboxTest(SimpleTestCase):
+class DeviceInfoboxTest(SimpleTestCase):
     def setUp(self):
         self.context = copy.deepcopy(default_context)
         self.template = copy.deepcopy(default_template)
@@ -47,15 +45,15 @@ class DeviceAssignmentInfoboxTest(SimpleTestCase):
         expected_fields = [
             {
                 "label": "Assignment ID :",
-                "value": self.context["deviceassignment"]["id"],
+                "value": self.context["device"]["id"],
             },
             {
                 "label": "Person :",
-                "value": self.context["deviceassignment"]["person"],
+                "value": self.context["device"]["person"],
             },
             {
                 "label": "Device :",
-                "value": self.context["deviceassignment"]["device"],
+                "value": self.context["device"]["device"],
             },
             {
                 "label": "Assignment Date :",
@@ -84,11 +82,11 @@ class DeviceAssignmentInfoboxTest(SimpleTestCase):
         """Verify providing a template for bottom_infobox_card loads that template"""
         context = copy.deepcopy(default_context)
         template = Template(
-            "{% include 'assignments/partials/deviceassignment_infobox.html' with bottom_infobox_card='assignments/partials/deviceassignment_control_buttons.html' %}"
+            "{% include 'devices/partials/device_infobox.html' with bottom_infobox_card='devices/partials/device_control_buttons.html' %}"
         )
         rendered = template.render(context)
         bottom_infobox_card_template = Template(
-            "{% include 'assignments/partials/deviceassignment_control_buttons.html' %}"
+            "{% include 'devices/partials/device_control_buttons.html' %}"
         )
         bottom_infobox_card_rendered = bottom_infobox_card_template.render(context)
         self.assertIn(bottom_infobox_card_rendered, rendered)

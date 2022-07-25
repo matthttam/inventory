@@ -57,6 +57,9 @@ class DeviceAssignmentTest(TestCase):
     def test_get_absolute_url(self):
         self.assertEqual(self.device_assignment.get_absolute_url(), "/assignments/1/")
 
+    def test_auditlog_register(self):
+        self.skipTest("Need to test that it is registered to the audit log")
+
 
 class DeviceAccessoryAssignmentTest(TestCase):
     @classmethod

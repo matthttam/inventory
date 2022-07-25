@@ -1,10 +1,10 @@
-{% if perms.assignments.change_deviceassignment %}
-  <a class="btn btn-primary mx-3 p-3" role="button" href="{% url 'assignments:edit' deviceassignment.id%}">Edit Assignment</a>
+{% if perms.people.change_person %}
+  <a class="btn btn-primary mx-3 p-3" role="button" href="{% url 'people:edit' person.id%}">Edit Person</a>
 {% endif %}
 
-{% if perms.assignments.delete_deviceassignment %}
-  <a class="btn btn-danger mx-3 p-3" role="button" href="{% url 'assignments:delete' deviceassignment.id%}">Delete Assignment</a>
+{% if perms.people.delete_person %}
+  <a class="btn btn-danger mx-3 p-3" role="button" href="{% url 'people:delete' person.id%}">Delete Person</a>
 {% endif %}
-{% if perms.assignments.view_deviceassignment %}
-  <a class="btn btn-primary mx-3 p-3" role="button" href="{% url 'assignments:index' %}" >Assignment List</a>
+{% if perms.people.view_person %}
+  <a class="btn btn-primary mx-3 p-3" role="button" href="{% url 'people:index' %}" >Person List</a>
 {% endif %}

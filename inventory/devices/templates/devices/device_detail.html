@@ -6,9 +6,11 @@
     
 {% if device %}
 
-{% block infobox %}
-{% include './partials/device_infobox.html' with bottom_infobox_card='./device_control_buttons.html' %}
-{% endblock infobox %}
+<div class="row">
+    <div class="col-md-6">
+        {% include './partials/device_infobox.html' with bottom_infobox_card='./device_control_buttons.html' %}
+    </div>
+</div>
 
 
 {% else %}

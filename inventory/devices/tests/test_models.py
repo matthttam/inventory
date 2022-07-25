@@ -170,28 +170,28 @@ class DeviceTest(TestCase):
         self.assertEqual(self.device._meta.get_field("room").null, True)
 
     ### Functions ###
-    def test___str__(self):
+    def test_display_name(self):
+        device = DeviceFactory(
+            asset_id="test_asset_id", serial_number="test_serial_number"
+        )
+        self.assertEqual(
+            device.display_name(),
+            f"test_asset_id (test_serial_number) - {device.device_model}",
+        )
+
+    def test___str___with_asset_id(self):
         device = DeviceFactory(
             asset_id="test_asset_id", serial_number="test_serial_number"
         )
         self.assertEqual(
             device.__str__(),
-            f"test_asset_id (test_serial_number) - {device.device_model}",
-        )
-
-    def test_display_name_with_asset_id(self):
-        device = DeviceFactory(
-            asset_id="test_asset_id", serial_number="test_serial_number"
-        )
-        self.assertEqual(
-            device.display_name(),
             f"test_asset_id (test_serial_number)",
         )
 
-    def test_display_name_without_asset_id(self):
+    def test___str___without_asset_id(self):
         device = DeviceFactory(asset_id="", serial_number="test_serial_number")
         self.assertEqual(
-            device.display_name(),
+            device.__str__(),
             f"test_serial_number",
         )
 

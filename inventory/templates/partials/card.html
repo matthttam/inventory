@@ -1,0 +1,18 @@
+ <div class="card" style="width: 100%;">
+
+    {% block card_title %}
+    <div class="card-header">
+        <h3 class="card-title">
+            {% block card_title_content %}
+            {% endblock %}
+        </h3>
+    </div>
+    {% endblock card_title %}
+
+    {% block card_body %}
+    <div class="card-body">
+        {% block card_body_content %}
+        {% endblock %}
+    {% endblock card_body %}
+    </div>
+</div>

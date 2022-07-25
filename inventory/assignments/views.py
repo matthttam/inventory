@@ -1,14 +1,10 @@
-from django.shortcuts import render
-from .models import DeviceAssignment
 from django.views.generic import (
-    ListView,
     DetailView,
     UpdateView,
     CreateView,
     DeleteView,
 )
 from django.views.generic.base import TemplateView
-from .forms import DeviceAssignmentForm
 from django.utils import timezone
 from django_datatable_serverside_mixin.views import (
     ServerSideDatatableMixin,
@@ -19,6 +15,11 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse, reverse_lazy
 from django.db.models.functions import Concat
 from django.db.models import CharField, Value as V
+
+from auditlog.models import LogEntry
+
+from .models import DeviceAssignment
+from .forms import DeviceAssignmentForm
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -80,6 +81,13 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
 class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):
     permission_required = "assignments.view_deviceassignment"
     model = DeviceAssignment
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["log_entries"] = LogEntry.objects.filter(
+            object_id=self.object.id
+        ).order_by("timestamp")
+        return context
 
 
 class DeviceAssignmentUpdateView(PermissionRequiredMixin, UpdateView):

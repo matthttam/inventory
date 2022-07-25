@@ -1,8 +1,12 @@
 from django.db import models
 from django.urls import reverse
 from devices.models import Device, DeviceAccessory
-from people.models import Person
 from django.db.models.functions import Concat
+
+from auditlog.registry import auditlog
+from auditlog.models import AuditlogHistoryField
+
+from people.models import Person
 
 
 class AssignmentAbstract(models.Model):
@@ -21,6 +25,7 @@ class AssignmentAbstract(models.Model):
 
 class DeviceAssignment(AssignmentAbstract):
     device = models.ForeignKey(Device, on_delete=models.PROTECT)
+    history = AuditlogHistoryField()
 
     def get_absolute_url(self):
         return reverse("assignments:detail", kwargs={"pk": self.pk})
@@ -31,3 +36,7 @@ class DeviceAssignment(AssignmentAbstract):
 
 class DeviceAccessoryAssignment(AssignmentAbstract):
     device_accessory = models.ForeignKey(DeviceAccessory, on_delete=models.PROTECT)
+
+
+# Audit Log Registrations
+auditlog.register(DeviceAssignment)

@@ -48,15 +48,15 @@ class Device(models.Model):
     )
 
     def __str__(self):
-        return f"{self.asset_id} ({self.serial_number}) - {self.device_model}"
+        if self.asset_id:
+            return f"{self.asset_id} ({self.serial_number})"
+        return f"{self.serial_number}"
 
     def get_absolute_url(self):
         return reverse("devices:detail", kwargs={"pk": self.pk})
 
     def display_name(self):
-        if self.asset_id:
-            return f"{self.asset_id} ({self.serial_number})"
-        return f"{self.serial_number}"
+        return f"{self} - {self.device_model}"
 
 
 class DeviceAccessory(models.Model):

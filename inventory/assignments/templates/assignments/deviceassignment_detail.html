@@ -1,16 +1,18 @@
 {% extends "dashboard/dashboard.html" %}
 
 {% block title %}Inventory - Assignment Detail{% endblock %}
-
 {% block content %}
 
 {% if deviceassignment %}
 
-{% block infobox %}
-{% include './partials/deviceassignment_infobox.html' with bottom_infobox_card='./deviceassignment_control_buttons.html' %}
-{% endblock infobox %}
-
-
+    <div class="row">
+            <div class="col md-6">
+                {% include './partials/deviceassignment_infobox.html' with bottom_infobox_card='./deviceassignment_control_buttons.html' %}
+            </div>
+            <div class="col md-3">
+                {% include './partials/deviceassignment_auditlog.html' %}
+            </div>
+        </div>
 {% else %}
 
 <p>Assignment Not Found</p>

@@ -1,32 +1,28 @@
+{% extends 'partials/card.html' %}
 {% load tz %}
-<div class="row">
-  <div class="col md-3">
-    <div class="card" style="width: 100%;">
-      <div class="card-body">
-        <h1 class="card-title">Assignment</h1>
-        <p name="assignment_card_body" class="card-text fs-5">
-          <div class="row mb-2">
-            <div class="col-md-4 fw-bold text-end">Assignment ID :</div><div class="col md-1 text-start">{{deviceassignment.id}}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-md-4 fw-bold text-end">Person :</div><div class="col md-1 text-start">{{deviceassignment.person}}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-md-4 fw-bold text-end">Device :</div><div class="col md-1 text-start">{{deviceassignment.device}}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-md-4 fw-bold text-end">Assignment Date :</div><div class="col md-1 text-start">{{deviceassignment.assignment_datetime|localtime|date:"SHORT_DATETIME_FORMAT"}}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-md-4 fw-bold text-end">Return Date :</div><div class="col md-1 text-start">{{deviceassignment.return_datetime|localtime|date:"SHORT_DATETIME_FORMAT"|default:""}}</div>
-          </div>
-          {% if bottom_infobox_card %}
-            {% include bottom_infobox_card %}
-          {% endif %}
-        </p>
-      </div>
+
+{% block card_title_content %}
+Assignment
+{% endblock %} 
+{% block card_body_content %}
+  <p name="assignment_card_body" class="card-text fs-5">
+    <div class="row mb-2">
+      <div class="col-md-4 fw-bold text-end">Assignment ID :</div><div class="col md-1 text-start">{{deviceassignment.id}}</div>
     </div>
-  </div>
-  <div class="col md-9">
-  </div>
-</div>
+    <div class="row mb-2">
+      <div class="col-md-4 fw-bold text-end">Person :</div><div class="col md-1 text-start">{{deviceassignment.person}}</div>
+    </div>
+    <div class="row mb-2">
+      <div class="col-md-4 fw-bold text-end">Device :</div><div class="col md-1 text-start">{{deviceassignment.device}}</div>
+    </div>
+    <div class="row mb-2">
+      <div class="col-md-4 fw-bold text-end">Assignment Date :</div><div class="col md-1 text-start">{{deviceassignment.assignment_datetime|localtime|date:"SHORT_DATETIME_FORMAT"}}</div>
+    </div>
+    <div class="row mb-2">
+      <div class="col-md-4 fw-bold text-end">Return Date :</div><div class="col md-1 text-start">{{deviceassignment.return_datetime|localtime|date:"SHORT_DATETIME_FORMAT"|default:""}}</div>
+    </div>
+    {% if bottom_infobox_card %}
+      {% include bottom_infobox_card %}
+    {% endif %}
+  </p>
+{% endblock card_body_content %}
