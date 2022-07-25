@@ -32,7 +32,7 @@ class DeviceAssignmentConfirmDeleteTest(TestCase):
     def test_buttons(self):
         print(self.response.content.decode())
         soup = BeautifulSoup(self.response.content.decode(), "html.parser")
-        submit_buttons = soup.select('a[type="submit"]')
+        submit_buttons = soup.select('button[type="submit"]')
         cancel_buttons = soup.select('a[href="/assignments/1/"]')
         self.assertEqual(len(submit_buttons), 1)
         self.assertEqual(len(cancel_buttons), 1)
