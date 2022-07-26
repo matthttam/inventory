@@ -1,10 +1,16 @@
 from django.test import TestCase
+
+import zoneinfo
+import datetime
+from unittest.mock import patch
+
 from assignments.models import (
     AssignmentAbstract,
     DeviceAssignment,
     DeviceAccessoryAssignment,
 )
 from people.models import Person
+from people.tests.factories import PersonFactory
 from devices.models import Device, DeviceAccessory
 from .factories import DeviceAssignmentFactory, DeviceAccessoryAssignmentFactory
 
@@ -34,6 +40,33 @@ class AssignmentAbstractTest(TestCase):
     def test_person_foreign_key(self):
         self.assertEqual(
             AssignmentAbstract._meta.get_field("person").related_model, Person
+        )
+
+    def test_person_related_query_name(self):
+        self.assertEqual(
+            AssignmentAbstract._meta.get_field("person").related_query_name(),
+            "%(class)s",
+        )
+
+    ### Functions ###
+    @patch("assignments.models.AssignmentAbstract._meta.abstract", set())
+    def test_is_outstanding(self):
+        person = PersonFactory.build()
+        assignment = AssignmentAbstract(
+            assignment_datetime=datetime.datetime(
+                2022, 5, 30, 15, 44, 47, tzinfo=zoneinfo.ZoneInfo(key="America/Chicago")
+            ),
+            return_datetime=None,
+            person=person,
+        )
+        self.assertEqual(
+            assignment.is_outstanding,
+            True,
+        )
+        assignment.return_datetime = assignment.assignment_datetime
+        self.assertEqual(
+            assignment.is_outstanding,
+            False,
         )
 
 

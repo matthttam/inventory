@@ -63,6 +63,9 @@ class DeviceAccessory(models.Model):
     name = models.CharField(max_length=255, unique=True)
     device_models = models.ManyToManyField(DeviceModel)
 
+    class Meta:
+        verbose_name_plural = "Device accessories"
+
     def __str__(self):
         # return f"{self.manufacturer} {self.name}"
         device_model_names = ",".join([x.name for x in self.device_models.all()])

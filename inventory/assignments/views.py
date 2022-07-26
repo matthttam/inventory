@@ -1,3 +1,4 @@
+from django.views import View
 from django.views.generic import (
     DetailView,
     UpdateView,
@@ -16,9 +17,15 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse, reverse_lazy
 from django.db.models.functions import Concat
 from django.db.models import CharField, Value as V
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import permission_required
+from django.db.models import F, Count, Q, When, Value, Case
 
 from auditlog.models import LogEntry
 
+from people.models import Person
+from devices.models import Device
 from .models import DeviceAssignment
 from .forms import DeviceAssignmentForm, QuickAssignmentForm
 
@@ -113,7 +120,42 @@ class DeviceAssignmentDeleteView(PermissionRequiredMixin, DeleteView):
     success_url = reverse_lazy("assignments:index")
 
 
-class DeviceAssignmentQuickAssignView(PermissionRequiredMixin, FormView):
+class DeviceAssignmentQuickAssignView(PermissionRequiredMixin, TemplateView):
     permission_required = "assignments.add_deviceassignment"
     template_name = "assignments/deviceassignment_quick_assign.html"
-    form_class = QuickAssignmentForm
+
+
+@permission_required("assignments.add_deviceassignment")
+@require_http_methods(["GET"])
+def quick_assign_user_list_view(request):
+    q = request.GET.get("q")
+    people = Person.objects.all()
+    if q:
+        people = people.filter(
+            Q(internal_id__exact=q)
+            | Q(first_name__icontains=q)
+            | Q(last_name__icontains=q)
+            | Q(last_name__icontains=q)
+            | Q(email__istartswith=q)
+        )
+    people = people.values(
+        "id",
+        "first_name",
+        "last_name",
+        "internal_id",
+        "has_outstanding_assignment",
+        "email",
+        "is_active",
+    ).order_by("type", "last_name")
+
+    result = [
+        {
+            "text": f"{person.get('last_name')}, {person.get('first_name')} - {person.get('internal_id')}",
+            "id": person.get("id"),
+            "internal_id": person.get("internal_id"),
+            "is_active": person.get("is_active"),
+            "has_outstanding_assignment": person.get("has_outstanding_assignment"),
+        }
+        for person in people
+    ]
+    return JsonResponse({"results": result})

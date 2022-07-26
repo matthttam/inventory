@@ -3,7 +3,7 @@
 {% block title %}Inventory - Assignments{% endblock %}
 
 {% block head %}
-
+{{ block.super }}
 {{ actions|json_script:"actions" }}
 {% include "partials/datatables.html"%}
 

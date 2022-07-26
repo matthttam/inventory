@@ -211,6 +211,10 @@ class DeviceAccessoryTest(TestCase):
         name_label = self.device_accessory._meta.get_field("name").verbose_name
         self.assertEqual(name_label, "name")
 
+    def test_name_label(self):
+        name_label = self.device_accessory._meta.verbose_name_plural
+        self.assertEqual(name_label, "Device accessories")
+
     def test_name_max_length(self):
         max_length = self.device_accessory._meta.get_field("name").max_length
         self.assertEqual(max_length, 255)
