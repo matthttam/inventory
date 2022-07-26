@@ -20,5 +20,6 @@ urlpatterns = [
     path("<int:pk>/", DeviceAssignmentDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", DeviceAssignmentUpdateView.as_view(), name="edit"),
     path("new/", DeviceAssignmentCreateView.as_view(), name="new"),
+    path("quickassign/", DeviceAssignmentQuickAssignView.as_view(), name="quickassign"),
     path("<int:pk>/delete/", DeviceAssignmentDeleteView.as_view(), name="delete"),
 ]

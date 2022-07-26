@@ -32,6 +32,7 @@
 
 {% if perms.assignments.add_deviceassignment %}
     <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:new' %}">Create Assignment</a>
+    <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:quickassign' %}">Quick Assign</a>
 {% endif %}
 
 {% endblock content %}

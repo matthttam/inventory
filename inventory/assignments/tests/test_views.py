@@ -1,14 +1,15 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
+from django.contrib.auth.models import User
+
+from authentication.tests.decorators import assert_redirect_to_login
+from inventory.tests.helpers import get_permission
+from authentication.tests.factories import UserFactory
 from .factories import DeviceAssignmentFactory
 from people.tests.factories import PersonFactory
 from devices.tests.factories import DeviceFactory
 from assignments.models import DeviceAssignment
-from django.utils import timezone
-from authentication.tests.factories import UserFactory
-from django.contrib.auth.models import User
-from authentication.tests.decorators import assert_redirect_to_login
-from inventory.tests.helpers import get_permission
 
 
 class DeviceAssignmentListViewAuthenticatedWithPermissionTest(TestCase):
@@ -155,11 +156,30 @@ class DeviceAssignmentDeleteViewAuthenticatedWithPermissionTest(TestCase):
         self.assertTemplateUsed("deviceassignment_confirm_delete.html")
 
     def test_delete_deviceassignment_post(self):
-
         response = self.client.post(reverse("assignments:delete", args=[1]))
         self.assertRedirects(response, reverse("assignments:index"))
         device_assignments = DeviceAssignment.objects.filter(id=1)
         self.assertEqual(len(device_assignments), 0)
+
+
+class DeviceAssignmentQuickAssignViewAuthenticatedWithPermissionTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory(id=1)
+        DeviceAssignmentFactory(id=1)
+
+    def setUp(self):
+        self.user = User.objects.get(id=1)
+        self.device_assignment = DeviceAssignment.objects.get(id=1)
+        self.client.force_login(self.user)
+        self.user.user_permissions.add(
+            get_permission(DeviceAssignment, "add_deviceassignment")
+        )
+
+    def test_quick_assign_deviceassignment(self):
+        response = self.client.get(reverse("assignments:quickassign"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed("deviceassignment_quick_assign.html")
 
 
 class DeviceAssignmentViewUnauthenticatedTest(TestCase):
@@ -180,6 +200,10 @@ class DeviceAssignmentViewUnauthenticatedTest(TestCase):
         pass
 
     @assert_redirect_to_login(reverse("assignments:delete", args=[1]))
+    def test_device_assignment_delete_redirects_to_login(self):
+        pass
+
+    @assert_redirect_to_login(reverse("assignments:quickassign"))
     def test_device_assignment_delete_redirects_to_login(self):
         pass
 
@@ -211,4 +235,8 @@ class DeviceAssignmentViewsAuthenticatedWithoutPermissionTest(TestCase):
 
     def test_device_assignment_delete_redirects_to_login(self):
         response = self.client.get(reverse("assignments:delete", args=[1]))
+        self.assertEqual(response.status_code, 403)
+
+    def test_device_assignment_quick_assign_redirect_to_login(self):
+        response = self.client.get(reverse("assignments:quickassign"))
         self.assertEqual(response.status_code, 403)

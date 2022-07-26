@@ -1,0 +1,14 @@
+{% extends "dashboard/dashboard.html" %}
+
+{% block title %}Inventory - Quick Assign{% endblock %}
+
+{% block content %}
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary m-2" role="button" type="submit">Save</button>
+        <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:quickassign' %}">Cancel</a>
+    </form>
+
+{% endblock content %}

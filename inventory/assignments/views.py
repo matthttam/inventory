@@ -3,6 +3,7 @@ from django.views.generic import (
     UpdateView,
     CreateView,
     DeleteView,
+    FormView,
 )
 from django.views.generic.base import TemplateView
 from django.utils import timezone
@@ -19,7 +20,7 @@ from django.db.models import CharField, Value as V
 from auditlog.models import LogEntry
 
 from .models import DeviceAssignment
-from .forms import DeviceAssignmentForm
+from .forms import DeviceAssignmentForm, QuickAssignmentForm
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -110,3 +111,9 @@ class DeviceAssignmentDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = "assignments.delete_deviceassignment"
     model = DeviceAssignment
     success_url = reverse_lazy("assignments:index")
+
+
+class DeviceAssignmentQuickAssignView(PermissionRequiredMixin, FormView):
+    permission_required = "assignments.add_deviceassignment"
+    template_name = "assignments/deviceassignment_quick_assign.html"
+    form_class = QuickAssignmentForm
