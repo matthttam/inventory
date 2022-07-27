@@ -118,7 +118,7 @@ class MappingAbstract(models.Model):
     from_field = models.CharField(max_length=255)
     to_field = models.CharField(max_length=255)
     matching_priority = models.IntegerField(
-        choices=[(x, x) for x in range(1, 10)], unique=True, blank=True, null=True
+        choices=[(x, x) for x in range(1, 10)], blank=True, null=True
     )
 
     class Meta:
@@ -127,7 +127,11 @@ class MappingAbstract(models.Model):
             models.UniqueConstraint(
                 fields=["sync_profile", "to_field"],
                 name="unique_sync_profile_and_to_field_in_%(class)s",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["sync_profile", "matching_priority"],
+                name="unique_sync_profile_and_matching_priority_in_%(class)s",
+            ),
         ]
 
     def __str__(self):
