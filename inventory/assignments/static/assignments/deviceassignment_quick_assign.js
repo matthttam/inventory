@@ -23,7 +23,7 @@ $(document).ready(function() {
                 }
                 
                 $.map(data.results, function (obj) {
-                    obj.text = `${obj.last_name}, ${obj.first_name} (${obj.internal_id})`
+                    obj.text = `${obj.last_name}, ${obj.first_name} - ${obj.internal_id}`
                     if(! obj.is_active){
                         obj.disabled = true;
                         obj.text = obj.text + " (inactive)"
