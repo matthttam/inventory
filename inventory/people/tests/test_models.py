@@ -1,5 +1,8 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from django.utils import timezone
 from django.test import TestCase
-from people.models import Person, PersonType, PersonStatus
+from people.models import Person, PersonManager, PersonType, PersonStatus
 from .factories import (
     PersonFactory,
     PersonWithBuildingsFactory,
@@ -9,6 +12,12 @@ from .factories import (
 )
 from locations.tests.factories import BuildingFactory
 from locations.models import Building, Room
+from assignments.tests.factories import (
+    DeviceAssignmentFactory,
+    DeviceAssignmentWithReturnDatetimeFactory,
+)
+
+tz = ZoneInfo(timezone.settings.TIME_ZONE)
 
 
 class PersonTest(TestCase):
@@ -78,6 +87,21 @@ class PersonTest(TestCase):
     def test_post_save_signal(self):
         self.skipTest("Need to test")
 
+    def test_objects_is_instance_of_person_manager(self):
+        self.assertIsInstance(Person.objects, PersonManager)
+
+    ### Properties ###
+    def test_display_name(self):
+        person = PersonFactory(first_name="Mark", last_name="Twain")
+        self.assertEqual(person.display_name, f"{person.first_name} {person.last_name}")
+
+    def test_building_list(self):
+        person = Person.objects.get(id=1)
+        person.buildings.set([BuildingFactory(name="z"), BuildingFactory(name="a")])
+        person = Person.objects.get(id=1)
+        self.assertEqual(person.building_list, "a, z")
+        self.assertNotEqual(person.building_list, "z, a")
+
     ### Functions ###
     def test___str__(self):
         person = PersonFactory(
@@ -91,6 +115,35 @@ class PersonTest(TestCase):
     def test_get_absolute_url(self):
         person = Person.objects.get(id=1)
         self.assertEqual(person.get_absolute_url(), "/people/1/")
+
+    ### Test custom model queryset
+    def test_outstanding_assignment_count(self):
+        person = Person.objects.get(id=1)
+        self.assertEqual(person.outstanding_assignment_count, 0)
+        DeviceAssignmentFactory(person=person, return_datetime=None)
+        person = Person.objects.get(id=1)
+        self.assertEqual(person.outstanding_assignment_count, 1)
+
+    def test_has_outstanding_assignment(self):
+        person = Person.objects.get(id=1)
+        self.assertFalse(person.has_outstanding_assignment)
+        DeviceAssignmentWithReturnDatetimeFactory(person=person, return_datetime=None)
+        person = Person.objects.get(id=1)
+        self.assertTrue(person.has_outstanding_assignment)
+        person.deviceassignment_set.update(return_datetime=datetime.now(tz=tz))
+        person = Person.objects.get(id=1)
+        self.assertFalse(person.has_outstanding_assignment)
+
+    def test_is_active(self):
+        active_status = PersonStatusFactory(name="Active", is_inactive=False)
+        inactive_status = PersonStatusFactory(name="Inctive", is_inactive=True)
+        PersonFactory(email="testuser@example.com", status=active_status)
+        person = Person.objects.get(email="testuser@example.com")
+        self.assertTrue(person.is_active)
+        person.status = inactive_status
+        person.save()
+        person = Person.objects.get(email="testuser@example.com")
+        self.assertFalse(person.is_active)
 
 
 class PersonWithBuildingsTest(TestCase):

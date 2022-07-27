@@ -7,13 +7,14 @@ $(document).ready(function() {
             dataType: 'json',
             processResults: function (data) {            
                 
-
                 var searchTerm = personSelect.data("select2").$dropdown.find("input").val();
-                console.log(data.results[0])
-                if (data.results.length == 1 && 
-                    data.results[0].internal_id == searchTerm && 
-                    data.results[0].is_active &&
-                    !data.results[0].has_outstanding_assignment) {
+                
+                if (
+                        data.results.length == 1 && 
+                        data.results[0].internal_id == searchTerm && 
+                        data.results[0].is_active &&
+                        !data.results[0].has_outstanding_assignment
+                    ) {
                     console.log('triggered')
                     personSelect.append($("<option />")
                         .attr("value", data.results[0].id)
@@ -22,6 +23,7 @@ $(document).ready(function() {
                 }
                 
                 $.map(data.results, function (obj) {
+                    obj.text = `${obj.last_name}, ${obj.first_name} (${obj.internal_id})`
                     if(! obj.is_active){
                         obj.disabled = true;
                         obj.text = obj.text + " (inactive)"

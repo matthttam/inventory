@@ -82,14 +82,7 @@ class Person(models.Model):
 
     @property
     def building_list(self):
-        return ", ".join([b.name for b in list(self.buildings.all())])
-
-    @property
-    def has_assignment(self):
-        """Returns true if this person has an active assignment"""
-        count_outstanding = self.deviceassignment_set.outstanding().count()
-        if count_outstanding > 0:
-            True
+        return ", ".join([b.name for b in list(self.buildings.all().order_by("name"))])
 
 
 @receiver(post_save, sender=Person)

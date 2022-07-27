@@ -1,3 +1,4 @@
+import re
 from django.views import View
 from django.views.generic import (
     DetailView,
@@ -129,6 +130,8 @@ class DeviceAssignmentQuickAssignView(PermissionRequiredMixin, TemplateView):
 @require_http_methods(["GET"])
 def quick_assign_user_list_view(request):
     q = request.GET.get("q")
+    # Remove symbols and repeated spaces
+    q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
     people = Person.objects.all()
     if q:
         people = people.filter(
@@ -148,14 +151,4 @@ def quick_assign_user_list_view(request):
         "is_active",
     ).order_by("type", "last_name")
 
-    result = [
-        {
-            "text": f"{person.get('last_name')}, {person.get('first_name')} - {person.get('internal_id')}",
-            "id": person.get("id"),
-            "internal_id": person.get("internal_id"),
-            "is_active": person.get("is_active"),
-            "has_outstanding_assignment": person.get("has_outstanding_assignment"),
-        }
-        for person in people
-    ]
-    return JsonResponse({"results": result})
+    return JsonResponse({"results": list(people)})
