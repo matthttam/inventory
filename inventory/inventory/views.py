@@ -1,5 +1,5 @@
 from django.http import HttpResponseNotAllowed, JsonResponse
-from django.views.generic import ListView
+from django.views.generic import ListView, FormView
 from django.views.generic.edit import BaseFormView
 from django.views.generic.list import BaseListView
 from django.core.exceptions import ImproperlyConfigured
@@ -37,6 +37,7 @@ class JSONFormView(JSONResponseMixin, BaseFormView):
         return None
 
     def form_valid(self, form):
+        form.save()
         return self.render_to_response(self.get_context_data(success=True))
 
     def form_invalid(self, form):
@@ -52,4 +53,9 @@ class JSONFormView(JSONResponseMixin, BaseFormView):
         )
 
     def get_data(self, context):
-        return {"success": context["success"]}
+        if context["success"]:
+            data = {"success": context["success"]}
+        else:
+            data = {"success": context["success"], "errors": context.form.errors}
+
+        return data

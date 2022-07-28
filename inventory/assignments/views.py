@@ -98,17 +98,13 @@ class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):
 class DeviceAssignmentUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "assignments.change_deviceassignment"
     model = DeviceAssignment
-    fields = ["assignment_datetime", "return_datetime"]
+    fields = ["return_datetime"]
 
 
 class DeviceAssignmentCreateView(PermissionRequiredMixin, CreateView):
     permission_required = "assignments.add_deviceassignment"
     form_class = DeviceAssignmentForm
     template_name = "assignments/deviceassignment_form.html"
-
-    def form_valid(self, form):
-        form.instance.assignment_datetime = timezone.now()
-        return super().form_valid(form)
 
 
 class DeviceAssignmentDeleteView(PermissionRequiredMixin, DeleteView):

@@ -12,13 +12,3 @@ class DeviceAssignmentForm(ModelForm):
 
         model = DeviceAssignment
         fields = ["person", "device"]
-
-
-class QuickAssignmentForm(ModelForm):
-    person = ModelChoiceField(queryset=Person.objects.all())
-    device = ModelChoiceField(queryset=Device.objects.all())
-
-    class Meta:
-
-        model = DeviceAssignment
-        fields = ["person", "device"]

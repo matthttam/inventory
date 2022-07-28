@@ -25,7 +25,9 @@ class AssignmentManager(models.Manager):
 
 
 class AssignmentAbstract(models.Model):
-    assignment_datetime = models.DateTimeField(verbose_name="assignment date")
+    assignment_datetime = models.DateTimeField(
+        verbose_name="assignment date", auto_now=True
+    )
     return_datetime = models.DateTimeField(
         blank=True,
         null=True,

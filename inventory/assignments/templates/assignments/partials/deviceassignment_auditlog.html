@@ -5,28 +5,6 @@
 Assignment History
 {% endblock %}
 {% block card_body_content%}
-<div class="table-responsive">
-    <table class="table table-striped table-bordered">
-      <thead>
-        <tr>
-          <th>Field</th>
-          <th>From</th>
-          <th>To</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for key, value in deviceassignment.history.latest.changes_dict.items %}
-        <tr>
-          <td>{{ key }}</td>
-          <td>{{ value.0|default:"None" }}</td>
-          <td>{{ value.1|default:"None" }}</td>
-        </tr>
-      {% empty %}
-        <p>No history for this item has been logged yet.</p>
-      {% endfor %}
-      </tbody>
-    </table>
-  </div>
 
 <p name="assignment_card_body" class="card-text fs-5">
     <div class="table-responsive">
