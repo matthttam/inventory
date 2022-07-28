@@ -55,6 +55,5 @@ class JSONFormView(JSONResponseMixin, BaseFormView):
             ]
         )
 
-    def get_data(context):
-
+    def get_data(self, context):
         return {"success": context["success"]}
