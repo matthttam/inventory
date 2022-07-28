@@ -1,8 +1,22 @@
+function get_ajax_url(key){
+    const ajax_urls = JSON.parse(document.getElementById('ajax_urls').textContent);
+    return ajax_urls[key]
+}
+
 $(document).ready(function() {
+
+    
+    
+    function get_person_option(obj){
+        text = `${obj.last_name}, ${obj.first_name} - ${obj.internal_id}`
+        text += obj.is_active ? "": " (inactive)"
+        text += obj.has_outstanding_assignment ? " (assigned)" : ""
+        return text
+    }
 
     var personSelect = $('#person').select2({
         ajax: {
-            url: 'ajax/users/',
+            url:  get_ajax_url('people'), //'ajax/people/',
             delay: 250,
             dataType: 'json',
             processResults: function (data) {            
@@ -15,23 +29,16 @@ $(document).ready(function() {
                         data.results[0].is_active &&
                         !data.results[0].has_outstanding_assignment
                     ) {
-                    console.log('triggered')
                     personSelect.append($("<option />")
                         .attr("value", data.results[0].id)
-                        .html(data.results[0].text)
+                        .html(get_person_option(data.results[0]))
                     ).val(data.results[0].id).trigger("change").select2('close').trigger('select2:select');
+                    return {'results':[]};
                 }
                 
                 $.map(data.results, function (obj) {
-                    obj.text = `${obj.last_name}, ${obj.first_name} - ${obj.internal_id}`
-                    if(! obj.is_active){
-                        obj.disabled = true;
-                        obj.text = obj.text + " (inactive)"
-                    } 
-                    if(obj.has_outstanding_assignment){
-                        obj.disabled = true;
-                        obj.text = obj.text + " (assigned)"
-                    } 
+                    obj.text = get_person_option(obj)
+                    obj.disabled = ! obj.is_active || obj.has_outstanding_assignment
                     return obj;
                 })
                 return data;
@@ -42,17 +49,17 @@ $(document).ready(function() {
         minimumInputLength: 3,
         dropdownParent: $('div[name=person_search]'),
     })
-/*
-    var assetSelect = $('#asset').select2({
+
+    var deviceSelect = $('#device').select2({
         ajax: {
-            url: 'ajax/assets.php',
+            url: get_ajax_url('devices'),
             delay: 250,
             dataType: 'json',
 
             processResults: function (data) {                    
-                var searchTerm = assetSelect.data("select2").$dropdown.find("input").val();
+                var searchTerm = deviceSelect.data("select2").$dropdown.find("input").val();
                 if (data.results.length == 1 && data.results[0].id == searchTerm) {
-                    assetSelect.append($("<option />")
+                    deviceSelect.append($("<option />")
                         .attr("value", data.results[0].id)
                         .html(data.results[0].text)
                     ).val(data.results[0].id).trigger("change").select2('close').trigger('select2:select');
@@ -60,17 +67,17 @@ $(document).ready(function() {
                 return data;
             },
         },
-        theme: 'bootstrap4',
+        theme: 'bootstrap-5',
         placeholder: 'L######',
         minimumInputLength: 3,
-        dropdownParent: $('div[name=asset_search]'),
+        dropdownParent: $('div[name=device_search]'),
         
     }).focus()
     .select2('open')
     .on('select2:select', function(e) {
         $('#student').focus().select2('open');
     });
-
+/*
     var studentSelect = $('#student').select2({
         ajax: {
             url: 'ajax/users/',
@@ -119,7 +126,7 @@ $(document).ready(function() {
                 // Clear fields
                 form.find('input[type=checkbox]').prop( "checked", false)
                 form.find('select').val(null).trigger('change')
-                $('#asset').select2('open').trigger('select2:open')
+                $('#device').select2('open').trigger('select2:open')
             }else{
                 CreateSplash('alert-danger', 'The response from the server is invalid.');
             }

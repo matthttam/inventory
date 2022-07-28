@@ -1,11 +1,10 @@
 import re
-from django.views import View
+
 from django.views.generic import (
     DetailView,
     UpdateView,
     CreateView,
     DeleteView,
-    FormView,
 )
 from django.views.generic.base import TemplateView
 from django.utils import timezone
@@ -17,18 +16,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse, reverse_lazy
 from django.db.models.functions import Concat
-from django.db.models import CharField, Value as V
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import permission_required
-from django.db.models import F, Count, Q, When, Value, Case
+from django.db.models import CharField, Value as V, Q
 
 from auditlog.models import LogEntry
-
-from people.models import Person
 from devices.models import Device
+
+from inventory.views import JSONListView
+from people.models import Person
 from .models import DeviceAssignment
-from .forms import DeviceAssignmentForm, QuickAssignmentForm
+from .forms import DeviceAssignmentForm
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -125,30 +121,83 @@ class DeviceAssignmentQuickAssignView(PermissionRequiredMixin, TemplateView):
     permission_required = "assignments.add_deviceassignment"
     template_name = "assignments/deviceassignment_quick_assign.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ajax_urls"] = {
+            "people": reverse("assignments:quick_assign_person_list"),
+            "devices": reverse("assignments:quick_assign_device_list"),
+        }
+        return context
 
-@permission_required("assignments.add_deviceassignment")
-@require_http_methods(["GET"])
-def quick_assign_user_list_view(request):
-    q = request.GET.get("q")
-    # Remove symbols and repeated spaces
-    q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
-    people = Person.objects.all()
-    if q:
-        people = people.filter(
-            Q(internal_id__exact=q)
-            | Q(first_name__icontains=q)
-            | Q(last_name__icontains=q)
-            | Q(last_name__icontains=q)
-            | Q(email__istartswith=q)
+
+class QuickAssignPersonListJSONView(PermissionRequiredMixin, JSONListView):
+    permission_required = "assignments.add_deviceassignment"
+
+    def get_queryset(self):
+        q = self.request.GET.get("q")
+        # Remove symbols and repeated spaces
+        q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
+        people = Person.objects.all()
+        if q != "":
+            people = people.filter(
+                Q(internal_id__exact=q)
+                | Q(first_name__icontains=q)
+                | Q(last_name__icontains=q)
+                | Q(last_name__icontains=q)
+                | Q(email__istartswith=q)
+            )
+        people = people.values(
+            "id",
+            "first_name",
+            "last_name",
+            "internal_id",
+            "has_outstanding_assignment",
+            "email",
+            "is_active",
+        ).order_by("type", "last_name")
+        return people
+
+
+class QuickAssignDeviceListJSONView(PermissionRequiredMixin, JSONListView):
+    permission_required = "assignments.add_deviceassignment"
+
+    def get_queryset(self):
+        q = self.request.GET.get("q")
+        # Remove symbols and repeated spaces
+        q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
+        devices = Device.objects.all()
+        if q != "":
+            devices = devices.filter(Q(asset_id__exact=q) | Q(serial_number__exact=q))
+        devices = devices.values("id", "asset_id", "serial_number").order_by(
+            "asset_id", "serial_number"
         )
-    people = people.values(
-        "id",
-        "first_name",
-        "last_name",
-        "internal_id",
-        "has_outstanding_assignment",
-        "email",
-        "is_active",
-    ).order_by("type", "last_name")
+        return devices
 
-    return JsonResponse({"results": list(people)})
+
+# @permission_required("assignments.add_deviceassignment")
+# @require_http_methods(["GET"])
+# def quick_assign_user_list_view(request):
+#    q = request.GET.get("q")
+#    # Remove symbols and repeated spaces
+#    q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
+#    people = Person.objects.all()
+#    if q:
+#        people = people.filter(
+#            Q(internal_id__exact=q)
+#            | Q(first_name__icontains=q)
+#            | Q(last_name__icontains=q)
+#            | Q(last_name__icontains=q)
+#            | Q(email__istartswith=q)
+#        )
+#    people = people.values(
+#        "id",
+#        "first_name",
+#        "last_name",
+#        "internal_id",
+#        "has_outstanding_assignment",
+#        "email",
+#        "is_active",
+#    ).order_by("type", "last_name")
+#
+#    return JsonResponse({"results": list(people)})
+#

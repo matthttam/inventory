@@ -8,7 +8,6 @@ function getActionButtons(row){
     const actions = JSON.parse(document.getElementById('actions').textContent);
     if(!actions) return ""
 
-    console.log(actions)
     action_buttons = 
     `
     <div class="container">

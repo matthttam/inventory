@@ -7,7 +7,8 @@ from .views import (
     DeviceAssignmentDeleteView,
     DeviceAssignmentQuickAssignView,
     DeviceAssignmentDatatableServerSideProcessingView,
-    quick_assign_user_list_view,
+    QuickAssignPersonListJSONView,
+    QuickAssignDeviceListJSONView,
 )
 
 app_name = "assignments"
@@ -24,8 +25,13 @@ urlpatterns = [
     path("quickassign/", DeviceAssignmentQuickAssignView.as_view(), name="quickassign"),
     path("<int:pk>/delete/", DeviceAssignmentDeleteView.as_view(), name="delete"),
     path(
-        "quickassign/ajax/users/",
-        quick_assign_user_list_view,
-        name="quick_assign_user_list",
+        "quickassign/ajax/people/",
+        QuickAssignPersonListJSONView.as_view(),
+        name="quick_assign_person_list",
+    ),
+    path(
+        "quickassign/ajax/devices/",
+        QuickAssignDeviceListJSONView.as_view(),
+        name="quick_assign_device_list",
     ),
 ]
