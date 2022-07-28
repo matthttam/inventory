@@ -9,6 +9,7 @@ from .views import (
     DeviceAssignmentDatatableServerSideProcessingView,
     QuickAssignPersonListJSONView,
     QuickAssignDeviceListJSONView,
+    QuickAssignSubmitView,
 )
 
 app_name = "assignments"
@@ -33,5 +34,10 @@ urlpatterns = [
         "quickassign/ajax/devices/",
         QuickAssignDeviceListJSONView.as_view(),
         name="quick_assign_device_list",
+    ),
+    path(
+        "quickassign/ajax/submit/",
+        QuickAssignSubmitView.as_view(),
+        name="quick_assign_submit",
     ),
 ]

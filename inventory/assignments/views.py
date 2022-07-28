@@ -21,7 +21,7 @@ from django.db.models import CharField, Value as V, Q
 from auditlog.models import LogEntry
 from devices.models import Device
 
-from inventory.views import JSONListView
+from inventory.views import JSONListView, JSONFormView
 from people.models import Person
 from .models import DeviceAssignment
 from .forms import DeviceAssignmentForm
@@ -126,6 +126,7 @@ class DeviceAssignmentQuickAssignView(PermissionRequiredMixin, TemplateView):
         context["ajax_urls"] = {
             "people": reverse("assignments:quick_assign_person_list"),
             "devices": reverse("assignments:quick_assign_device_list"),
+            "submit": reverse("assignments:quick_assign_submit"),
         }
         return context
 
@@ -154,7 +155,7 @@ class QuickAssignPersonListJSONView(PermissionRequiredMixin, JSONListView):
             "has_outstanding_assignment",
             "email",
             "is_active",
-        ).order_by("type", "last_name")
+        ).order_by("-is_active", "is_currently_assigned", "type", "last_name")
         return people
 
 
@@ -167,37 +168,17 @@ class QuickAssignDeviceListJSONView(PermissionRequiredMixin, JSONListView):
         q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
         devices = Device.objects.all()
         if q != "":
-            devices = devices.filter(Q(asset_id__exact=q) | Q(serial_number__exact=q))
-        devices = devices.values("id", "asset_id", "serial_number").order_by(
-            "asset_id", "serial_number"
-        )
+            devices = devices.filter(
+                Q(asset_id__exact=q)
+                | Q(serial_number__exact=q)
+                | Q(asset_id__icontains=q)
+            )
+        devices = devices.values(
+            "id", "asset_id", "serial_number", "is_active", "is_currently_assigned"
+        ).order_by("-is_active", "is_currently_assigned", "asset_id", "serial_number")
         return devices
 
 
-# @permission_required("assignments.add_deviceassignment")
-# @require_http_methods(["GET"])
-# def quick_assign_user_list_view(request):
-#    q = request.GET.get("q")
-#    # Remove symbols and repeated spaces
-#    q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
-#    people = Person.objects.all()
-#    if q:
-#        people = people.filter(
-#            Q(internal_id__exact=q)
-#            | Q(first_name__icontains=q)
-#            | Q(last_name__icontains=q)
-#            | Q(last_name__icontains=q)
-#            | Q(email__istartswith=q)
-#        )
-#    people = people.values(
-#        "id",
-#        "first_name",
-#        "last_name",
-#        "internal_id",
-#        "has_outstanding_assignment",
-#        "email",
-#        "is_active",
-#    ).order_by("type", "last_name")
-#
-#    return JsonResponse({"results": list(people)})
-#
+class QuickAssignSubmitView(PermissionRequiredMixin, JSONFormView):
+    permission_required = "assignments.add_deviceassignment"
+    form_class = DeviceAssignmentForm

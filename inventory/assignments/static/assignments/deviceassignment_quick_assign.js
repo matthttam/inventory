@@ -7,10 +7,16 @@ $(document).ready(function() {
 
     
     
-    function get_person_option(obj){
+    function get_person_text(obj){
         text = `${obj.last_name}, ${obj.first_name} - ${obj.internal_id}`
         text += obj.is_active ? "": " (inactive)"
-        text += obj.has_outstanding_assignment ? " (assigned)" : ""
+        text += obj.is_currently_assigned ? " (assigned)" : ""
+        return text
+    }
+    function get_device_text(obj){
+        text = `${obj.asset_id} (${obj.serial_number})`
+        text += obj.is_active ? "": " (inactive)"
+        text += obj.is_currently_assigned ? " (assigned)" : ""
         return text
     }
 
@@ -27,18 +33,18 @@ $(document).ready(function() {
                         data.results.length == 1 && 
                         data.results[0].internal_id == searchTerm && 
                         data.results[0].is_active &&
-                        !data.results[0].has_outstanding_assignment
+                        !data.results[0].is_currently_assigned
                     ) {
                     personSelect.append($("<option />")
                         .attr("value", data.results[0].id)
-                        .html(get_person_option(data.results[0]))
+                        .html(get_person_text(data.results[0]))
                     ).val(data.results[0].id).trigger("change").select2('close').trigger('select2:select');
                     return {'results':[]};
                 }
                 
                 $.map(data.results, function (obj) {
-                    obj.text = get_person_option(obj)
-                    obj.disabled = ! obj.is_active || obj.has_outstanding_assignment
+                    obj.text = get_person_text(obj)
+                    obj.disabled = ! obj.is_active || obj.is_currently_assigned
                     return obj;
                 })
                 return data;
@@ -58,12 +64,19 @@ $(document).ready(function() {
 
             processResults: function (data) {                    
                 var searchTerm = deviceSelect.data("select2").$dropdown.find("input").val();
-                if (data.results.length == 1 && data.results[0].id == searchTerm) {
+                console.log('beforeif')
+                if (data.results.length == 1 && (data.results[0].asset_id == searchTerm || data.results[0].serial_number == searchTerm))  {
+                    console.log('here')
                     deviceSelect.append($("<option />")
                         .attr("value", data.results[0].id)
-                        .html(data.results[0].text)
+                        .html(get_device_text(data.results[0]))
                     ).val(data.results[0].id).trigger("change").select2('close').trigger('select2:select');
                 }
+                $.map(data.results, function (obj) {
+                    obj.text = get_device_text(obj)
+                    obj.disabled = ! obj.is_active || obj.is_currently_assigned
+                    return obj;
+                })
                 return data;
             },
         },
@@ -75,34 +88,9 @@ $(document).ready(function() {
     }).focus()
     .select2('open')
     .on('select2:select', function(e) {
-        $('#student').focus().select2('open');
+        $('#person').focus().select2('open');
     });
-/*
-    var studentSelect = $('#student').select2({
-        ajax: {
-            url: 'ajax/users/',
-            delay: 250,
-            dataType: 'json',
-            processResults: function (data) {                    
-                var searchTerm = studentSelect.data("select2").$dropdown.find("input").val();
-                if (data.results.length == 1 && data.results[0].id == searchTerm) {
-                    studentSelect.append($("<option />")
-                        .attr("value", data.results[0].id)
-                        .html(data.results[0].text)
-                    ).val(data.results[0].id).trigger("change").select2('close').trigger('select2:select');
-                }
-                return data;
-            },
-        },
-        theme: 'bootstrap4',
-        placeholder: "ID, Username, or Email",
-        minimumInputLength: 3,
-        dropdownParent: $('div[name=student_search]'),
-    })
-    .on('select2:select', function(e) {
-        $('#needs_repair').focus();
-    });
-*/
+
     $(document).on('submit', 'form#check_form', function(e){
         var form = $('form#check_form')
         var form_inputs = $(this).find('select, input')
@@ -113,18 +101,19 @@ $(document).ready(function() {
         // Perform post
         $.ajax({
             method: "POST",
-            url: "submit.php",
+            headers: {'X-CSRFToken': csrftoken},
+            mode: 'same-origin',
+            url: get_ajax_url('submit'),
             data: form.serialize(),
         }).done(function(data){
-            if(data.status == 'error'){
+            if(! data.success){
                 // Splash fail
-                CreateSplash('alert-danger', 'Error saving record. Error Code: ' + data.error_code);
-            }else if(data.status == 'success'){
+                CreateSplash('alert-danger', 'Error saving record. Error Code: ' + data.errors.join(', '));
+            }else if(data.success){
                 // Splash success
                 let splash = CreateSplash('alert-success', 'Record saved!');
                 $(splash).delay(1500).fadeOut();
                 // Clear fields
-                form.find('input[type=checkbox]').prop( "checked", false)
                 form.find('select').val(null).trigger('change')
                 $('#device').select2('open').trigger('select2:open')
             }else{
@@ -144,13 +133,12 @@ $(document).ready(function() {
     });
 
     function CreateSplash(class_name, message){
-        $splash = $('\
-            <div name="splash" class="alert alert-dismissible fade show" role="alert">\
-                <p id="splash_message">'+ message +'</p>\
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">\
-                    <span aria-hidden="true">&times;</span>\
-                </button>\
-            </div>');
+        $splash = $(`
+            <div name="splash" class="alert alert-dismissible fade show" role="alert">
+                <p id="splash_message">${message}</p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                </button>
+            </div>`);
         $splash.addClass(class_name)
         $('#splash_area').append($splash)
         return $splash

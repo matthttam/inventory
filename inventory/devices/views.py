@@ -44,7 +44,8 @@ class DeviceDetailView(PermissionRequiredMixin, DetailView):
 class DeviceUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "devices.change_device"
     model = Device
-    fields = ["serial_number", "asset_id", "device_model", "notes"]
+    form_class = DeviceForm
+    # fields = ["serial_number", "asset_id", "device_model", "notes"]
 
 
 class DeviceCreateView(PermissionRequiredMixin, CreateView):

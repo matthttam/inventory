@@ -40,6 +40,13 @@ class PersonManager(models.Manager):
                 default=False,
             )
         )
+        # Alias of has_outstanding_assignment
+        qs = qs.annotate(
+            is_currently_assigned=Case(
+                When(outstanding_assignment_count__gt=0, then=True),
+                default=False,
+            )
+        )
 
         # Set if the person is active
         qs = qs.annotate(
