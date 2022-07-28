@@ -113,7 +113,6 @@ class PersonCreateViewAuthenticatedWithPermissionTest(TestCase):
             "google_id": "",
         }
         response = self.client.post(reverse("people:new"), person_dict)
-        print(response.content.decode())
         person_object = Person.objects.last()
         self.assertIsNotNone(person_object)
         self.assertEqual(person_object, person)

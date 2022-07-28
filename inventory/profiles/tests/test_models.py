@@ -21,7 +21,6 @@ class ProfileTest(TestCase):
     def test_custom_timezone_type(self):
         timezone = self.profile._meta.get_field("timezone")
         self.assertIsInstance(timezone, TimeZoneField)
-        print(timezone.__class__)
 
     def test_user_foreign_key(self):
         user = self.profile._meta.get_field("user")

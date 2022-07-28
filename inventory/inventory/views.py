@@ -34,21 +34,17 @@ class JSONListView(JSONResponseMixin, BaseListView):
 
 class JSONFormView(JSONResponseMixin, BaseFormView):
     def get_success_url(self):
-        print("get_success_url")
         return None
 
     def form_valid(self, form):
-        print("form_valid")
         return self.render_to_response(self.get_context_data(success=True))
 
     def form_invalid(self, form):
-        print("form_invalid")
         context = self.get_context_data(success=False)
         context["errors"] = form.errors
         return self.render_to_response(context)
 
     def get(self, request, *args, **kwargs):
-        print("get")
         return HttpResponseNotAllowed(
             [
                 "GET",

@@ -84,7 +84,6 @@ class DeviceInfoboxTest(SimpleTestCase):
         )
         self.assertEqual(len(info_divs), len(expected_fields))
         for index, info_div in enumerate(info_divs):
-            print(info_div.select("div"))
             label = info_div.select("div")[0].contents[0]
             value = info_div.select("div")[1].contents[0]
             self.assertEqual(

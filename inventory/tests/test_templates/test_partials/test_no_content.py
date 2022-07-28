@@ -8,7 +8,6 @@ class NoContentTest(SimpleTestCase):
         context = Context({})
         template = Template("{% include 'partials/no_content.html' %}")
         rendered = template.render(context)
-        print(rendered)
         soup = BeautifulSoup(rendered, "html.parser")
 
         display = soup.select("h1")
@@ -20,7 +19,6 @@ class NoContentTest(SimpleTestCase):
         template = Template("{% include 'partials/no_content.html' %}")
         rendered = template.render(context)
         soup = BeautifulSoup(rendered, "html.parser")
-        print(rendered)
         display = soup.select("h1")
         self.assertEqual(len(display), 1)
         self.assertInHTML(display[0].contents[0], "Different Message")

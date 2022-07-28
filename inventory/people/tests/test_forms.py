@@ -27,7 +27,6 @@ class PersonFormTest(TestCase):
                 ],
             )
         )
-        print(form.errors)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.errors, {})
         self.assertQuerysetEqual(
