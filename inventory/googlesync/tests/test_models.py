@@ -1,5 +1,8 @@
 from django.test import TestCase
+from django.db.models import UniqueConstraint
+
 from unittest.mock import patch
+
 from people.tests.factories import PersonTypeFactory
 from people.models import PersonType, Person
 from devices.models import Device
@@ -526,10 +529,6 @@ class MappingAbstractTest(TestCase):
         potential_choices = [(x, x) for x in range(1, 10)]
         self.assertCountEqual(potential_choices, choices)
 
-    def test_matching_priority_unique(self):
-        unique = MappingAbstract._meta.get_field("matching_priority").unique
-        self.assertTrue(unique)
-
     def test_matching_priority_optional(self):
         self.assertEqual(
             MappingAbstract._meta.get_field("matching_priority").blank, True
@@ -537,6 +536,24 @@ class MappingAbstractTest(TestCase):
         self.assertEqual(
             MappingAbstract._meta.get_field("matching_priority").null, True
         )
+
+    def test_unique_constraints(self):
+        expected_constraint_fields = [
+            ("sync_profile", "to_field"),
+            ("sync_profile", "matching_priority"),
+        ]
+        constraints = [
+            c
+            for c in MappingAbstract._meta.constraints
+            if isinstance(c, UniqueConstraint)
+        ]
+        self.assertEqual(
+            len(expected_constraint_fields),
+            len(constraints),
+            "Difference in unique constraint length.",
+        )
+        for constraint in constraints:
+            self.assertIn(constraint.fields, expected_constraint_fields)
 
     ### Functions ###
     @patch("googlesync.models.MappingAbstract._meta.abstract", set())
