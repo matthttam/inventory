@@ -379,18 +379,6 @@ class GooglePersonSyncProfileTest(TestCase):
             "mappings",
         )
 
-    ### Functions ###
-    def test___str__(self):
-        person_type = PersonTypeFactory()
-        google_service_account_config = GoogleServiceAccountConfigFactory()
-        google_person_sync_profile = GooglePersonSyncProfileFactory(
-            name="test_profile_name", person_type=person_type
-        )
-        self.assertEqual(
-            google_person_sync_profile.__str__(),
-            f"test_profile_name ({person_type.__str__()}: {google_service_account_config.__str__()})",
-        )
-
 
 class GoogleDeviceSyncProfileTest(TestCase):
     @classmethod
@@ -486,19 +474,6 @@ class GoogleDeviceSyncProfileTest(TestCase):
             "mappings",
         )
 
-    ### Functions ###
-    def test___str__(self):
-        GooglePersonSyncProfileFactory()
-        person_type = PersonTypeFactory()
-        google_service_account_config = GoogleServiceAccountConfigFactory()
-        google_person_sync_profile = GooglePersonSyncProfileFactory(
-            name="test_profile_name", person_type=person_type
-        )
-        self.assertEqual(
-            google_person_sync_profile.__str__(),
-            f"test_profile_name ({person_type.__str__()}: {google_service_account_config.__str__()})",
-        )
-
 
 class MappingAbstractTest(TestCase):
     def test_is_abstract(self):
@@ -557,13 +532,14 @@ class MappingAbstractTest(TestCase):
 
     ### Functions ###
     @patch("googlesync.models.MappingAbstract._meta.abstract", set())
+    @patch("googlesync.models.MappingAbstract.sync_profile", "profile_name")
     def test___str__(self):
         google_person_mapping = MappingAbstract(
             from_field="from field", to_field="to field"
         )
         self.assertEqual(
             google_person_mapping.__str__(),
-            "from field => to field",
+            "profile_name: from field => to field",
         )
 
 

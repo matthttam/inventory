@@ -80,6 +80,9 @@ class GoogleSyncProfileAbstract(models.Model):
     class Meta:
         abstract = True
 
+    def __str__(self):
+        return f"{self.name}"
+
 
 # Person sync profile
 class GooglePersonSyncProfile(GoogleSyncProfileAbstract):
@@ -90,9 +93,12 @@ class GooglePersonSyncProfile(GoogleSyncProfileAbstract):
         help_text="Google API query to use when searching for users to sync for this profile. (e.g. 'orgUnitPath=/Staff'). Query documentation: https://developers.google.com/admin-sdk/directory/v1/guides/search-users",
         blank=True,
     )
-
-    def __str__(self):
-        return f"{self.name} ({self.person_type}: {self.google_service_account_config})"
+    domain = models.CharField(
+        max_length=1024,
+        default="",
+        blank=True,
+        help_text="Filter by domain of users. If left blank users of any domain for your Google Customer will be included.",
+    )
 
 
 class GoogleDeviceSyncProfile(GoogleSyncProfileAbstract):
@@ -108,9 +114,6 @@ class GoogleDeviceSyncProfile(GoogleSyncProfileAbstract):
         help_text="Google API query to use when searching for devices to sync for this profile. (e.g. 'location:seattle'). Query documentation: https://developers.google.com/admin-sdk/directory/v1/list-query-operators",
         blank=True,
     )
-
-    def __str__(self):
-        return f"{self.name} (Devices: {self.google_service_account_config})"
 
 
 class MappingAbstract(models.Model):
@@ -135,7 +138,7 @@ class MappingAbstract(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.from_field} => {self.to_field}"
+        return f"{self.sync_profile}: {self.from_field} => {self.to_field}"
 
 
 class GooglePersonMapping(MappingAbstract):

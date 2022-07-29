@@ -45,14 +45,17 @@ class Command(GoogleSyncCommand):
             raise SyncProfileNotFound(profile_name=profile_name)
         return sync_profile
 
-    def _get_google_records(self, query) -> list:
+    def _get_google_records(self, query, domain) -> list:
         users = self._get_users_service()
-
-        request = users.list(
-            domain=self.customer.get("customerDomain"),
-            projection="full",
-            query=query,
-        )
+        options = {
+            "projection": "full",
+            "query": query,
+        }
+        if domain == "":
+            options["customer"] = self.customer.get("id")
+        else:
+            options["domain"] = domain
+        request = users.list(**options)
         google_user_records = []
         while request is not None:
             response = request.execute()
@@ -65,13 +68,14 @@ class Command(GoogleSyncCommand):
 
             google_user_records.extend(google_users)
             request = users.list_next(request, response)
-            # request = None
+
         return google_user_records
 
     def sync_google_people(self, sync_profile):
-        google_users = self._get_google_records(query=sync_profile.google_query)
+        google_users = self._get_google_records(
+            query=sync_profile.google_query, domain=sync_profile.domain
+        )
         person_records = self.convert_google_users_to_person(sync_profile, google_users)
-        print(f"Number of person records: {len(person_records)}")
 
         self.stdout.write(
             self.style.SUCCESS(f"Total Number of person records: {len(person_records)}")
