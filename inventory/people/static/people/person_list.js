@@ -5,21 +5,21 @@ $(document).ready(function () {
         ajax: {
             url: "/people/dt/",
         },
+        colReorder: {
+            fixedColumnsRight:1
+        },
+        fixedHeader: true,
         searchDelay: 350,
         columns: [
-            { name: 'first_name' },
-            { name: 'last_name'},
-            { 
-                name: 'email', 
-                data: 'email', 
-                render:function(data, type, row, meta){
-                    return '<a href="' + row.id + '/">' + data.toLowerCase() + '</a>';
-                }
-            },
+            { name: 'id', data: 'id', visible: false},
+            { name: 'first_name', data: 'first_name' },
+            { name: 'last_name', data: 'last_name'},
+            { name: 'email', data: 'email'},
             { name: 'internal_id', data: 'internal_id'},
             { name: 'type__name', data: 'type__name'},
             { name: 'status__name', data: 'status__name'},
             { name: 'building_name_list', data: 'building_name_list', orderable: false},
+            getActionColumnDef(),
         ]
     });
 });

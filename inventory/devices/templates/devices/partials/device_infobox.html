@@ -27,8 +27,10 @@ Device
   <div class="row mb-2">
     <div class="col-md-4 fw-bold text-end">Room :</div><div class="col md-1 text-start">{{device.room}}</div>
   </div>
-  {% if bottom_infobox_card %}
-    {% include bottom_infobox_card %}
-  {% endif %}
+  <div name="device_bottom_infobox" class="d-flex justify-content-center">
+    {% if bottom_infobox_card %}
+      {% include bottom_infobox_card %}
+    {% endif %}
+  </div>
 </p>
 {% endblock %}

@@ -14,6 +14,7 @@ from django_datatable_serverside_mixin.views import (
     ServerSideDatatableMixin,
 )
 
+from inventory.utils import get_permitted_actions
 from inventory.aggregates import GroupConcat
 from .models import Person
 from .forms import PersonForm
@@ -43,6 +44,26 @@ class PersonDatatableServerSideProcessingView(
 class PersonListView(PermissionRequiredMixin, TemplateView):
     permission_required = "people.view_person"
     template_name = "people/person_list.html"
+    extra_context = {
+        "headers": [
+            "ID",
+            "First Name",
+            "Last Name",
+            "Email",
+            "Internal ID",
+            "Type",
+            "Status",
+            "Buildings",
+            "Actions",
+        ],
+    }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["permitted_actions"] = get_permitted_actions(
+            self.request, "people", "person"
+        )
+        return context
 
 
 class PersonDetailView(PermissionRequiredMixin, DetailView):

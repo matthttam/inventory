@@ -6,3 +6,5 @@
 {% load static %}
 
 <script type="text/javascript" src="{% static 'inventory/datatable_defaults.js'%}"></script>
+<script type="text/javascript" src="{% static 'inventory/datatable_helpers.js'%}"></script>
+{{ permitted_actions|json_script:"permitted_actions" }}

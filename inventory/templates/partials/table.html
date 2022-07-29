@@ -1,0 +1,13 @@
+<table id="{{ table_id }}" class="{{table_class|default:"table table-striped table-bordered nowrap"}}" style="{{ table_style|default:"width:100%" }}">
+    <thead>
+        <tr>
+            {% for value in headers %}
+            <th>{{value}}</th>
+            {% empty %}
+            No Headers Provided for Template
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>

@@ -110,7 +110,7 @@ class RoomModelTest(TestCase):
             )
         ]
         constraints = [
-            c.fields for c in Room._meta.constraints if isinstance(c, UniqueConstraint)
+            c for c in Room._meta.constraints if isinstance(c, UniqueConstraint)
         ]
         self.assertEqual(
             len(expected_constraint_fields),

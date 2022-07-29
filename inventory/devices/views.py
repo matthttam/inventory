@@ -14,6 +14,7 @@ from django_datatable_serverside_mixin.views import (
     ServerSideDatatableMixin,
 )
 
+from inventory.utils import get_permitted_actions
 from .forms import DeviceForm
 from .models import Device
 
@@ -26,14 +27,22 @@ class DeviceDatatableServerSideProcessingView(
     queryset = Device.objects.all()
     columns = [
         "id",
-        "serial_number",
         "asset_id",
+        "serial_number",
     ]
 
 
 class DeviceListView(PermissionRequiredMixin, TemplateView):
     permission_required = "devices.view_device"
     template_name = "devices/device_list.html"
+    extra_context = {"headers": ["ID", "Asset ID", "Serial Number", "Actions"]}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["permitted_actions"] = get_permitted_actions(
+            self.request, "devices", "device"
+        )
+        return context
 
 
 class DeviceDetailView(PermissionRequiredMixin, DetailView):
@@ -45,7 +54,6 @@ class DeviceUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "devices.change_device"
     model = Device
     form_class = DeviceForm
-    # fields = ["serial_number", "asset_id", "device_model", "notes"]
 
 
 class DeviceCreateView(PermissionRequiredMixin, CreateView):

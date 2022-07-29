@@ -3,34 +3,22 @@
 {% block title %}Inventory - People{% endblock %}
 
 {% block head %}
-{{ block.super }}
-{% include "partials/datatables.html"%}
 
-{% load static %}
-<script src="{% static 'people/person_list.js'%}"></script>
+    {{ block.super }}
+
+    {% include "partials/datatables.html"%}
+
+    {% load static %}
+    <script src="{% static 'people/person_list.js'%}"></script>
 
 {% endblock head %}
 
 {% block content %}
 
-    <table id="person_list" class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>Internal ID</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Buildings</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+    {% include 'partials/table.html' with table_id='person_list' %}
 
-{% if perms.people.add_person %}
-    <a class="btn btn-primary m-2" role="button" href="{% url 'people:new' %}">Create Person</a>
-{% endif %}
+    {% if perms.people.add_person %}
+        <a class="btn btn-primary m-2" role="button" href="{% url 'people:new' %}">Create Person</a>
+    {% endif %}
 
 {% endblock content %}

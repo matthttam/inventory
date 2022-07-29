@@ -64,9 +64,7 @@ $(document).ready(function() {
 
             processResults: function (data) {                    
                 var searchTerm = deviceSelect.data("select2").$dropdown.find("input").val();
-                console.log('beforeif')
                 if (data.results.length == 1 && (data.results[0].asset_id == searchTerm || data.results[0].serial_number == searchTerm))  {
-                    console.log('here')
                     deviceSelect.append($("<option />")
                         .attr("value", data.results[0].id)
                         .html(get_device_text(data.results[0]))

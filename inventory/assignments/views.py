@@ -19,10 +19,11 @@ from django.db.models.functions import Concat
 from django.db.models import CharField, Value as V, Q
 
 from auditlog.models import LogEntry
-from devices.models import Device
 
+from inventory.utils import get_permitted_actions
 from inventory.views import JSONListView, JSONFormView
 from people.models import Person
+from devices.models import Device
 from .models import DeviceAssignment
 from .forms import DeviceAssignmentForm
 
@@ -49,37 +50,22 @@ class DeviceAssignmentDatatableServerSideProcessingView(
 class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
     permission_required = "assignments.view_deviceassignment"
     template_name = "assignments/deviceassignment_list.html"
+    extra_context = {
+        "headers": [
+            "ID",
+            "Person",
+            "Device",
+            "Assignment Date",
+            "Return Date",
+            "Actions",
+        ],
+    }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        temp_id = 12345
-        placeholder = "__id_placeholder__"
-        context["actions"] = {
-            "view": {
-                "allowed": self.request.user.has_perm(
-                    "assignments.view_deviceassignment"
-                ),
-                "path": reverse("assignments:detail", args=[temp_id]).replace(
-                    str(temp_id), placeholder
-                ),
-            },
-            "change": {
-                "allowed": self.request.user.has_perm(
-                    "assignments.change_deviceassignment"
-                ),
-                "path": reverse("assignments:edit", args=[temp_id]).replace(
-                    str(temp_id), placeholder
-                ),
-            },
-            "delete": {
-                "allowed": self.request.user.has_perm(
-                    "assignments.delete_deviceassignment"
-                ),
-                "path": reverse("assignments:delete", args=[temp_id]).replace(
-                    str(temp_id), placeholder
-                ),
-            },
-        }
+        context["permitted_actions"] = get_permitted_actions(
+            self.request, "assignments", "deviceassignment"
+        )
         return context
 
 
