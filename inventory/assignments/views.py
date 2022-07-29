@@ -115,14 +115,14 @@ class DeviceAssignmentDeleteView(PermissionRequiredMixin, DeleteView):
 
 class DeviceAssignmentQuickAssignView(PermissionRequiredMixin, TemplateView):
     permission_required = "assignments.add_deviceassignment"
-    template_name = "assignments/deviceassignment_quick_assign.html"
+    template_name = "assignments/deviceassignment_quickassign.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["ajax_urls"] = {
-            "people": reverse("assignments:quick_assign_person_list"),
-            "devices": reverse("assignments:quick_assign_device_list"),
-            "submit": reverse("assignments:quick_assign_submit"),
+            "people": reverse("assignments:quickassign_person_list"),
+            "devices": reverse("assignments:quickassign_device_list"),
+            "submit": reverse("assignments:quickassign_submit"),
         }
         return context
 

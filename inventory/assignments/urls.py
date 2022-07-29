@@ -28,16 +28,16 @@ urlpatterns = [
     path(
         "quickassign/ajax/people/",
         QuickAssignPersonListJSONView.as_view(),
-        name="quick_assign_person_list",
+        name="quickassign_person_list",
     ),
     path(
         "quickassign/ajax/devices/",
         QuickAssignDeviceListJSONView.as_view(),
-        name="quick_assign_device_list",
+        name="quickassign_device_list",
     ),
     path(
         "quickassign/ajax/submit/",
         QuickAssignSubmitView.as_view(),
-        name="quick_assign_submit",
+        name="quickassign_submit",
     ),
 ]

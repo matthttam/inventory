@@ -6,9 +6,9 @@ from assignments.tests.factories import DeviceAssignmentFactory
 from inventory.tests.helpers import get_permission
 
 new_link = '<a class="btn btn-primary m-2" role="button" href="/assignments/new/">Create Assignment</a>'
-quick_assign_link = '<a class="btn btn-primary m-2" role="button" href="/assignments/quickassign/">Quick Assign</a>'
+quickassign_link = '<a class="btn btn-primary m-2" role="button" href="/assignments/quickassign/">Quick Assign</a>'
 DEFAULT_LINKS = []
-ALL_LINKS = [new_link, quick_assign_link]
+ALL_LINKS = [new_link, quickassign_link]
 
 
 class DeviceAssignmenListSuperuserTest(TestCase):
@@ -97,7 +97,7 @@ class DeviceAssignmentListWithPermissionTest(TestCase):
             self.response.content.decode(),
         )
 
-    def test_quick_assign_link(self):
+    def test_quickassign_link(self):
         self.user.user_permissions.add(
             get_permission(DeviceAssignment, "add_deviceassignment")
         )

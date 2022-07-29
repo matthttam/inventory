@@ -176,10 +176,10 @@ class DeviceAssignmentQuickAssignViewAuthenticatedWithPermissionTest(TestCase):
             get_permission(DeviceAssignment, "add_deviceassignment")
         )
 
-    def test_quick_assign_deviceassignment(self):
+    def test_quickassign_deviceassignment(self):
         response = self.client.get(reverse("assignments:quickassign"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("deviceassignment_quick_assign.html")
+        self.assertTemplateUsed("deviceassignment_quickassign.html")
 
 
 class DeviceAssignmentViewUnauthenticatedTest(TestCase):
@@ -204,6 +204,18 @@ class DeviceAssignmentViewUnauthenticatedTest(TestCase):
         pass
 
     @assert_redirect_to_login(reverse("assignments:quickassign"))
+    def test_device_assignment_delete_redirects_to_login(self):
+        pass
+
+    @assert_redirect_to_login(reverse("assignments:quickassign_person_list"))
+    def test_device_assignment_delete_redirects_to_login(self):
+        pass
+
+    @assert_redirect_to_login(reverse("assignments:quickassign_device_list"))
+    def test_device_assignment_delete_redirects_to_login(self):
+        pass
+
+    @assert_redirect_to_login(reverse("assignments:quickassign_submit"))
     def test_device_assignment_delete_redirects_to_login(self):
         pass
 
@@ -237,6 +249,18 @@ class DeviceAssignmentViewsAuthenticatedWithoutPermissionTest(TestCase):
         response = self.client.get(reverse("assignments:delete", args=[1]))
         self.assertEqual(response.status_code, 403)
 
-    def test_device_assignment_quick_assign_redirect_to_login(self):
+    def test_device_assignment_quickassign_redirect_to_login(self):
         response = self.client.get(reverse("assignments:quickassign"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_device_assignment_quickassign_person_list_redirect_to_login(self):
+        response = self.client.get(reverse("assignments:quickassign_person_list"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_device_assignment_quickassign_person_list_redirect_to_login(self):
+        response = self.client.get(reverse("assignments:quickassign_device_list"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_device_assignment_quickassign_person_list_redirect_to_login(self):
+        response = self.client.get(reverse("assignments:quickassign_submit"))
         self.assertEqual(response.status_code, 403)
