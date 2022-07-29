@@ -15,7 +15,9 @@
 
 {% block content %}
 
-    {% include 'partials/table.html' with table_id='person_list' %}
+    {% with prefix=tables.person_list %}
+        {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers %}
+    {% endwith %}
 
     {% if perms.people.add_person %}
         <a class="btn btn-primary m-2" role="button" href="{% url 'people:new' %}">Create Person</a>

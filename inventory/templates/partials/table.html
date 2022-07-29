@@ -1,13 +1,19 @@
-<table id="{{ table_id }}" class="{{table_class|default:"table table-striped table-bordered nowrap"}}" style="{{ table_style|default:"width:100%" }}">
-    <thead>
-        <tr>
-            {% for value in headers %}
-            <th>{{value}}</th>
-            {% empty %}
-            No Headers Provided for Template
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+{% extends 'base_table.html' %}
+
+{% block table_id %}{{ table_id }}{% endblock %}
+
+{% block thead %}
+    <tr>
+        {{ block.super }}
+        {% if thead_template %}
+            {% include thead_template %}
+        {% endif %}
+    </tr>
+{% endblock thead %}
+
+{% block tbody %}
+    {{ block.super }}
+    {% if tbody_template %}
+        {% include tbody_template %}
+    {% endif %}
+{% endblock tbody %}

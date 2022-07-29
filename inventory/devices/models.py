@@ -1,6 +1,10 @@
 from django.db import models
 from django.db.models import F, Count, Q, When, Value, Case
 from django.urls import reverse
+
+from auditlog.registry import auditlog
+from auditlog.models import AuditlogHistoryField
+
 from locations.models import Room, Building
 
 
@@ -81,6 +85,7 @@ class Device(models.Model):
         null=True,
     )
     objects = DeviceManager()
+    history = AuditlogHistoryField()
 
     def __str__(self):
         if self.asset_id:
@@ -105,3 +110,7 @@ class DeviceAccessory(models.Model):
         # return f"{self.manufacturer} {self.name}"
         device_model_names = ",".join([x.name for x in self.device_models.all()])
         return f"{self.name} ({device_model_names})"
+
+
+# Audit Log Registrations
+auditlog.register(Device)

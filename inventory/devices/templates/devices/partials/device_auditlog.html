@@ -2,12 +2,12 @@
 {% load tz %}
 
 {% block card_title_content %} 
-Assignment History
+Device History
 {% endblock %}
 {% block card_body_content%}
 
-<p name="assignment_card_body" class="card-text fs-5">
-    {% with prefix=tables.deviceassignment_history %}
+<p name="device_card_body" class="card-text fs-5">
+    {% with prefix=tables.device_history %}
     {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers tbody_template="partials/table_body_history.html" %}
     {% endwith %}
 </p>

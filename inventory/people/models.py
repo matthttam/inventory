@@ -4,6 +4,9 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.urls import reverse
 
+from auditlog.registry import auditlog
+from auditlog.models import AuditlogHistoryField
+
 from locations.models import Building, Room
 
 
@@ -73,6 +76,7 @@ class Person(models.Model):
     _rooms: list[Room] = None
 
     objects = PersonManager()
+    history = AuditlogHistoryField()
 
     class Meta:
         verbose_name_plural = "People"
@@ -105,3 +109,7 @@ class PersonType(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+
+# Audit Log Registrations
+auditlog.register(Person)

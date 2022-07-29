@@ -20,7 +20,11 @@ from django.db.models import CharField, Value as V, Q
 
 from auditlog.models import LogEntry
 
-from inventory.utils import get_permitted_actions
+from inventory.utils import (
+    get_permitted_actions,
+    get_history_table_context,
+    get_table_context,
+)
 from inventory.views import JSONListView, JSONFormView
 from people.models import Person
 from devices.models import Device
@@ -51,14 +55,19 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
     permission_required = "assignments.view_deviceassignment"
     template_name = "assignments/deviceassignment_list.html"
     extra_context = {
-        "headers": [
-            "ID",
-            "Person",
-            "Device",
-            "Assignment Date",
-            "Return Date",
-            "Actions",
-        ],
+        "tables": {
+            "assignment_list": {
+                "id": "assignment_list",
+                "headers": [
+                    "ID",
+                    "Person",
+                    "Device",
+                    "Assignment Date",
+                    "Return Date",
+                    "Actions",
+                ],
+            }
+        },
     }
 
     def get_context_data(self, **kwargs):
@@ -72,6 +81,7 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
 class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):
     permission_required = "assignments.view_deviceassignment"
     model = DeviceAssignment
+    extra_context = {"tables": get_history_table_context("deviceassignment_history")}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

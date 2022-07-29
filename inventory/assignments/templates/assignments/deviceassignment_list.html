@@ -15,7 +15,9 @@
 
 {% block content %}
 
-    {% include 'partials/table.html' with table_id='assignment_list' %}
+    {% with prefix=tables.assignment_list %}
+        {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers %}
+    {% endwith %}
 
     {% if perms.assignments.add_deviceassignment %}
         <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:new' %}">Create Assignment</a>

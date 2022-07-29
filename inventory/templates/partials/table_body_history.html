@@ -1,0 +1,21 @@
+{% load tz %}
+
+{% for log_entry in log_entries %}
+
+    {% for key, value in log_entry.changes_display_dict.items %}
+
+        <tr>
+            <td>{{ log_entry.timestamp|localtime|date:"SHORT_DATETIME_FORMAT" }}</td>
+            <td>{{ log_entry.actor.profile.display_name|default:"Unknown" }}</td>
+            <td>{{ key }}</td>
+            <td>{{ value.0|default:"None" }}</td>
+            <td>{{ value.1|default:"None" }}</td>
+        </tr>
+
+    {% endfor %}
+
+{% empty %}
+
+    <tr><td colspan="5" class="text-center h5 text-muted">No history has been logged yet</td></tr>
+
+{% endfor %}

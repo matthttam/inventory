@@ -1,6 +1,5 @@
 from django.db import models
 from django.urls import reverse
-from django.db.models import F, Sum, Count, Q, When, Case, BooleanField
 
 from auditlog.registry import auditlog
 from auditlog.models import AuditlogHistoryField
@@ -12,16 +11,6 @@ from people.models import Person
 class AssignmentManager(models.Manager):
     def outstanding(self):
         return self.filter(return_datetime=None)
-
-    # def get_queryset(self):
-    #    qs = super().get_queryset()
-    #    qs = qs.annotate(
-    #        is_outstanding=Case(
-    #            When(return_datetime=None, then=True),
-    #            default=False,
-    #        )
-    #    )
-    #    return qs
 
 
 class AssignmentAbstract(models.Model):

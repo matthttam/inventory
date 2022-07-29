@@ -2,8 +2,10 @@
 
 {% block title %}Inventory - Devices{%endblock %} 
 
-{% block head %} 
+{% block head %}
+
     {{ block.super }}
+
     {% include "partials/datatables.html"%}
 
     {% load static %}
@@ -13,10 +15,12 @@
 
 {% block content %} 
 
-    {% include 'partials/table.html' with table_id='device_list' %}
+    {% with prefix=tables.device_list %}
+        {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers %}
+    {% endwith %}
     
     {% if perms.devices.add_device %}
-      <a class="btn btn-primary m-2" role="button" href="{% url 'devices:new' %}">Create Device</a>
+        <a class="btn btn-primary m-2" role="button" href="{% url 'devices:new' %}">Create Device</a>
     {% endif %}
 
 {% endblock content %}
