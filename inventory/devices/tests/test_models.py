@@ -1,10 +1,15 @@
 from django.test import TestCase
+
+from auditlog.models import AuditlogHistoryField
+from auditlog.registry import auditlog
+
 from devices.models import (
     DeviceAccessory,
     DeviceStatus,
     DeviceManufacturer,
     Device,
     DeviceModel,
+    DeviceManager,
 )
 from googlesync.models import GoogleDevice
 from locations.models import Room, Building
@@ -15,7 +20,6 @@ from .factories import (
     DeviceFactory,
     DeviceAccessoryFactory,
     DeviceManufacturerFactory,
-    DeviceAccessoryWithDeviceModelsFactory,
 )
 
 
@@ -169,6 +173,9 @@ class DeviceTest(TestCase):
         self.assertEqual(self.device._meta.get_field("room").blank, True)
         self.assertEqual(self.device._meta.get_field("room").null, True)
 
+    def test_history_class(self):
+        self.assertIsInstance(Device._meta.get_field("history"), AuditlogHistoryField)
+
     ### Functions ###
     def test_display_name(self):
         device = DeviceFactory(
@@ -197,6 +204,12 @@ class DeviceTest(TestCase):
 
     def test_get_absolute_url(self):
         self.assertEqual(self.device.get_absolute_url(), "/devices/1/")
+
+    def test_auditlog_register(self):
+        self.assertTrue(auditlog.contains(model=Device))
+
+    def test_objects_is_instance_of_person_manager(self):
+        self.assertIsInstance(Device.objects, DeviceManager)
 
 
 class DeviceAccessoryTest(TestCase):

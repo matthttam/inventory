@@ -1,8 +1,13 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from django.utils import timezone
+
 from django.test import TestCase
+from auditlog.models import AuditlogHistoryField
+from auditlog.registry import auditlog
+
 from people.models import Person, PersonManager, PersonType, PersonStatus
+from locations.models import Building, Room
+
 from .factories import (
     PersonFactory,
     PersonWithBuildingsFactory,
@@ -10,14 +15,11 @@ from .factories import (
     PersonStatusFactory,
     PersonTypeFactory,
 )
-from locations.tests.factories import BuildingFactory
-from locations.models import Building, Room
+from locations.tests.factories import BuildingFactory, RoomFactory
 from assignments.tests.factories import (
     DeviceAssignmentFactory,
     DeviceAssignmentWithReturnDatetimeFactory,
 )
-
-tz = ZoneInfo(timezone.settings.TIME_ZONE)
 
 
 class PersonTest(TestCase):
@@ -84,11 +86,21 @@ class PersonTest(TestCase):
     def test_rooms_foreign_key(self):
         self.assertEqual(self.person._meta.get_field("rooms").related_model, Room)
 
-    def test_post_save_signal(self):
-        self.skipTest("Need to test")
+    def test_post_save_signal_for_buildings_and_rooms(self):
+        buildings = BuildingFactory.create_batch(5)
+        rooms = RoomFactory.create_batch(5)
+        PersonFactory(id=11, buildings=buildings, rooms=rooms)
+        person = Person.objects.get(id=11)
+        self.assertEqual(person.buildings.count(), 5)
+        self.assertEqual(person.rooms.count(), 5)
+        self.assertCountEqual(person.buildings.all(), buildings)
+        self.assertCountEqual(person.rooms.all(), rooms)
 
     def test_objects_is_instance_of_person_manager(self):
         self.assertIsInstance(Person.objects, PersonManager)
+
+    def test_history_class(self):
+        self.assertIsInstance(Person._meta.get_field("history"), AuditlogHistoryField)
 
     ### Properties ###
     def test_display_name(self):
@@ -116,6 +128,9 @@ class PersonTest(TestCase):
         person = Person.objects.get(id=1)
         self.assertEqual(person.get_absolute_url(), "/people/1/")
 
+    def test_auditlog_register(self):
+        self.assertTrue(auditlog.contains(model=Person))
+
     ### Test custom model queryset
     def test_outstanding_assignment_count(self):
         person = Person.objects.get(id=1)
@@ -130,7 +145,9 @@ class PersonTest(TestCase):
         DeviceAssignmentWithReturnDatetimeFactory(person=person, return_datetime=None)
         person = Person.objects.get(id=1)
         self.assertTrue(person.has_outstanding_assignment)
-        person.deviceassignment_set.update(return_datetime=datetime.now(tz=tz))
+        person.deviceassignment_set.update(
+            return_datetime=datetime.now(tz=ZoneInfo(key="America/Chicago"))
+        )
         person = Person.objects.get(id=1)
         self.assertFalse(person.has_outstanding_assignment)
 

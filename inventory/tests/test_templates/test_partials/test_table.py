@@ -5,16 +5,9 @@ from bs4 import BeautifulSoup
 from unittest.mock import MagicMock, Mock
 
 
-class TableTest(SimpleTestCase):
-    def setUp(self):
-        context = Context({})
-        template = Template("{% include 'partials/table.html' %}")
-        self.rendered = template.render(context)
-        # self.assertNotIn("<h1>test</h1>", self.rendered)
-
-    def test_extends_base_table(self):
-        # response = MagicMock(HttpResponse)
-        # self.assertTemplateUsed(self.rendered, "base_table.html")
-        print(dir(self.rendered))
-        pass
-        # self.assertTemplateUsed()
+# class TableTest(SimpleTestCase):
+#    def setUp(self):
+#        context = Context({})
+#        self.template = Template("{% include 'partials/table.html' %}")
+#        self.rendered = self.template.render(context)
+#

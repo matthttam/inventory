@@ -27,19 +27,19 @@ class DeviceAssignmentListViewAuthenticatedWithPermissionTest(TestCase):
     def test_no_deviceassignments(self):
         response = self.client.get(reverse("assignments:index"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("deviceassignment_list.html")
+        self.assertTemplateUsed(response, "assignments/deviceassignment_list.html")
 
     def test_one_deviceassignment(self):
         DeviceAssignmentFactory(id=1)
         response = self.client.get(reverse("assignments:index"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("deviceassignment_list.html")
+        self.assertTemplateUsed(response, "assignments/deviceassignment_list.html")
 
     def test_ten_deviceassignments(self):
         DeviceAssignmentFactory.create_batch(10)
         response = self.client.get(reverse("assignments:index"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("deviceassignment_list.html")
+        self.assertTemplateUsed(response, "assignments/deviceassignment_list.html")
 
 
 class DeviceAssignmentDetailViewAuthenticatedWithPermissionTest(TestCase):
@@ -64,6 +64,10 @@ class DeviceAssignmentDetailViewAuthenticatedWithPermissionTest(TestCase):
         device_assignment = DeviceAssignmentFactory(id=1, device=device, person=person)
         response = self.client.get(reverse("assignments:detail", args=[1]))
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "assignments/partials/deviceassignment_auditlog.html"
+        )
+        self.assertTemplateUsed(response, "assignments/deviceassignment_detail.html")
         self.assertContains(response, "TestName123")
         self.assertContains(response, "TestSerial123")
         self.assertContains(response, "TestAssetID123")
@@ -88,12 +92,10 @@ class DeviceAssignmentUpdateViewAuthenticatedWithPermissionTest(TestCase):
 
     def test_valid_deviceassignment(self):
         current_time = timezone.now()
-        device_assignment = DeviceAssignmentFactory(
-            id=1, assignment_datetime=current_time
-        )
+        device_assignment = DeviceAssignmentFactory(id=1)
         response = self.client.get(reverse("assignments:edit", args=[1]))
+        self.assertTemplateUsed(response, "assignments/deviceassignment_form.html")
         self.assertEqual(response.status_code, 200)
-        self.skipTest("Need to test contains")
 
 
 class DeviceAssignmentCreateViewAuthenticatedWithPermissionTest(TestCase):
@@ -153,7 +155,9 @@ class DeviceAssignmentDeleteViewAuthenticatedWithPermissionTest(TestCase):
     def test_delete_deviceassignment(self):
         response = self.client.get(reverse("assignments:delete", args=[1]))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("deviceassignment_confirm_delete.html")
+        self.assertTemplateUsed(
+            response, "assignments/deviceassignment_confirm_delete.html"
+        )
 
     def test_delete_deviceassignment_post(self):
         response = self.client.post(reverse("assignments:delete", args=[1]))
@@ -179,7 +183,9 @@ class DeviceAssignmentQuickAssignViewAuthenticatedWithPermissionTest(TestCase):
     def test_quickassign_deviceassignment(self):
         response = self.client.get(reverse("assignments:quickassign"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("deviceassignment_quickassign.html")
+        self.assertTemplateUsed(
+            response, "assignments/deviceassignment_quickassign.html"
+        )
 
 
 class DeviceAssignmentViewUnauthenticatedTest(TestCase):

@@ -39,7 +39,7 @@ class DeviceListViewAuthenticatedWithPermissionTest(TestCase):
         devices = DeviceFactory.create_batch(10)
         response = self.client.get(reverse("devices:index"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("device_list.html")
+        self.assertTemplateUsed(response, "devices/device_list.html")
 
 
 class DeviceDetailViewAuthenticatedWithPermissionTest(TestCase):
@@ -59,6 +59,8 @@ class DeviceDetailViewAuthenticatedWithPermissionTest(TestCase):
     def test_valid_device(self):
         device = DeviceFactory(id=1, serial_number="ABCD1234")
         response = self.client.get(reverse("devices:detail", args=[1]))
+        self.assertTemplateUsed(response, "devices/device_detail.html")
+        self.assertTemplateUsed(response, "devices/partials/device_auditlog.html")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "ABCD1234")
 
@@ -144,7 +146,7 @@ class DeviceDeleteViewAuthenticatedWithPermissionTest(TestCase):
     def test_delete_device(self):
         response = self.client.get(reverse("devices:delete", args=[1]))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("device_confirm_delete.html")
+        self.assertTemplateUsed(response, "devices/device_confirm_delete.html")
 
     def test_delete_device_post(self):
         response = self.client.post(reverse("devices:delete", args=[1]))
