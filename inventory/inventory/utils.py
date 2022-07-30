@@ -12,18 +12,21 @@ def get_permitted_actions(
     ],
 ) -> dict:
 
-    temp_id = 9999999
-    placeholder = "__id_placeholder__"
     permitted_actions = {}
     for action, path in action_paths:
         permitted_actions[action] = {
             "allowed": request.user.has_perm(f"{app}.{action}_{model}"),
-            "path": reverse(f"{app}:{path}", args=[temp_id]).replace(
-                str(temp_id), placeholder
-            ),
+            "path": get_reverse_placeholder(f"{app}:{path}"),
         }
 
     return permitted_actions
+
+
+def get_reverse_placeholder(
+    view_name: str, placeholder: str = "__id_placeholder__", args=[9999999]
+):
+    """Accepts a view and placeholder. Returns a string of the view url where the ID is replaced with a placeholder"""
+    return reverse(view_name, args=[9999999]).replace(str(args[0]), placeholder)
 
 
 def get_history_table_context(table_id: str):

@@ -1,13 +1,10 @@
-from django.http import HttpResponse
 from django.test import SimpleTestCase
 from django.template import Context, Template
 from bs4 import BeautifulSoup
-from django.template.loader_tags import BlockNode
-from django.template.base import Node, NodeList, TextNode
 
 
 class BaseTest(SimpleTestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         context = Context({})
         template = Template("{% include 'base.html' %}")
         self.rendered = template.render(context)
