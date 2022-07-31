@@ -3,7 +3,7 @@ from django.test import TestCase
 from parameterized import parameterized
 from django.core.management import call_command
 
-from googlesync.management.commands._google_sync import GoogleSyncCommand
+from googlesync.management.commands._google_sync import GoogleSyncCommandAbstract
 from googlesync.management.commands.sync_google_devices import (
     Command as GoogleDevicesSyncCommand,
 )
@@ -52,14 +52,16 @@ class SyncGoogleDevicesTest(TestCase):
 
         # Mock the _get_my_customer call used in GoogleSyncCommand __init__
         mock_customer_resource = Mock()
-        patcher__get_my_customer = patch.object(GoogleSyncCommand, "_get_my_customer")
+        patcher__get_my_customer = patch.object(
+            GoogleSyncCommandAbstract, "_get_my_customer"
+        )
 
         self.addCleanup(patcher__get_my_customer.stop)
         self.mock__get_my_customer = patcher__get_my_customer.start()
         self.mock__get_my_customer.return_value = mock_customer_resource
 
     def test_subclass(self):
-        self.assertTrue(issubclass(GoogleDevicesSyncCommand, GoogleSyncCommand))
+        self.assertTrue(issubclass(GoogleDevicesSyncCommand, GoogleSyncCommandAbstract))
 
     def test_help(self):
         self.assertEqual(

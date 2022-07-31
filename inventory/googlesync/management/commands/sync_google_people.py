@@ -1,45 +1,136 @@
-from types import NoneType
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
 from googlesync.exceptions import SyncProfileNotFound
-from googlesync.models import GooglePersonSyncProfile
+from googlesync.models import (
+    GoogleCustomSchema,
+    GoogleCustomSchemaField,
+    GooglePersonSyncProfile,
+)
 from people.models import Person, PersonStatus
 
-from ._google_sync import GoogleSyncCommand
+from ._google_sync import GoogleSyncCommandAbstract
 
 
-class Command(GoogleSyncCommand):
+class Command(GoogleSyncCommandAbstract):
     help = "Syncs google users to inventory people."
 
     def add_arguments(self, parser):
-        parser.add_argument("profiles", nargs="+", help="list each profile to sync")
+        subparsers = parser.add_subparsers(
+            title="Command Options", help="", dest="command"
+        )
+        ### init command ###
+        init_subparser = subparsers.add_parser(
+            "init",
+            help="Initialize google person sync by pulling user schema data from google.",
+        )
+        init_subparser.add_argument(
+            "--force",
+            action="store_true",
+            help="Used to reinitialize the google user schema. Do this if new custom fields have been added to Google.",
+        )
+        ### profiles command ###
+        sync_subparser = subparsers.add_parser(
+            "sync", help="Used to initiate a sync of all profiles."
+        )
+        sync_subparser.add_argument(
+            "profiles", nargs="*", help="List of user profiles to sync."
+        )
 
     def handle(self, *args, **options):
-        profile_names = options.get("profiles")
-
-        # Get each sync profile based on profile names passed
-        self.sync_profiles = []
-        for profile_name in profile_names:
-            self.sync_profiles.append(self._get_person_sync_profile(profile_name))
-
-        # Loop over each sync profile and sync people
-        for sync_profile in self.sync_profiles:
-            self.stdout.write(
-                self.style.NOTICE(f"Starting people sync: {sync_profile.name}")
-            )
-            self.sync_google_people(sync_profile)
+        command = options.get("command")
+        if command == "init":
+            force = options.get("force")
+            self._initialize_person_sync(force=force)
+        elif command == "sync":
+            profile_names = options.get("profiles")
+            # Get each sync profile based on profile names passed
+            self.sync_profiles = []
+            for profile_name in profile_names:
+                self.sync_profiles.append(self._get_person_sync_profile(profile_name))
+            self._sync_google_profiles(self.sync_profiles)
+        else:
+            return False
 
         self.stdout.write(self.style.SUCCESS("Done"))
 
-    def _initialize_person_sync_profile(
-        self, profile: GooglePersonSyncProfile
-    ) -> NoneType:
+    def _sync_google_profiles(self, sync_profiles: list[GooglePersonSyncProfile]):
+        for sync_profile in sync_profiles:
+            self._sync_google_profile(sync_profile)
+
+    def _sync_google_profile(self, sync_profile: GooglePersonSyncProfile):
+        self.stdout.write(
+            self.style.SUCCESS(f"Starting people sync: {sync_profile.name!r}")
+        )
+        self.sync_google_people(sync_profile)
+
+    @transaction.atomic
+    def _initialize_person_sync(self, force):
         """Gets all schema information and saves it to the database."""
+        self.stdout.write(self.style.SUCCESS(f"Starting people sync initialization."))
+        if self.google_config.get("person_initialized"):
+            if not force:
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"Google Person Sync already initialized. Use --force to override."
+                    )
+                )
+                return
+            else:
+                self.stdout.write(self.style.WARNING(f"Forcing reinitialization."))
+        self._initialize_person_sync_custom_schemas()
+        self._initialize_person_sync_default_schema()
+
+        # Set acocunt as initialized
+        google_config = self._get_google_config()
+        google_config.person_initialized = True
+        google_config.save()
+
+    def _initialize_person_sync_custom_schemas(self):
         schemas = self._get_schemas_service()
-        request = schemas.list({"customerId": self.customer.get("id")})
+        request = schemas.list(customerId=self.customer.get("id"))
         response = request.execute()
         google_schemas = response.get("schemas")
+        # Delete any schemas already stored
+        GoogleCustomSchema.objects.all().delete()
+        # Populate custom chema data
+        for gs in google_schemas:
+            current_schema = GoogleCustomSchema.objects.create(
+                service_account_config_id=self.google_config.get("id"),
+                schema_id=gs.get("schemaId"),
+                schema_name=gs.get("schemaName"),
+                display_name=gs.get("displayName"),
+                kind=gs.get("kind"),
+                etag=gs.get("etag"),
+            )
+
+            for f in gs.get("fields"):
+                GoogleCustomSchemaField.objects.create(
+                    schema=current_schema,
+                    field_name=f.get("fieldName"),
+                    field_id=f.get("fieldId"),
+                    field_type=f.get("fieldType"),
+                    multi_valued=f.get("multiValued", False),
+                    kind=f.get("kind"),
+                    etag=f.get("etag"),
+                    indexed=f.get("indexed", False),
+                    display_name=f.get("displayName"),
+                    read_access_type=f.get("readAccessType"),
+                    numeric_indexing_spec_min_value=f.get(
+                        "numericIndexingSpec", {}
+                    ).get("minValue", None),
+                    numeric_indexing_spec_max_value=f.get(
+                        "numericIndexingSpec", {}
+                    ).get("maxValue", None),
+                )
+
+    def _initialize_person_sync_default_schema(self):
+        users = self._get_users_service()
+        user_schema = users._schema.get("User")
+        print(type(user_schema.get("properties")))
+        for etag, property in user_schema.get("properties").items():
+            print(f"{etag}: {property}")
+            return
 
     def _get_person_sync_profile(self, profile_name):
         try:
@@ -114,9 +205,21 @@ class Command(GoogleSyncCommand):
                 else:
                     records_to_create.append(person_record)
 
-        print(f"Number of person records to update: {len(records_to_update)}")
-        print(f"Number of person records to create: {len(records_to_create)}")
-        print(f"Number of person records to skip: {len(records_to_skip)}")
+        self.stdout.write(
+            self.style.SUCCESS(
+                (f"Number of person records to update: {len(records_to_update)}")
+            )
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                (f"Number of person records to create: {len(records_to_create)}")
+            )
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                (f"Number of person records to skip: {len(records_to_skip)}")
+            )
+        )
 
         # Update found records
         if records_to_update:

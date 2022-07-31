@@ -62,6 +62,7 @@ class GoogleServiceAccountConfig(GoogleConfigAbstract):
     target = models.CharField(
         max_length=255, help_text="Google domain name to connect to (e.g. my.site.com)"
     )
+    person_initialized = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.project_id}"
@@ -99,7 +100,6 @@ class GooglePersonSyncProfile(GoogleSyncProfileAbstract):
         blank=True,
         help_text="Filter by domain of users. If left blank users of any domain for your Google Customer will be included.",
     )
-    initialized = models.BooleanField(default=False)
 
 
 class GoogleDeviceSyncProfile(GoogleSyncProfileAbstract):
@@ -225,7 +225,12 @@ class GoogleDeviceTranslation(TranslationAbstract):
         return f"Translate {self.google_device_mapping.to_field!r} from {self.translate_from!r} to {self.translate_to!r}"
 
 
-class GooglePersonSchema(models.Model):
+class GoogleCustomSchema(models.Model):
+    service_account_config = models.ForeignKey(
+        GoogleServiceAccountConfig,
+        on_delete=models.CASCADE,
+        related_name="custom_schemas",
+    )
     schema_id = models.CharField(max_length=255)
     schema_name = models.CharField(max_length=255)
     display_name = models.CharField(max_length=255)
@@ -245,19 +250,19 @@ class GooglePersonSchema(models.Model):
     # }
 
 
-class GooglePersonSchemaField(models.Model):
-    schema = models.ForeignKey(GooglePersonSchema, on_delete=models.CASCADE)
+class GoogleCustomSchemaField(models.Model):
+    schema = models.ForeignKey(GoogleCustomSchema, on_delete=models.CASCADE)
     field_name = models.CharField(max_length=255)
     field_id = models.CharField(max_length=255)
     field_type = models.CharField(max_length=255)
-    multi_valued = models.BooleanField()
+    multi_valued = models.BooleanField(default=False)
     kind = models.CharField(max_length=255)
     etag = models.CharField(max_length=255)
-    indexed = models.BooleanField()
+    indexed = models.BooleanField(default=False)
     display_name = models.CharField(max_length=255)
     read_access_type = models.CharField(max_length=255)
-    numeric_indexing_spec_min_value = models.IntegerField()
-    numeric_indexing_spec_max_value = models.IntegerField()
+    numeric_indexing_spec_min_value = models.IntegerField(blank=True, null=True)
+    numeric_indexing_spec_max_value = models.IntegerField(blank=True, null=True)
     # SchemaFieldSpec
     # {
     #    "fieldName": string,
@@ -274,3 +279,43 @@ class GooglePersonSchemaField(models.Model):
     #        "maxValue": number
     #    }
     # }
+
+
+class GoogleDefaultSchema(models.Model):
+    # {
+    #   "Users": {
+    #        "type": "object",
+    #        "properties": {
+    #            "etag": {
+    #                "type": "string",
+    #                "description": "ETag of the collection."
+    #            },
+    #            "kind": {
+    #                "type": "string",
+    #                "description": "Output only. The type of the API resource. For Users resources, the value is `admin#directory#user`.",
+    #                "default": "calendar#acl"
+    #            },
+    #            "nextPageToken": {
+    #                "type": "string",
+    #                "description": "Token used to access the next
+    #                page of this result. Omitted if no further results are available."
+    #            }
+    #        }
+    #    }
+    # }
+
+    service_account_config = models.ForeignKey(
+        GoogleServiceAccountConfig,
+        on_delete=models.CASCADE,
+        related_name="default_schemas",
+    )
+    description = models.CharField(max_length=1024)
+    schema_id = models.CharField(max_length=255)
+    type = models.CharField(max_length=255)
+
+
+class GoogleDefaultSchemaProperty(models.Model):
+    schema = models.ForeignKey(GoogleDefaultSchema, on_delete=models.CASCADE)
+    etag = models.CharField(max_length=255)
+    type = models.CharField(max_length=255)
+    description = models.CharField(max_length=1024)

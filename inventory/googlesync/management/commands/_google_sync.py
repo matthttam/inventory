@@ -8,25 +8,28 @@ from googlesync.exceptions import ConfigNotFound
 from googlesync.models import GoogleServiceAccountConfig, GoogleSyncProfileAbstract
 
 
-class GoogleSyncCommand(BaseCommand):
+class GoogleSyncCommandAbstract(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Get the google config
-        self.google_config = self._get_google_config()
+        self.google_config = self._get_google_config_dict()
         self.DELEGATE = self.google_config.pop("delegate")
 
         # Retreive current customer information used by other services
         self.customer = self._get_my_customer()
 
-    def _get_google_config(self) -> dict:
+    def _get_google_config_dict(self) -> dict:
         try:
-            google_config = model_to_dict(GoogleServiceAccountConfig.objects.first())
+            google_config = model_to_dict(self._get_google_config())
         except AttributeError:
             self.stdout.write(self.style.ERROR("Failed to find google sync config!"))
             raise ConfigNotFound(config_name="Google Sync")
 
         return google_config
+
+    def _get_google_config(self) -> GoogleServiceAccountConfig:
+        return GoogleServiceAccountConfig.objects.first()
 
     def _get_google_credentials(self, scopes: list):
         # Parse the config into a json string and load it into a json object

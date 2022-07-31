@@ -6,7 +6,7 @@ from django.test import TestCase
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import Resource
 from googlesync.exceptions import SyncProfileNotFound
-from googlesync.management.commands._google_sync import GoogleSyncCommand
+from googlesync.management.commands._google_sync import GoogleSyncCommandAbstract
 from googlesync.management.commands.sync_google_people import (
     Command as GooglePeopleSyncCommand,
 )
@@ -29,14 +29,16 @@ class SyncGooglePeopleTest(TestCase):
 
         # Mock the _get_my_customer call used in GoogleSyncCommand __init__
         mock_customer_resource = Mock()
-        patcher__get_my_customer = patch.object(GoogleSyncCommand, "_get_my_customer")
+        patcher__get_my_customer = patch.object(
+            GoogleSyncCommandAbstract, "_get_my_customer"
+        )
 
         self.addCleanup(patcher__get_my_customer.stop)
         self.mock__get_my_customer = patcher__get_my_customer.start()
         self.mock__get_my_customer.return_value = mock_customer_resource
 
     def test_subclass(self):
-        self.assertTrue(issubclass(GooglePeopleSyncCommand, GoogleSyncCommand))
+        self.assertTrue(issubclass(GooglePeopleSyncCommand, GoogleSyncCommandAbstract))
 
     def test_help(self):
         self.assertEqual(

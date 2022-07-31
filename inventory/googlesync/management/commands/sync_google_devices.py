@@ -11,11 +11,11 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.db import transaction
 
-from ._google_sync import GoogleSyncCommand
+from ._google_sync import GoogleSyncCommandAbstract
 from devices.models import DeviceManufacturer, DeviceModel, DeviceStatus
 
 
-class Command(GoogleSyncCommand):
+class Command(GoogleSyncCommandAbstract):
     help = "Syncs google devices to inventory devices."
 
     def add_arguments(self, parser):

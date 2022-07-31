@@ -3,7 +3,7 @@ from django.test import TestCase
 from parameterized import parameterized
 from django.core.management import call_command
 
-from googlesync.management.commands._google_sync import GoogleSyncCommand
+from googlesync.management.commands._google_sync import GoogleSyncCommandAbstract
 from googlesync.management.commands.sync_google_devices import (
     Command as GoogleDevicesSyncCommand,
 )

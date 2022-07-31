@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import GoogleConfig, GoogleDeviceLinkMapping, GoogleServiceAccountConfig
+from .models import (
+    GoogleConfig,
+    GoogleDeviceLinkMapping,
+    GoogleCustomSchema,
+    GoogleCustomSchemaField,
+    GoogleServiceAccountConfig,
+)
 from .models import (
     GooglePersonSyncProfile,
     GooglePersonTranslation,
@@ -75,3 +81,18 @@ class GoogleDeviceTranslationAdmin(admin.ModelAdmin):
 @admin.register(GoogleDeviceSyncProfile)
 class GoogleDeviceSyncProfileAdmin(admin.ModelAdmin):
     list_display = ("name", "google_service_account_config")
+
+
+@admin.register(GoogleCustomSchema)
+class GoogleCustomSchema(admin.ModelAdmin):
+    # pass
+    list_display = ("display_name",)
+
+
+@admin.register(GoogleCustomSchemaField)
+class GoogleCustomSchemaField(admin.ModelAdmin):
+
+    list_display = ("display_name", "field_type", "indexed", "multi_valued")
+
+    def has_change_permission(self, request, obj=None):
+        return False
