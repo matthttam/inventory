@@ -47,7 +47,6 @@ class Command(GoogleSyncCommand):
 
     def _get_google_records(self, query, org_unit_path) -> list:
         devices = self._get_chromeosdevices_service()
-
         request = devices.list(
             customerId=self.customer.get("id"),
             projection="FULL",

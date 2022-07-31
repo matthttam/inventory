@@ -58,10 +58,10 @@ class GoogleSyncMissingConfigTest(TestCase):
 class GoogleSyncTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        GoogleServiceAccountConfigFactory(delegate="test@example.com")
+        GoogleServiceAccountConfigFactory(project_id=1, delegate="test@example.com")
 
     def setUp(self):
-        self.google_config = GoogleServiceAccountConfig.objects.get(id=1)
+        self.google_config = GoogleServiceAccountConfig.objects.get(project_id=1)
 
     @patch("sys.stdout", new_callable=StringIO)
     @patch.object(GoogleSyncCommand, "_get_my_customer")
@@ -290,10 +290,10 @@ class GoogleSyncTest(TestCase):
 class SyncGooglePeopleTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        GoogleServiceAccountConfigFactory(delegate="test@example.com")
+        GoogleServiceAccountConfigFactory(project_id=1, delegate="test@example.com")
 
     def setUp(self):
-        self.google_config = GoogleServiceAccountConfig.objects.get(id=1)
+        self.google_config = GoogleServiceAccountConfig.objects.get(project_id=1)
 
         # Mock the _get_my_customer call used in GoogleSyncCommand __init__
         mock_customer_resource = Mock()
@@ -329,8 +329,12 @@ class SyncGooglePeopleTest(TestCase):
     def test__get_person_sync_profile_valid_names(self, mock_sync_google_people):
         GooglePersonSyncProfileFactory(name="real_sync_profile")
         GooglePersonSyncProfileFactory(name="another_real_sync_profile")
-        google_person_sync1 = GooglePersonSyncProfile.objects.get(id=1)
-        google_person_sync2 = GooglePersonSyncProfile.objects.get(id=2)
+        google_person_sync1 = GooglePersonSyncProfile.objects.get(
+            name="real_sync_profile"
+        )
+        google_person_sync2 = GooglePersonSyncProfile.objects.get(
+            name="another_real_sync_profile"
+        )
 
         call_command("sync_google_people", "real_sync_profile")
 
@@ -346,6 +350,72 @@ class SyncGooglePeopleTest(TestCase):
         mock_sync_google_people.assert_has_calls(
             [call(google_person_sync1), call(google_person_sync2)]
         )
+
+    @patch.object(GooglePeopleSyncCommand, "_get_users_service")
+    def test__get_google_records_with_domain(self, mock__get_users_service):
+        response_get_sideffect = []
+        mock_response = Mock(**{"get.side_effect": response_get_sideffect})
+        mock_request = Mock(**{"execute.return_value": mock_response})
+        user_list_next_sideffect = [None]
+        mock_user_service = Mock(
+            **{
+                "list.return_value": mock_request,
+                "list_next.side_effect": user_list_next_sideffect,
+            }
+        )
+        mock__get_users_service.return_value = mock_user_service
+
+        # Testing with three results
+        GooglePersonSyncProfileFactory(
+            name="staff", google_query="test_query", domain="testdomain.com"
+        )
+        sync_profile = GooglePersonSyncProfile.objects.get(name="staff")
+        command = GooglePeopleSyncCommand()
+        query = sync_profile.google_query
+        domain = sync_profile.domain
+        return_value = command._get_google_records(query=query, domain=domain)
+
+        mock__get_users_service.assert_called_once()
+        mock_user_service.list.assert_called_with(
+            domain=domain,
+            projection="full",
+            query=query,
+        )
+
+    @patch.object(GooglePeopleSyncCommand, "_get_users_service")
+    def test__get_google_records_without_domain(self, mock__get_users_service):
+        response_get_sideffect = [None]
+        mock_response = Mock(**{"get.side_effect": response_get_sideffect})
+        mock_request = Mock(**{"execute.return_value": mock_response})
+        user_list_next_sideffect = [None]
+        mock_user_service = Mock(
+            **{
+                "list.return_value": mock_request,
+                "list_next.side_effect": user_list_next_sideffect,
+            }
+        )
+        mock__get_users_service.return_value = mock_user_service
+
+        # Testing with three results
+        GooglePersonSyncProfileFactory(
+            name="staff", google_query="test_query", domain=""
+        )
+        sync_profile = GooglePersonSyncProfile.objects.get(name="staff")
+        command = GooglePeopleSyncCommand()
+        query = sync_profile.google_query
+        domain = sync_profile.domain
+        return_value = command._get_google_records(query=query, domain=domain)
+
+        mock__get_users_service.assert_called_once()
+        mock_user_service.list.assert_called_with(
+            customer=command.customer.get("id"),
+            projection="full",
+            query=query,
+        )
+
+    @patch.object(GooglePeopleSyncCommand, "_get_users_service")
+    def test__get_google_records_with_domain(self, mock__get_users_service):
+        pass
 
     @patch.object(GooglePeopleSyncCommand, "_get_users_service")
     def test__get_google_records(self, mock__get_users_service):
@@ -367,14 +437,15 @@ class SyncGooglePeopleTest(TestCase):
 
         # Testing with three results
         GooglePersonSyncProfileFactory(name="staff", google_query="test_query")
-        sync_profile = GooglePersonSyncProfile.objects.get(id=1)
+        sync_profile = GooglePersonSyncProfile.objects.get(name="staff")
         command = GooglePeopleSyncCommand()
         query = sync_profile.google_query
-        return_value = command._get_google_records(query=query)
+        domain = sync_profile.domain
+        return_value = command._get_google_records(query=query, domain=domain)
 
         mock__get_users_service.assert_called_once()
         mock_user_service.list.assert_called_with(
-            domain=command.customer.get("customerDomain"),
+            domain=domain,
             projection="full",
             query=query,
         )
@@ -393,16 +464,17 @@ class SyncGooglePeopleTest(TestCase):
 
         # Testing with three results
         GooglePersonSyncProfileFactory(name="staff", google_query="test_query")
-        sync_profile = GooglePersonSyncProfile.objects.get(id=1)
+        sync_profile = GooglePersonSyncProfile.objects.get(name="staff")
         command = GooglePeopleSyncCommand()
         query = sync_profile.google_query
-        return_value = command._get_google_records(query=query)
+        domain = sync_profile.domain
+        return_value = command._get_google_records(query=query, domain=domain)
 
         mock__get_users_service.assert_called_once()
         mock_user_service.list.assert_called_with(
-            domain=command.customer.get("customerDomain"),
             projection="full",
             query=query,
+            domain=domain,
         )
         mock_request.execute.assert_called()
         mock_response.get.assert_called_with("users")
@@ -418,7 +490,7 @@ class SyncGooglePeopleTest(TestCase):
         mock_convert_google_user_to_person.side_effect = google_people
 
         GooglePersonSyncProfileFactory(name="staff", google_query="test_query")
-        sync_profile = GooglePersonSyncProfile.objects.get(id=1)
+        sync_profile = GooglePersonSyncProfile.objects.get(name="staff")
         google_users = [{"user": "user1"}, {"user": "user2"}, {"user": "user3"}]
         command = GooglePeopleSyncCommand()
         return_value = command.convert_google_users_to_person(
@@ -443,7 +515,7 @@ class SyncGooglePeopleTest(TestCase):
         sync_profile = GooglePersonSyncProfileFactory(
             name="staff", google_query="test_query", person_type=person_type
         )
-        sync_profile = GooglePersonSyncProfile.objects.get(id=1)
+        sync_profile = GooglePersonSyncProfile.objects.get(name="staff")
 
         command = GooglePeopleSyncCommand()
         # google_user doesn't matter since we are mocking the return of _map_dictionary
@@ -467,10 +539,10 @@ class SyncGooglePeopleTest(TestCase):
 class SyncGoogleDevicesTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        GoogleServiceAccountConfigFactory(delegate="test@example.com")
+        GoogleServiceAccountConfigFactory(project_id=1, delegate="test@example.com")
 
     def setUp(self):
-        self.google_config = GoogleServiceAccountConfig.objects.get(id=1)
+        self.google_config = GoogleServiceAccountConfig.objects.get(project_id=1)
 
         # Mock the _get_my_customer call used in GoogleSyncCommand __init__
         mock_customer_resource = Mock()
@@ -508,8 +580,12 @@ class SyncGoogleDevicesTest(TestCase):
     def test__get_device_sync_profile_valid_names(self, mock_sync_google_devices):
         GoogleDeviceSyncProfileFactory(name="real_sync_profile")
         GoogleDeviceSyncProfileFactory(name="another_real_sync_profile")
-        google_device_sync1 = GoogleDeviceSyncProfile.objects.get(id=1)
-        google_device_sync2 = GoogleDeviceSyncProfile.objects.get(id=2)
+        google_device_sync1 = GoogleDeviceSyncProfile.objects.get(
+            name="real_sync_profile"
+        )
+        google_device_sync2 = GoogleDeviceSyncProfile.objects.get(
+            name="another_real_sync_profile"
+        )
 
         call_command("sync_google_devices", "real_sync_profile")
 
@@ -546,7 +622,7 @@ class SyncGoogleDevicesTest(TestCase):
 
         # Testing with three results
         GoogleDeviceSyncProfileFactory(name="staff", google_query="test_query")
-        sync_profile = GoogleDeviceSyncProfile.objects.get(id=1)
+        sync_profile = GoogleDeviceSyncProfile.objects.get(name="staff")
         command = GoogleDevicesSyncCommand()
         query = sync_profile.google_query
         org_unit_path = sync_profile.google_org_unit_path
@@ -576,7 +652,7 @@ class SyncGoogleDevicesTest(TestCase):
 
         # Testing with three results
         GoogleDeviceSyncProfileFactory(name="staff", google_query="test_query")
-        sync_profile = GoogleDeviceSyncProfile.objects.get(id=1)
+        sync_profile = GoogleDeviceSyncProfile.objects.get(name="staff")
         command = GoogleDevicesSyncCommand()
         query = sync_profile.google_query
         org_unit_path = sync_profile.google_org_unit_path
@@ -607,7 +683,7 @@ class SyncGoogleDevicesTest(TestCase):
         mock_convert_google_device_to_google_device.side_effect = google_devices
 
         GoogleDeviceSyncProfileFactory(name="staff", google_query="test_query")
-        sync_profile = GoogleDeviceSyncProfile.objects.get(id=1)
+        sync_profile = GoogleDeviceSyncProfile.objects.get(name="staff")
         google_devices_dict = [
             {"device": "device1"},
             {"device": "device2"},
@@ -635,7 +711,7 @@ class SyncGoogleDevicesTest(TestCase):
         sync_profile = GoogleDeviceSyncProfileFactory(
             name="staff", google_query="test_query"
         )
-        sync_profile = GoogleDeviceSyncProfile.objects.get(id=1)
+        sync_profile = GoogleDeviceSyncProfile.objects.get(name="staff")
 
         command = GoogleDevicesSyncCommand()
         # google_device doesn't matter since we are mocking the return of _map_dictionary
@@ -650,6 +726,7 @@ class SyncGoogleDevicesTest(TestCase):
 
     def test_sync_google_devices(self):
         self.skipTest("Need to test")
+
 
 class LinkGoogleDevicesTest(TestCase):
     def test_subclass(self):

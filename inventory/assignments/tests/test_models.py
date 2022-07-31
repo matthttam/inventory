@@ -1,23 +1,39 @@
+from zoneinfo import ZoneInfo
+from datetime import datetime
+from unittest.mock import patch
+
 from django.test import TestCase
+from auditlog.models import AuditlogHistoryField
+from auditlog.registry import auditlog
+
 from assignments.models import (
     AssignmentAbstract,
     DeviceAssignment,
     DeviceAccessoryAssignment,
+    AssignmentManager,
 )
 from people.models import Person
 from devices.models import Device, DeviceAccessory
+
 from .factories import DeviceAssignmentFactory, DeviceAccessoryAssignmentFactory
+from people.tests.factories import PersonFactory
+
 
 # Test the abstract assignment class
 class AssignmentAbstractTest(TestCase):
     def test_is_abstract(self):
         self.assertTrue(AssignmentAbstract._meta.abstract)
 
-    def test_datetime_label(self):
+    def test_assignment_datetime_label(self):
         field_label = AssignmentAbstract._meta.get_field(
             "assignment_datetime"
         ).verbose_name
         self.assertEqual(field_label, "assignment date")
+
+    def test_assignment_datetime_auto_now(self):
+        self.assertTrue(
+            AssignmentAbstract._meta.get_field("assignment_datetime").auto_now
+        )
 
     def test_return_datetime_label(self):
         field_label = AssignmentAbstract._meta.get_field("return_datetime").verbose_name
@@ -34,6 +50,36 @@ class AssignmentAbstractTest(TestCase):
     def test_person_foreign_key(self):
         self.assertEqual(
             AssignmentAbstract._meta.get_field("person").related_model, Person
+        )
+
+    def test_person_related_query_name(self):
+        self.assertEqual(
+            AssignmentAbstract._meta.get_field("person").related_query_name(),
+            "%(class)s",
+        )
+
+    def test_objects_is_instance_of_assignment_manager(self):
+        self.assertIsInstance(AssignmentAbstract._default_manager, AssignmentManager)
+
+    ### Functions ###
+    @patch("assignments.models.AssignmentAbstract._meta.abstract", set())
+    def test_is_outstanding(self):
+        person = PersonFactory.build()
+        assignment = AssignmentAbstract(
+            assignment_datetime=datetime(
+                2022, 5, 30, 15, 44, 47, tzinfo=ZoneInfo(key="America/Chicago")
+            ),
+            return_datetime=None,
+            person=person,
+        )
+        self.assertEqual(
+            assignment.is_outstanding,
+            True,
+        )
+        assignment.return_datetime = assignment.assignment_datetime
+        self.assertEqual(
+            assignment.is_outstanding,
+            False,
         )
 
 
@@ -53,9 +99,17 @@ class DeviceAssignmentTest(TestCase):
             self.device_assignment._meta.get_field("device").related_model, Device
         )
 
+    def test_history_class(self):
+        self.assertIsInstance(
+            DeviceAssignment._meta.get_field("history"), AuditlogHistoryField
+        )
+
     ### Functions ###
     def test_get_absolute_url(self):
         self.assertEqual(self.device_assignment.get_absolute_url(), "/assignments/1/")
+
+    def test_auditlog_register(self):
+        self.assertTrue(auditlog.contains(model=DeviceAssignment))
 
 
 class DeviceAccessoryAssignmentTest(TestCase):

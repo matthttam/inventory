@@ -1,5 +1,8 @@
 from django.test import TestCase
+from django.db.models import UniqueConstraint
+
 from unittest.mock import patch
+
 from people.tests.factories import PersonTypeFactory
 from people.models import PersonType, Person
 from devices.models import Device
@@ -376,18 +379,6 @@ class GooglePersonSyncProfileTest(TestCase):
             "mappings",
         )
 
-    ### Functions ###
-    def test___str__(self):
-        person_type = PersonTypeFactory()
-        google_service_account_config = GoogleServiceAccountConfigFactory()
-        google_person_sync_profile = GooglePersonSyncProfileFactory(
-            name="test_profile_name", person_type=person_type
-        )
-        self.assertEqual(
-            google_person_sync_profile.__str__(),
-            f"test_profile_name ({person_type.__str__()}: {google_service_account_config.__str__()})",
-        )
-
 
 class GoogleDeviceSyncProfileTest(TestCase):
     @classmethod
@@ -483,19 +474,6 @@ class GoogleDeviceSyncProfileTest(TestCase):
             "mappings",
         )
 
-    ### Functions ###
-    def test___str__(self):
-        GooglePersonSyncProfileFactory()
-        person_type = PersonTypeFactory()
-        google_service_account_config = GoogleServiceAccountConfigFactory()
-        google_person_sync_profile = GooglePersonSyncProfileFactory(
-            name="test_profile_name", person_type=person_type
-        )
-        self.assertEqual(
-            google_person_sync_profile.__str__(),
-            f"test_profile_name ({person_type.__str__()}: {google_service_account_config.__str__()})",
-        )
-
 
 class MappingAbstractTest(TestCase):
     def test_is_abstract(self):
@@ -526,10 +504,6 @@ class MappingAbstractTest(TestCase):
         potential_choices = [(x, x) for x in range(1, 10)]
         self.assertCountEqual(potential_choices, choices)
 
-    def test_matching_priority_unique(self):
-        unique = MappingAbstract._meta.get_field("matching_priority").unique
-        self.assertTrue(unique)
-
     def test_matching_priority_optional(self):
         self.assertEqual(
             MappingAbstract._meta.get_field("matching_priority").blank, True
@@ -538,15 +512,34 @@ class MappingAbstractTest(TestCase):
             MappingAbstract._meta.get_field("matching_priority").null, True
         )
 
+    def test_unique_constraints(self):
+        expected_constraint_fields = [
+            ("sync_profile", "to_field"),
+            ("sync_profile", "matching_priority"),
+        ]
+        constraints = [
+            c
+            for c in MappingAbstract._meta.constraints
+            if isinstance(c, UniqueConstraint)
+        ]
+        self.assertEqual(
+            len(expected_constraint_fields),
+            len(constraints),
+            "Difference in unique constraint length.",
+        )
+        for constraint in constraints:
+            self.assertIn(constraint.fields, expected_constraint_fields)
+
     ### Functions ###
     @patch("googlesync.models.MappingAbstract._meta.abstract", set())
+    @patch("googlesync.models.MappingAbstract.sync_profile", "profile_name")
     def test___str__(self):
         google_person_mapping = MappingAbstract(
             from_field="from field", to_field="to field"
         )
         self.assertEqual(
             google_person_mapping.__str__(),
-            "from field => to field",
+            "profile_name: from field => to field",
         )
 
 

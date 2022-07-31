@@ -1,0 +1,46 @@
+{% extends "dashboard/dashboard.html" %}
+
+{% block title %}Inventory - Quick Assign{% endblock %}
+
+{% block head %}
+{{ block.super }}
+{{ ajax_urls|json_script:"ajax_urls" }}
+{% include 'partials/select2.html'%}
+
+{% load static %}
+<script src="{% static 'inventory/csrftoken.js' %}" rel="stylesheet"></script>
+<link href="{% static 'assignments/deviceassignment_quickassign.css'%}" rel="stylesheet" />
+<script src="{% static 'assignments/deviceassignment_quickassign.js'%}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="jumbotron font-weight-bold">
+
+    <div id="splash_area">
+    </div>
+    <form id='check_form' class="needs-validation">
+        <div class="form-group pb-5">
+            <label for="device">Device:</label>
+            <select name="device" class="form-control" id="device" required>
+            </select>
+            <div name='device_search'>
+            </div>
+        </div>
+        <div class="form-group pt-3 pb-5">
+            <label for="person">Person:</label>
+            <select name="person" class="form-control" id="person" required>
+            </select>
+            <div name='person_search'>
+            </div>
+        </div>
+
+        <div class="container-fluid mt-5">
+            <div class="row">
+            <button class="btn btn-lg btn-primary ml-auto" style="width: 100%;" role="button" type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock content %}

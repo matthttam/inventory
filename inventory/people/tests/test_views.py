@@ -23,19 +23,19 @@ class PersonListViewAuthenticatedWithPermissionTest(TestCase):
     def test_no_people(self):
         response = self.client.get(reverse("people:index"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("person_list.html")
+        self.assertTemplateUsed(response, "people/person_list.html")
 
     def test_one_person(self):
         device_assignment = PersonFactory(id=1)
         response = self.client.get(reverse("people:index"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("person_list.html")
+        self.assertTemplateUsed(response, "people/person_list.html")
 
     def test_ten_people(self):
         device_people = PersonFactory.create_batch(10)
         response = self.client.get(reverse("people:index"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("person_list.html")
+        self.assertTemplateUsed(response, "people/person_list.html")
 
 
 class PersonDetailViewAuthenticatedWithPermissionTest(TestCase):
@@ -56,6 +56,8 @@ class PersonDetailViewAuthenticatedWithPermissionTest(TestCase):
         person = PersonFactory(first_name="TestName123")
         response = self.client.get(reverse("people:detail", args=[1]))
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "people/person_detail.html")
+        self.assertTemplateUsed(response, "people/partials/person_auditlog.html")
         self.assertContains(response, "TestName123")
         self.assertEqual(response.context["person"], person)
 
@@ -78,7 +80,7 @@ class PersonUpdateViewAuthenticatedWithPermissionTest(TestCase):
         person = PersonFactory(id=1)
         response = self.client.get(reverse("people:edit", args=[1]))
         self.assertEqual(response.status_code, 200)
-        self.skipTest("Need to test contains")
+        self.assertTemplateUsed(response, "people/person_form.html")
 
 
 class PersonCreateViewAuthenticatedWithPermissionTest(TestCase):
@@ -113,7 +115,6 @@ class PersonCreateViewAuthenticatedWithPermissionTest(TestCase):
             "google_id": "",
         }
         response = self.client.post(reverse("people:new"), person_dict)
-        print(response.content.decode())
         person_object = Person.objects.last()
         self.assertIsNotNone(person_object)
         self.assertEqual(person_object, person)
@@ -140,7 +141,7 @@ class PersonDeleteViewAuthenticatedWithPermissionTest(TestCase):
     def test_delete_person(self):
         response = self.client.get(reverse("people:delete", args=[1]))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed("person_confirm_delete.html")
+        self.assertTemplateUsed(response, "people/person_confirm_delete.html")
 
     def test_delete_person_post(self):
 

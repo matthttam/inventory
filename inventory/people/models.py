@@ -1,8 +1,13 @@
 from django.db import models
-from django.urls import reverse
-from locations.models import Room, Building
-from django.db.models.signals import post_save
+from django.db.models import F, Count, Q, When, Value, Case
 from django.dispatch import receiver
+from django.db.models.signals import post_save
+from django.urls import reverse
+
+from auditlog.registry import auditlog
+from auditlog.models import AuditlogHistoryField
+
+from locations.models import Building, Room
 
 
 class PersonStatus(models.Model):
@@ -14,6 +19,46 @@ class PersonStatus(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+
+class PersonManager(models.Manager):
+    def active(self):
+        return self.filter(return_datetime=None)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        # Add a count of outstanding assignments
+        qs = qs.annotate(
+            outstanding_assignment_count=Count(
+                F("deviceassignment"),
+                filter=Q(deviceassignment__return_datetime=None),
+            )
+        )
+
+        # Set if they have an outstanding assignment or not
+        qs = qs.annotate(
+            has_outstanding_assignment=Case(
+                When(outstanding_assignment_count__gt=0, then=True),
+                default=False,
+            )
+        )
+        # Alias of has_outstanding_assignment
+        qs = qs.annotate(
+            is_currently_assigned=Case(
+                When(outstanding_assignment_count__gt=0, then=True),
+                default=False,
+            )
+        )
+
+        # Set if the person is active
+        qs = qs.annotate(
+            is_active=Case(
+                When(status__is_inactive=False, then=True),
+                default=False,
+            )
+        )
+        return qs
 
 
 class Person(models.Model):
@@ -30,6 +75,9 @@ class Person(models.Model):
     _buildings: list[Building] = None
     _rooms: list[Room] = None
 
+    objects = PersonManager()
+    history = AuditlogHistoryField()
+
     class Meta:
         verbose_name_plural = "People"
 
@@ -45,7 +93,7 @@ class Person(models.Model):
 
     @property
     def building_list(self):
-        return ", ".join([b.name for b in list(self.buildings.all())])
+        return ", ".join([b.name for b in list(self.buildings.all().order_by("name"))])
 
 
 @receiver(post_save, sender=Person)
@@ -61,3 +109,7 @@ class PersonType(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+
+# Audit Log Registrations
+auditlog.register(Person)

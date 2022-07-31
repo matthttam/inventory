@@ -1,10 +1,10 @@
 from os import environ
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import tag
 from django.urls import reverse
 
 from authentication.tests.factories import UserFactory
-
 from inventory.tests.web_browser import WebBrowser
 
 

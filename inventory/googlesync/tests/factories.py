@@ -62,6 +62,7 @@ class GooglePersonSyncProfileFactory(DjangoModelFactory):
     google_service_account_config = factory.SubFactory(
         GoogleServiceAccountConfigFactory
     )
+    domain = fake.ascii_safe_email().split("@")[1]
 
 
 class GooglePersonMappingFactory(DjangoModelFactory):

@@ -1,5 +1,13 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from django.test import TestCase
-from people.models import Person, PersonType, PersonStatus
+from auditlog.models import AuditlogHistoryField
+from auditlog.registry import auditlog
+
+from people.models import Person, PersonManager, PersonType, PersonStatus
+from locations.models import Building, Room
+
 from .factories import (
     PersonFactory,
     PersonWithBuildingsFactory,
@@ -7,8 +15,11 @@ from .factories import (
     PersonStatusFactory,
     PersonTypeFactory,
 )
-from locations.tests.factories import BuildingFactory
-from locations.models import Building, Room
+from locations.tests.factories import BuildingFactory, RoomFactory
+from assignments.tests.factories import (
+    DeviceAssignmentFactory,
+    DeviceAssignmentWithReturnDatetimeFactory,
+)
 
 
 class PersonTest(TestCase):
@@ -75,8 +86,33 @@ class PersonTest(TestCase):
     def test_rooms_foreign_key(self):
         self.assertEqual(self.person._meta.get_field("rooms").related_model, Room)
 
-    def test_post_save_signal(self):
-        self.skipTest("Need to test")
+    def test_post_save_signal_for_buildings_and_rooms(self):
+        buildings = BuildingFactory.create_batch(5)
+        rooms = RoomFactory.create_batch(5)
+        PersonFactory(id=11, buildings=buildings, rooms=rooms)
+        person = Person.objects.get(id=11)
+        self.assertEqual(person.buildings.count(), 5)
+        self.assertEqual(person.rooms.count(), 5)
+        self.assertCountEqual(person.buildings.all(), buildings)
+        self.assertCountEqual(person.rooms.all(), rooms)
+
+    def test_objects_is_instance_of_person_manager(self):
+        self.assertIsInstance(Person.objects, PersonManager)
+
+    def test_history_class(self):
+        self.assertIsInstance(Person._meta.get_field("history"), AuditlogHistoryField)
+
+    ### Properties ###
+    def test_display_name(self):
+        person = PersonFactory(first_name="Mark", last_name="Twain")
+        self.assertEqual(person.display_name, f"{person.first_name} {person.last_name}")
+
+    def test_building_list(self):
+        person = Person.objects.get(id=1)
+        person.buildings.set([BuildingFactory(name="z"), BuildingFactory(name="a")])
+        person = Person.objects.get(id=1)
+        self.assertEqual(person.building_list, "a, z")
+        self.assertNotEqual(person.building_list, "z, a")
 
     ### Functions ###
     def test___str__(self):
@@ -91,6 +127,40 @@ class PersonTest(TestCase):
     def test_get_absolute_url(self):
         person = Person.objects.get(id=1)
         self.assertEqual(person.get_absolute_url(), "/people/1/")
+
+    def test_auditlog_register(self):
+        self.assertTrue(auditlog.contains(model=Person))
+
+    ### Test custom model queryset
+    def test_outstanding_assignment_count(self):
+        person = Person.objects.get(id=1)
+        self.assertEqual(person.outstanding_assignment_count, 0)
+        DeviceAssignmentFactory(person=person, return_datetime=None)
+        person = Person.objects.get(id=1)
+        self.assertEqual(person.outstanding_assignment_count, 1)
+
+    def test_has_outstanding_assignment(self):
+        person = Person.objects.get(id=1)
+        self.assertFalse(person.has_outstanding_assignment)
+        DeviceAssignmentWithReturnDatetimeFactory(person=person, return_datetime=None)
+        person = Person.objects.get(id=1)
+        self.assertTrue(person.has_outstanding_assignment)
+        person.deviceassignment_set.update(
+            return_datetime=datetime.now(tz=ZoneInfo(key="America/Chicago"))
+        )
+        person = Person.objects.get(id=1)
+        self.assertFalse(person.has_outstanding_assignment)
+
+    def test_is_active(self):
+        active_status = PersonStatusFactory(name="Active", is_inactive=False)
+        inactive_status = PersonStatusFactory(name="Inctive", is_inactive=True)
+        PersonFactory(email="testuser@example.com", status=active_status)
+        person = Person.objects.get(email="testuser@example.com")
+        self.assertTrue(person.is_active)
+        person.status = inactive_status
+        person.save()
+        person = Person.objects.get(email="testuser@example.com")
+        self.assertFalse(person.is_active)
 
 
 class PersonWithBuildingsTest(TestCase):

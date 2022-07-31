@@ -1,4 +1,6 @@
 from django.test import TestCase
+from django.db.models import UniqueConstraint
+
 from locations.models import Building, Room
 from .factories import BuildingFactory, RoomFactory
 
@@ -99,6 +101,24 @@ class RoomModelTest(TestCase):
                 "number",
             ),
         )
+
+    def test_unique_constraints(self):
+        expected_constraint_fields = [
+            (
+                "number",
+                "building",
+            )
+        ]
+        constraints = [
+            c for c in Room._meta.constraints if isinstance(c, UniqueConstraint)
+        ]
+        self.assertEqual(
+            len(expected_constraint_fields),
+            len(constraints),
+            "Difference in unique constraint length.",
+        )
+        for constraint in constraints:
+            self.assertIn(constraint.fields, expected_constraint_fields)
 
     ### Functions ###
     def test___str__(self):

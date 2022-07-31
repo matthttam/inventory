@@ -1,10 +1,15 @@
 from django.test import TestCase
+
+from auditlog.models import AuditlogHistoryField
+from auditlog.registry import auditlog
+
 from devices.models import (
     DeviceAccessory,
     DeviceStatus,
     DeviceManufacturer,
     Device,
     DeviceModel,
+    DeviceManager,
 )
 from googlesync.models import GoogleDevice
 from locations.models import Room, Building
@@ -15,7 +20,6 @@ from .factories import (
     DeviceFactory,
     DeviceAccessoryFactory,
     DeviceManufacturerFactory,
-    DeviceAccessoryWithDeviceModelsFactory,
 )
 
 
@@ -169,34 +173,43 @@ class DeviceTest(TestCase):
         self.assertEqual(self.device._meta.get_field("room").blank, True)
         self.assertEqual(self.device._meta.get_field("room").null, True)
 
+    def test_history_class(self):
+        self.assertIsInstance(Device._meta.get_field("history"), AuditlogHistoryField)
+
     ### Functions ###
-    def test___str__(self):
+    def test_display_name(self):
+        device = DeviceFactory(
+            asset_id="test_asset_id", serial_number="test_serial_number"
+        )
+        self.assertEqual(
+            device.display_name(),
+            f"test_asset_id (test_serial_number) - {device.device_model}",
+        )
+
+    def test___str___with_asset_id(self):
         device = DeviceFactory(
             asset_id="test_asset_id", serial_number="test_serial_number"
         )
         self.assertEqual(
             device.__str__(),
-            f"test_asset_id (test_serial_number) - {device.device_model}",
-        )
-
-    def test_display_name_with_asset_id(self):
-        device = DeviceFactory(
-            asset_id="test_asset_id", serial_number="test_serial_number"
-        )
-        self.assertEqual(
-            device.display_name(),
             f"test_asset_id (test_serial_number)",
         )
 
-    def test_display_name_without_asset_id(self):
+    def test___str___without_asset_id(self):
         device = DeviceFactory(asset_id="", serial_number="test_serial_number")
         self.assertEqual(
-            device.display_name(),
+            device.__str__(),
             f"test_serial_number",
         )
 
     def test_get_absolute_url(self):
         self.assertEqual(self.device.get_absolute_url(), "/devices/1/")
+
+    def test_auditlog_register(self):
+        self.assertTrue(auditlog.contains(model=Device))
+
+    def test_objects_is_instance_of_person_manager(self):
+        self.assertIsInstance(Device.objects, DeviceManager)
 
 
 class DeviceAccessoryTest(TestCase):
@@ -210,6 +223,10 @@ class DeviceAccessoryTest(TestCase):
     def test_name_label(self):
         name_label = self.device_accessory._meta.get_field("name").verbose_name
         self.assertEqual(name_label, "name")
+
+    def test_name_label(self):
+        name_label = self.device_accessory._meta.verbose_name_plural
+        self.assertEqual(name_label, "Device accessories")
 
     def test_name_max_length(self):
         max_length = self.device_accessory._meta.get_field("name").max_length

@@ -4,16 +4,21 @@
 
 {% block content %}
 
-{% if person %}
+    {% if person %}
 
-{% block infobox %}
-{% include './partials/person_infobox.html' with bottom_infobox_card='./person_control_buttons.html' %}
-{% endblock infobox %}
+        <div class="row">
+            <div class="col md-6">
+                {% include './partials/person_infobox.html' with bottom_infobox_card='./person_control_buttons.html' %}
+            </div>
+            <div class="col md-3">
+                {% include './partials/person_auditlog.html' %}
+            </div>
+        </div>
 
-{% else %}
+    {% else %}
 
-<p>Person Not Found</p>
+    <p>Person Not Found</p>
 
-{% endif %}
+    {% endif %}
 
 {% endblock content %}

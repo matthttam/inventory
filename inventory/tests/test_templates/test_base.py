@@ -1,13 +1,10 @@
-from django.http import HttpResponse
 from django.test import SimpleTestCase
 from django.template import Context, Template
 from bs4 import BeautifulSoup
-from django.template.loader_tags import BlockNode
-from django.template.base import Node, NodeList, TextNode
 
 
 class BaseTest(SimpleTestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         context = Context({})
         template = Template("{% include 'base.html' %}")
         self.rendered = template.render(context)
@@ -35,7 +32,7 @@ class BaseTest(SimpleTestCase):
             'script[src="https://code.jquery.com/jquery-3.6.0.min.js"]'
         )
         bootstrap_js = self.soup.select(
-            'script[src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js"]'
+            'script[src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"]'
         )
         self.assertEqual(len(jquery_js), 1)
         self.assertEqual(len(bootstrap_js), 1)

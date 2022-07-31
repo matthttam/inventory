@@ -25,6 +25,12 @@ class DeviceAssignmentFactory(DjangoModelFactory):
     device = factory.SubFactory(DeviceFactory)
 
 
+class DeviceAssignmentWithReturnDatetimeFactory(DeviceAssignmentFactory):
+    return_datetime = factory.lazy_attribute(
+        lambda o: fake.date_time_between(start_date=o.assignment_datetime, tzinfo=tz)
+    )
+
+
 class DeviceAccessoryAssignmentFactory(DjangoModelFactory):
     class Meta:
         model = DeviceAccessoryAssignment

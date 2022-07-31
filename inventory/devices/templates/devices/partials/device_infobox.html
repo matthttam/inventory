@@ -1,38 +1,36 @@
+{% extends 'partials/card.html' %}
 {% load tz %}
-<div class="row">
-  <div class="col md-3">
-    <div class="card" style="width: 100%;">
-      <div class="card-body">
-        <h1 class="card-title">Device</h1>
-        <p name="assignment_card_body" class="card-text fs-5">
-          <div class="row mb-2">
-            <div class="col-md-4 fw-bold text-end">Device ID :</div><div class="col md-1 text-start">{{device.id}}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-md-4 fw-bold text-end">Serial :</div><div class="col md-1 text-start">{{device.serial_number}}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-md-4 fw-bold text-end">Asset :</div><div class="col md-1 text-start">{{device.asset_id}}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-md-4 fw-bold text-end">Status :</div><div class="col md-1 text-start">{{device.status}}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-md-4 fw-bold text-end">Model :</div><div class="col md-1 text-start">{{device.device_model}}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-md-4 fw-bold text-end">Building :</div><div class="col md-1 text-start">{{device.building}}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-md-4 fw-bold text-end">Room :</div><div class="col md-1 text-start">{{device.room}}</div>
-          </div>
-          {% if bottom_infobox_card %}
-            {% include bottom_infobox_card %}
-          {% endif %}
-        </p>
-      </div>
-    </div>
+
+{% block card_title_content %} 
+Device
+{% endblock %}
+{% block card_body_content%}
+<p name="device_card_body" class="card-text fs-5">
+  <div class="row mb-2">
+    <div class="col-md-4 fw-bold text-end">Device ID :</div><div class="col md-1 text-start">{{device.id}}</div>
   </div>
-  <div class="col md-9">
+  <div class="row mb-2">
+    <div class="col-md-4 fw-bold text-end">Serial :</div><div class="col md-1 text-start">{{device.serial_number}}</div>
   </div>
-</div>
+  <div class="row mb-2">
+    <div class="col-md-4 fw-bold text-end">Asset :</div><div class="col md-1 text-start">{{device.asset_id}}</div>
+  </div>
+  <div class="row mb-2">
+    <div class="col-md-4 fw-bold text-end">Status :</div><div class="col md-1 text-start">{{device.status}}</div>
+  </div>
+  <div class="row mb-2">
+    <div class="col-md-4 fw-bold text-end">Model :</div><div class="col md-1 text-start">{{device.device_model}}</div>
+  </div>
+  <div class="row mb-2">
+    <div class="col-md-4 fw-bold text-end">Building :</div><div class="col md-1 text-start">{{device.building}}</div>
+  </div>
+  <div class="row mb-2">
+    <div class="col-md-4 fw-bold text-end">Room :</div><div class="col md-1 text-start">{{device.room}}</div>
+  </div>
+  <div name="device_bottom_infobox" class="d-flex justify-content-center">
+    {% if bottom_infobox_card %}
+      {% include bottom_infobox_card %}
+    {% endif %}
+  </div>
+</p>
+{% endblock %}

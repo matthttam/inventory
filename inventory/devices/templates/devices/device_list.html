@@ -2,30 +2,25 @@
 
 {% block title %}Inventory - Devices{%endblock %} 
 
-{% block head %} 
+{% block head %}
 
-{% include "partials/datatables.html"%}
+    {{ block.super }}
 
-{% load static %}
-<script src="{% static 'devices/device_list.js'%}"></script>
+    {% include "partials/datatables.html"%}
+
+    {% load static %}
+    <script src="{% static 'devices/device_list.js'%}"></script>
 
 {% endblock head %}
 
 {% block content %} 
 
-  <table id="device_list" class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        <th>Asset ID</th>
-        <th>Serial Number</th>
-      </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
-
-{% if perms.devices.add_device %}
-  <a class="btn btn-primary m-2" role="button" href="{% url 'devices:new' %}">Create Device</a>
-{% endif %}
+    {% with prefix=tables.device_list %}
+        {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers %}
+    {% endwith %}
+    
+    {% if perms.devices.add_device %}
+        <a class="btn btn-primary m-2" role="button" href="{% url 'devices:new' %}">Create Device</a>
+    {% endif %}
 
 {% endblock content %}

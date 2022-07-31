@@ -20,7 +20,7 @@ default_context = Context(
             "person": "Test Person",
             "device": "Test Device",
             "assignment_datetime": datetime(2022, 7, 1, 2, 0, 0, 0),
-            "return_datetime": "",
+            "return_datetime": datetime(2022, 7, 31, 2, 0, 0, 0),
         },
         "perms": {
             "assignments": {
@@ -63,7 +63,7 @@ class DeviceAssignmentInfoboxTest(SimpleTestCase):
             },
             {
                 "label": "Return Date :",
-                "value": "",
+                "value": "07/31/2022 2 a.m.",
             },
         ]
         context = copy.deepcopy(default_context)
@@ -77,8 +77,26 @@ class DeviceAssignmentInfoboxTest(SimpleTestCase):
 
         self.assertEqual(len(info_divs), len(expected_fields))
         for index, info_div in enumerate(info_divs):
-            self.assertIn(str(expected_fields[index]["label"]), str(info_div))
-            self.assertIn(str(expected_fields[index]["value"]), str(info_div))
+            try:
+                label = info_div.select("div")[0].contents[0]
+            except IndexError:
+                label = None
+
+            try:
+                value = info_div.select("div")[1].contents[0]
+            except IndexError:
+                value = None
+
+            self.assertEqual(
+                str(expected_fields[index]["label"]),
+                str(label),
+                msg=f"Failed to match up label for {info_div.select('div')}",
+            )
+            self.assertEqual(
+                str(expected_fields[index]["value"]),
+                str(value),
+                msg=f"Failed to match up value for {info_div.select('div')}",
+            )
 
     def test_bottom_infobox_card(self):
         """Verify providing a template for bottom_infobox_card loads that template"""

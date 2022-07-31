@@ -1,10 +1,11 @@
 from django.test import TestCase
 from django.urls import reverse
-from authentication.tests.factories import SuperuserUserFactory, User, UserFactory
-from assignments.models import DeviceAssignment
-from assignments.tests.factories import DeviceAssignmentFactory
-from inventory.tests.helpers import get_permission
+
+from authentication.tests.factories import SuperuserUserFactory, User
+
 from bs4 import BeautifulSoup
+
+from assignments.tests.factories import DeviceAssignmentFactory
 
 
 class DeviceAssignmentFormTest(TestCase):

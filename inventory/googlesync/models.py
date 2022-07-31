@@ -80,6 +80,9 @@ class GoogleSyncProfileAbstract(models.Model):
     class Meta:
         abstract = True
 
+    def __str__(self):
+        return f"{self.name}"
+
 
 # Person sync profile
 class GooglePersonSyncProfile(GoogleSyncProfileAbstract):
@@ -90,9 +93,12 @@ class GooglePersonSyncProfile(GoogleSyncProfileAbstract):
         help_text="Google API query to use when searching for users to sync for this profile. (e.g. 'orgUnitPath=/Staff'). Query documentation: https://developers.google.com/admin-sdk/directory/v1/guides/search-users",
         blank=True,
     )
-
-    def __str__(self):
-        return f"{self.name} ({self.person_type}: {self.google_service_account_config})"
+    domain = models.CharField(
+        max_length=1024,
+        default="",
+        blank=True,
+        help_text="Filter by domain of users. If left blank users of any domain for your Google Customer will be included.",
+    )
 
 
 class GoogleDeviceSyncProfile(GoogleSyncProfileAbstract):
@@ -109,16 +115,13 @@ class GoogleDeviceSyncProfile(GoogleSyncProfileAbstract):
         blank=True,
     )
 
-    def __str__(self):
-        return f"{self.name} (Devices: {self.google_service_account_config})"
-
 
 class MappingAbstract(models.Model):
     sync_profile = None
     from_field = models.CharField(max_length=255)
     to_field = models.CharField(max_length=255)
     matching_priority = models.IntegerField(
-        choices=[(x, x) for x in range(1, 10)], unique=True, blank=True, null=True
+        choices=[(x, x) for x in range(1, 10)], blank=True, null=True
     )
 
     class Meta:
@@ -127,11 +130,15 @@ class MappingAbstract(models.Model):
             models.UniqueConstraint(
                 fields=["sync_profile", "to_field"],
                 name="unique_sync_profile_and_to_field_in_%(class)s",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["sync_profile", "matching_priority"],
+                name="unique_sync_profile_and_matching_priority_in_%(class)s",
+            ),
         ]
 
     def __str__(self):
-        return f"{self.from_field} => {self.to_field}"
+        return f"{self.sync_profile}: {self.from_field} => {self.to_field}"
 
 
 class GooglePersonMapping(MappingAbstract):

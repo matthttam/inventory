@@ -4,34 +4,24 @@
 
 {% block head %}
 
-{{ actions|json_script:"actions" }}
-{% include "partials/datatables.html"%}
+    {{ block.super }}
 
-{% load static %}
-<script src="{% static 'assignments/deviceassignment_list.js'%}"></script>
+    {% include "partials/datatables.html"%}
+
+    {% load static %}
+    <script src="{% static 'assignments/deviceassignment_list.js'%}"></script>
 
 {% endblock head %}
 
 {% block content %}
 
-    <table id="assignment_list" class="table table-striped table-bordered nowrap" style="width:100%">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Person</th>
-                <th>Device</th>
-                <th>Assignment Date</th>
-                <th>Return Date</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+    {% with prefix=tables.assignment_list %}
+        {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers %}
+    {% endwith %}
 
-
-{% if perms.assignments.add_deviceassignment %}
-    <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:new' %}">Create Assignment</a>
-{% endif %}
+    {% if perms.assignments.add_deviceassignment %}
+        <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:new' %}">Create Assignment</a>
+        <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:quickassign' %}">Quick Assign</a>
+    {% endif %}
 
 {% endblock content %}
