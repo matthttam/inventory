@@ -1,12 +1,11 @@
-from django.core.management.base import BaseCommand, CommandError
-
-from google.oauth2 import service_account
-import googleapiclient.discovery
 import json
 
+import googleapiclient.discovery
+from django.core.management.base import BaseCommand
 from django.forms import model_to_dict
-from googlesync.models import GoogleServiceAccountConfig, GoogleSyncProfileAbstract
+from google.oauth2 import service_account
 from googlesync.exceptions import ConfigNotFound
+from googlesync.models import GoogleServiceAccountConfig, GoogleSyncProfileAbstract
 
 
 class GoogleSyncCommand(BaseCommand):
@@ -43,39 +42,49 @@ class GoogleSyncCommand(BaseCommand):
         return request.execute()
 
     def _get_customer_service(self):
-        service = googleapiclient.discovery.build(
-            "admin",
-            "directory_v1",
-            credentials=self._get_google_credentials(
-                scopes=[
-                    "https://www.googleapis.com/auth/admin.directory.customer.readonly"
-                ]
-            ),
+        service = self._get_service(
+            "https://www.googleapis.com/auth/admin.directory.customer.readonly"
         )
+
         return service.customers()
 
     def _get_chromeosdevices_service(self):
-        service = googleapiclient.discovery.build(
-            "admin",
-            "directory_v1",
-            credentials=self._get_google_credentials(
-                scopes=[
-                    "https://www.googleapis.com/auth/admin.directory.device.chromeos.readonly",
-                    "https://www.googleapis.com/auth/admin.directory.device.chromeos",
-                ]
-            ),
+        service = self._get_service(
+            [
+                "https://www.googleapis.com/auth/admin.directory.device.chromeos.readonly",
+                "https://www.googleapis.com/auth/admin.directory.device.chromeos",
+            ]
         )
+
         return service.chromeosdevices()
 
     def _get_users_service(self):
+        service = self._get_service(
+            "https://www.googleapis.com/auth/admin.directory.user.readonly"
+        )
+        return service.users()
+
+    def _get_schemas_service(self):
+        service = self._get_service(
+            "https://www.googleapis.com/auth/admin.directory.userschema.readonly"
+        )
+        return service.schemas()
+
+    def _get_service(self, scopes: list[str] | str):
+        """
+        Returns a service discovery service with provided scopes
+
+        @params
+        scopes: List of strings or a comma separated string of scopes for the service.
+        """
+        if isinstance(scopes, str):
+            scopes = scopes.split(",")
         service = googleapiclient.discovery.build(
             "admin",
             "directory_v1",
-            credentials=self._get_google_credentials(
-                scopes=["https://www.googleapis.com/auth/admin.directory.user.readonly"]
-            ),
+            credentials=self._get_google_credentials(scopes=scopes),
         )
-        return service.users()
+        return service
 
     def _extract_from_dictionary(self, dictionary: dict, keys: list):
         if not keys:

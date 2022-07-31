@@ -1,18 +1,12 @@
-from googlesync.exceptions import SyncProfileNotFound
-
-from googlesync.models import (
-    GooglePersonMapping,
-    GooglePersonTranslation,
-    GooglePersonSyncProfile,
-    GoogleSyncProfileAbstract,
-)
-
+from types import NoneType
 from django.core.exceptions import ValidationError
-from django.db.models import Q
 from django.db import transaction
+from django.db.models import Q
+from googlesync.exceptions import SyncProfileNotFound
+from googlesync.models import GooglePersonSyncProfile
+from people.models import Person, PersonStatus
 
 from ._google_sync import GoogleSyncCommand
-from people.models import Person, PersonStatus
 
 
 class Command(GoogleSyncCommand):
@@ -37,6 +31,15 @@ class Command(GoogleSyncCommand):
             self.sync_google_people(sync_profile)
 
         self.stdout.write(self.style.SUCCESS("Done"))
+
+    def _initialize_person_sync_profile(
+        self, profile: GooglePersonSyncProfile
+    ) -> NoneType:
+        """Gets all schema information and saves it to the database."""
+        schemas = self._get_schemas_service()
+        request = schemas.list({"customerId": self.customer.get("id")})
+        response = request.execute()
+        google_schemas = response.get("schemas")
 
     def _get_person_sync_profile(self, profile_name):
         try:

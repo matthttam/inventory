@@ -99,6 +99,7 @@ class GooglePersonSyncProfile(GoogleSyncProfileAbstract):
         blank=True,
         help_text="Filter by domain of users. If left blank users of any domain for your Google Customer will be included.",
     )
+    initialized = models.BooleanField(default=False)
 
 
 class GoogleDeviceSyncProfile(GoogleSyncProfileAbstract):
@@ -222,3 +223,54 @@ class GoogleDeviceTranslation(TranslationAbstract):
 
     def __str__(self):
         return f"Translate {self.google_device_mapping.to_field!r} from {self.translate_from!r} to {self.translate_to!r}"
+
+
+class GooglePersonSchema(models.Model):
+    schema_id = models.CharField(max_length=255)
+    schema_name = models.CharField(max_length=255)
+    display_name = models.CharField(max_length=255)
+    kind = models.CharField(max_length=255)
+    etag = models.CharField(max_length=255)
+    # {
+    #    "schemaId": string,
+    #    "schemaName": string,
+    #    "fields": [
+    #        {
+    #        object (SchemaFieldSpec)
+    #        }
+    #    ],
+    #    "displayName": string,
+    #    "kind": string,
+    #    "etag": string
+    # }
+
+
+class GooglePersonSchemaField(models.Model):
+    schema = models.ForeignKey(GooglePersonSchema, on_delete=models.CASCADE)
+    field_name = models.CharField(max_length=255)
+    field_id = models.CharField(max_length=255)
+    field_type = models.CharField(max_length=255)
+    multi_valued = models.BooleanField()
+    kind = models.CharField(max_length=255)
+    etag = models.CharField(max_length=255)
+    indexed = models.BooleanField()
+    display_name = models.CharField(max_length=255)
+    read_access_type = models.CharField(max_length=255)
+    numeric_indexing_spec_min_value = models.IntegerField()
+    numeric_indexing_spec_max_value = models.IntegerField()
+    # SchemaFieldSpec
+    # {
+    #    "fieldName": string,
+    #    "fieldId": string,
+    #    "fieldType": string,
+    #    "multiValued": boolean,
+    #    "kind": string,
+    #    "etag": string,
+    #    "indexed": boolean,
+    #    "displayName": string,
+    #    "readAccessType": string,
+    #    "numericIndexingSpec": {
+    #        "minValue": number,
+    #        "maxValue": number
+    #    }
+    # }
