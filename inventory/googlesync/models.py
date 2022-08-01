@@ -1,10 +1,9 @@
-from abc import ABC, abstractmethod
+from devices.models import Device
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import reverse
 from people.models import Person, PersonType
-from devices.models import Device
-from django.db.models import F, Count, Q, When, Value, Case
-from django.db.models.functions import Concat
 
 
 class GoogleConfigAbstract(models.Model):
