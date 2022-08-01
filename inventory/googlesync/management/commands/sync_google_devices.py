@@ -93,7 +93,7 @@ class Command(GoogleSyncCommandAbstract):
 
     def _sync_google_device_profile(self, sync_profile: GoogleDeviceSyncProfile):
         self.stdout.write(
-            self.style.NOTICE(f"Starting devices sync: {sync_profile.name}")
+            self.style.SUCCESS(f"Starting devices sync: {sync_profile.name}")
         )
         self.sync_google_devices(sync_profile)
 
@@ -126,7 +126,7 @@ class Command(GoogleSyncCommandAbstract):
                 return None
             google_device_records.extend(google_devices)
             request = devices.list_next(request, response)
-            # request = None
+            # request = None  # !!!!!
         return google_device_records
 
     def sync_google_devices(self, sync_profile):
@@ -142,17 +142,12 @@ class Command(GoogleSyncCommandAbstract):
             self.style.SUCCESS(f"Total Number of device records: {len(device_records)}")
         )
 
-        # active_device_status = DeviceStatus.objects.filter(is_inactive=False).first()
-        inactive_device_status = DeviceStatus.objects.filter(is_inactive=True).first()
-        # found_record_ids = []
+        # inactive_device_status = DeviceStatus.objects.filter(is_inactive=True).first()
         records_to_update = []
         records_to_create = []
         records_to_skip = []
 
         unique_field_values = {}
-        # unique_fields = [
-        #    x.name for x in Device._meta.fields if x.unique == True and x.name != "id"
-        # ]
         unique_fields = [
             {"name": x.name, "blank": x.blank}
             for x in GoogleDevice._meta.fields
@@ -163,23 +158,8 @@ class Command(GoogleSyncCommandAbstract):
             unique_field_values[unique_field["name"]] = []
 
         for device_record in device_records:
-
-            ## Build a query to search through each ID specified
-            # query = Q()
-            #
-            ## Use lookup ids in order of matching_priority
-            # lookup_ids = [
-            #    x.to_field
-            #    for x in sync_profile.mappings.exclude(matching_priority=None).order_by(
-            #        "matching_priority"
-            #    )
-            # ]
-            # for id_field in lookup_ids:
-            #    query.add(Q(**{id_field: getattr(device_record, id_field)}), Q.OR)
-            # id = getattr(GoogleDevice.objects.filter(query).first(), "id", None)
             id = GoogleDevice.objects.filter(id=device_record.id).only("id").first().id
             if id:
-                # found_record_ids.append(id)
                 device_record.id = id
                 records_to_update.append(device_record)
             else:
@@ -212,32 +192,15 @@ class Command(GoogleSyncCommandAbstract):
 
         # Update found records
         if records_to_update:
-            excluded_fields = ["id'"]
+            excluded_fields = ["id"]
             fields = [
                 x.name
                 for x in GoogleDevice._meta.fields
                 if (x.name not in excluded_fields)
             ]
+            print(fields)
             GoogleDevice.objects.bulk_update(records_to_update, fields=fields)
 
-            # Inactivate Records Not Found
-            # missing_records = (
-            #    GoogleDevice.objects.exclude(google_id__isnull=True)
-            #    .filter(google_sync_profile=sync_profile)
-            #    .difference(Device.objects.filter(id__in=found_record_ids))
-            # )
-
-            # with transaction.atomic():
-            #     for missing_record in missing_records:
-            #         missing_record.status = inactive_device_status
-            #         missing_record.save()
-            #         self.stdout.write(
-            #             self.style.WARNING(
-            #                 f"Device not found. Setting to Inactive: {missing_record}"
-            #             )
-            #         )
-            # Device.objects.update(, fields=)
-        print(records_to_create[0].__dict__)
         # Create New Records
         if records_to_create:
             GoogleDevice.objects.bulk_create(records_to_create)
@@ -260,80 +223,6 @@ class Command(GoogleSyncCommandAbstract):
     ) -> GoogleDevice:
 
         device_dictionary = self._map_dictionary(sync_profile, google_device)
-
-        # mappings = GoogleDeviceMapping.objects.filter(sync_profile=sync_profile)
-
-        # for mapping in mappings:
-        #    try:
-        #        device[mapping.to_field] = self._extract_from_dictionary(
-        #            user, mapping.from_field.split(".")
-        #        )
-        #    except KeyError:
-        #        device[mapping.to_field] = None
-        #
-        #    # Use translations to convert one value to another
-        #    translations = GoogleDeviceTranslation.objects.filter(
-        #        google_device_mapping=mapping
-        #    )
-        #
-        #    for translation in translations:
-        #        if str(device[mapping.to_field]) == translation.translate_from:
-        #            device[mapping.to_field] = translation.translate_to
-
-        # Map Device status
-        # device_status_object = DeviceStatus.objects.filter(
-        #    name=device["status"]
-        # ).first()
-        # if not device_status_object:
-        #    self.stdout.write(
-        #        self.style.ERROR(
-        #            f"Device status {device['status']} not a valid option. Either create this device status or map this to a valid device status."
-        #        )
-        #    )
-        #    return None
-        # device["status"] = device_status_object
-
-        # Map Device model
-        # if not device["device_model"]:
-        #    self.stdout.write(
-        #        self.style.ERROR(
-        #            f"Required field device model blank for google device {device!r}."
-        #        )
-        #    )
-        #    return None
-        # (
-        #    device_model_object,
-        #    device_model_object_created,
-        # ) = DeviceModel.objects.get_or_create(
-        #    name=device["device_model"],
-        #    defaults={
-        #        "manufacturer": DeviceManufacturer.objects.filter(
-        #            name=device["device_model"].split()[0]
-        #        ).first()
-        #    },
-        # )
-
-        # if device_model_object_created:
-        #    self.stdout.write(
-        #        self.style.SUCCESS(
-        #            f"Device model {device_model_object.name!r} created with manufacturer {device_model_object.manufacturer!r}."
-        #        )
-        #    )
-        # device_model_object = DeviceModel.objects.filter(
-        #    name=device["device_model"]
-        # ).first()
-        # if not device_model_object:
-        #    self.stdout.write(
-        #        self.style.ERROR(
-        #            f"Device model {device['device_model']} not a valid option. Either create this device model or map this to a valid device model."
-        #        )
-        #    )
-        #    return None
-        # device["device_model"] = device_model_object
-
-        # Set sync_profile
-        # device["google_sync_profile"] = sync_profile
-        # Create a Device object
 
         device = GoogleDevice(**device_dictionary)
         try:

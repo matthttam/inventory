@@ -69,9 +69,16 @@ class Person(models.Model):
     internal_id = models.CharField(max_length=255, unique=True)
     type = models.ForeignKey("PersonType", on_delete=models.PROTECT)
     status = models.ForeignKey(PersonStatus, on_delete=models.PROTECT, default=1)
-    buildings = models.ManyToManyField(Building, blank=True)
-    rooms = models.ManyToManyField(Room, blank=True)
+    buildings = models.ManyToManyField(Building, blank=True, related_name="people")
+    rooms = models.ManyToManyField(Room, blank=True, related_name="people")
     google_id = models.CharField(max_length=255, blank=True)
+    primary_building = models.ForeignKey(
+        Building, blank=True, null=True, on_delete=models.SET_NULL
+    )
+    primary_room = models.ForeignKey(
+        Room, blank=True, null=True, on_delete=models.SET_NULL
+    )
+
     _buildings: list[Building] = None
     _rooms: list[Room] = None
 

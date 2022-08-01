@@ -327,7 +327,7 @@ class GooglePersonMapping(MappingAbstract):
         max_length=255,
         choices=[
             (f.name, f.verbose_name) for f in Person._meta.fields if f.name != "id"
-        ],
+        ],  # When we support m2m field mappings use: for f in (list(Person._meta.fields) + list(Person._meta.local_many_to_many))
     )
 
     def get_absolute_url(self):

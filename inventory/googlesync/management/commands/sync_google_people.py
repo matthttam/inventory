@@ -4,6 +4,7 @@ from django.db.models import Q
 from googlesync.exceptions import SyncProfileNotFound
 from googlesync.models import GoogleCustomSchema, GooglePersonSyncProfile
 from people.models import Person, PersonStatus
+from locations.models import Building, Room
 
 from ._google_sync import GoogleSyncCommandAbstract
 
@@ -121,7 +122,7 @@ class Command(GoogleSyncCommandAbstract):
 
             google_user_records.extend(google_users)
             request = users.list_next(request, response)
-
+            # request = None  #!!!!!
         return google_user_records
 
     def sync_google_people(self, sync_profile):
@@ -184,7 +185,9 @@ class Command(GoogleSyncCommandAbstract):
         if records_to_update:
             excluded_fields = ["id"]
             fields = [
-                x.name for x in Person._meta.fields if (x.name not in excluded_fields)
+                x.name
+                for x in Person._meta.concrete_fields
+                if (x.name not in excluded_fields)
             ]
             Person.objects.bulk_update(records_to_update, fields=fields)
 
@@ -225,10 +228,34 @@ class Command(GoogleSyncCommandAbstract):
     ) -> Person:
 
         person_dictionary = self._map_dictionary(sync_profile, google_user)
-        person_dictionary["type"] = sync_profile.person_type
-        person_dictionary["status"] = PersonStatus.objects.filter(
-            name=person_dictionary["status"]
-        ).first()
+
+        # Map foreign keys to their objects
+        model_classes = [
+            x for x in Person._meta.concrete_fields if x.related_model is not None
+        ]
+        for model_class in model_classes:
+            name = model_class.name
+            if name == "type":
+                person_dictionary["type"] = sync_profile.person_type
+                continue
+
+            if person_dictionary.get(name) is None:
+                continue
+
+            person_dictionary[name] = model_class.related_model.objects.filter(
+                name=person_dictionary[name]
+            ).first()
+        # print(person_dictionary)
+        # person_dictionary["type"] = sync_profile.person_type
+        # person_dictionary["status"] = PersonStatus.objects.filter(
+        #    name=person_dictionary["status"]
+        # ).first()
+        # person_dictionary["primary_building"] = Building.objects.filter(
+        #    name=person_dictionary.get("primary_building", None)
+        # ).first()
+        # person_dictionary["primary_room"] = Building.objects.filter(
+        #    name=person_dictionary.get("primary_room", None)
+        # ).first()
         buildings = person_dictionary.pop("buildings", None)
         rooms = person_dictionary.pop("rooms", None)
         person = Person(**person_dictionary)

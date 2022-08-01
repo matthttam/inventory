@@ -1,11 +1,19 @@
 import factory
 from faker import Faker
-from faker.providers import internet as InternetProvider, date_time as DateTimeProvider
+from faker.providers import (
+    internet as InternetProvider,
+    date_time as DateTimeProvider,
+    misc as MiscProvider,
+)
 from factory.django import DjangoModelFactory
 from zoneinfo import ZoneInfo
 from django.utils import timezone
 from googlesync.models import (
     GoogleConfig,
+    GoogleCustomSchema,
+    GoogleCustomSchemaField,
+    GoogleDefaultSchema,
+    GoogleDefaultSchemaProperty,
     GoogleDeviceLinkMapping,
     GoogleServiceAccountConfig,
     GooglePersonSyncProfile,
@@ -26,6 +34,7 @@ fake = Faker()
 Faker.seed(0)
 fake.add_provider(InternetProvider)
 fake.add_provider(DateTimeProvider)
+fake.add_provider(MiscProvider)
 
 tz = ZoneInfo(timezone.settings.TIME_ZONE)
 
@@ -149,3 +158,55 @@ class GoogleDeviceFactory(DjangoModelFactory):
     location = fake.lexify(text="?" * 30)
     most_recent_user = fake.lexify(text="?" * 30)
     annotated_asset_id = fake.lexify(text="?" * 30)
+
+
+class GoogleCustomSchemaFactory(DjangoModelFactory):
+    class Meta:
+        model = GoogleCustomSchema
+
+    service_account_config = factory.SubFactory(GoogleServiceAccountConfigFactory)
+    schema_id = fake.lexify(text="?" * 30)
+    schema_name = fake.lexify(text="?" * 30)
+    display_name = fake.lexify(text="?" * 30)
+    kind = fake.lexify(text="?" * 30)
+    etag = fake.lexify(text="?" * 30)
+
+
+class GoogleCustomSchemaFactory(DjangoModelFactory):
+    class Meta:
+        model = GoogleCustomSchemaField
+
+    schema = factory.SubFactory(GoogleCustomSchemaFactory)
+    field_name = fake.lexify(text="?" * 30)
+    field_id = fake.lexify(text="?" * 30)
+    field_type = fake.lexify(text="?" * 30)
+    multi_valued = fake.boolean()
+    kind = fake.lexify(text="?" * 30)
+    etag = fake.lexify(text="?" * 30)
+    indexed = fake.boolean()
+    display_name = fake.lexify(text="?" * 30)
+    read_access_type = fake.lexify(text="?" * 30)
+    numeric_indexing_spec_min_value = None
+    numeric_indexing_spec_max_value = None
+
+
+class GoogleDefaultSchemaFactory(DjangoModelFactory):
+    class Meta:
+        model = GoogleDefaultSchema
+
+    service_account_config = factory.SubFactory(GoogleServiceAccountConfigFactory)
+    description = fake.lexify(text="?" * 200)
+    schema_id = fake.lexify(text="?" * 30)
+    type = fake.lexify(text="?" * 30)
+
+
+class GoogleDefaultSchemaPropertyFactory(DjangoModelFactory):
+    class Meta:
+        model = GoogleDefaultSchemaProperty
+
+    schema = factory.SubFactory(GoogleDefaultSchemaFactory)
+    parent = None
+    etag = fake.lexify(text="?" * 30)
+    format = fake.lexify(text="?" * 30)
+    type = fake.lexify(text="?" * 30)
+    description = fake.lexify(text="?" * 200)

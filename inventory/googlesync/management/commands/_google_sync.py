@@ -121,8 +121,9 @@ class GoogleSyncCommandAbstract(BaseCommand):
                     object_dictionary, (mapping.from_field.dot_notation).split(".")
                 )
                 # Convert result to appropriate type
-                # print(map_dict[mapping.to_field])
-                # map_dict[mapping.to_field] = map_dict[mapping.to_field]
+                map_dict[mapping.to_field] = self._convert_to_type(
+                    map_dict[mapping.to_field], from_field_type
+                )
 
             except KeyError:
                 map_dict[mapping.to_field] = None
@@ -141,6 +142,8 @@ class GoogleSyncCommandAbstract(BaseCommand):
         return map_dict
 
     def _convert_to_type(self, value, type: Type):
+        if isinstance(value, type):
+            return value
         if value is None:
             return None
         if type == bool:
