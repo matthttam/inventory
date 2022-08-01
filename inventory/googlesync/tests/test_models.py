@@ -534,11 +534,11 @@ class MappingAbstractTest(TestCase):
     ### Functions ###
     @patch("googlesync.models.MappingAbstract._meta.abstract", set())
     @patch("googlesync.models.MappingAbstract.sync_profile", "profile_name")
-    def test___str__(self):
-        google_default_schema_property = GoogleDefaultSchemaProperty()
-        google_person_mapping = MappingAbstract(
-            from_field=google_default_schema_property, to_field="to field"
-        )
+    # @patch.object(MappingAbstract,"from_field", {'name': 'from field'})
+    def test___str__(self, mock_mapping_abstract):
+        # mock_mapping_abstract.from_field.name.return_value = "from field"
+        # google_default_schema_property = GoogleDefaultSchemaProperty()
+        google_person_mapping = MappingAbstract(to_field="to field")
         self.assertEqual(
             google_person_mapping.__str__(),
             "profile_name: from field => to field",

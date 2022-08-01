@@ -12,6 +12,7 @@ from googlesync.management.commands.sync_google_people import (
 )
 from googlesync.models import GoogleServiceAccountConfig
 from googlesync.tests.factories import (
+    GoogleDefaultSchemaPropertyFactory,
     GooglePersonMappingFactory,
     GooglePersonSyncProfileFactory,
     GooglePersonTranslationFactory,
@@ -234,8 +235,13 @@ class GoogleSyncTest(TestCase):
     @patch.object(GoogleSyncCommandAbstract, "_get_my_customer")
     def test__map_dictionary(self, mock__get_my_customer):
         sync_profile = GooglePersonSyncProfileFactory()
+        google_default_schema_property = GoogleDefaultSchemaPropertyFactory(
+            etag="fromfield"
+        )
         GooglePersonMappingFactory(
-            sync_profile=sync_profile, from_field="fromfield", to_field="tofield"
+            sync_profile=sync_profile,
+            from_field=google_default_schema_property,
+            to_field="tofield",
         )
         google_user = {"fromfield": "fromfieldvalue"}
         command = GooglePeopleSyncCommand()
@@ -245,9 +251,15 @@ class GoogleSyncTest(TestCase):
     @patch.object(GoogleSyncCommandAbstract, "_get_my_customer")
     def test__map_dictionary_with_translations(self, mock__get_my_customer):
         sync_profile = GooglePersonSyncProfileFactory()
+
         # Create a mapping with a translation
+        google_default_schema_property = GoogleDefaultSchemaPropertyFactory(
+            etag="fromfield"
+        )
         mapping = GooglePersonMappingFactory(
-            sync_profile=sync_profile, from_field="fromfield", to_field="tofield"
+            sync_profile=sync_profile,
+            from_field=google_default_schema_property,
+            to_field="tofield",
         )
         GooglePersonTranslationFactory(
             google_person_mapping=mapping,
@@ -255,11 +267,22 @@ class GoogleSyncTest(TestCase):
             translate_to="with_this",
         )
         # Create a mapping with dot notation
+        google_default_schema_property_name = GoogleDefaultSchemaPropertyFactory(
+            etag="name",
+        )
+        google_default_schema_property_first = GoogleDefaultSchemaPropertyFactory(
+            etag="first",
+            parent=google_default_schema_property_name,
+        )
         GooglePersonMappingFactory(
-            sync_profile=sync_profile, from_field="name.first", to_field="firstname"
+            sync_profile=sync_profile,
+            from_field=google_default_schema_property_first,
+            to_field="firstname",
         )
 
         google_user = {"fromfield": "replace_me", "name": {"first": "Doug"}}
+
+        expected_output = {"tofield": "with_this", "firstname": "Doug"}
         command = GoogleSyncCommandAbstract()
         return_value = command._map_dictionary(sync_profile, google_user)
-        self.assertEqual(return_value, {"tofield": "with_this", "firstname": "Doug"})
+        self.assertEqual(return_value, expected_output)

@@ -70,8 +70,8 @@ class GoogleCustomSchemaFactory(DjangoModelFactory):
     schema_id = fake.lexify(text="?" * 30)
     schema_name = fake.lexify(text="?" * 30)
     display_name = fake.lexify(text="?" * 30)
-    kind = fake.lexify(text="?" * 30)
-    etag = fake.lexify(text="?" * 30)
+    kind = "admin#directory#schema"
+    etag = fake.lexify(text="?" * 80)
 
 
 class GoogleCustomSchemaFactory(DjangoModelFactory):
@@ -81,7 +81,7 @@ class GoogleCustomSchemaFactory(DjangoModelFactory):
     schema = factory.SubFactory(GoogleCustomSchemaFactory)
     field_name = fake.lexify(text="?" * 30)
     field_id = fake.lexify(text="?" * 30)
-    field_type = fake.lexify(text="?" * 30)
+    field_type = "STRING"
     multi_valued = fake.boolean()
     kind = fake.lexify(text="?" * 30)
     etag = fake.lexify(text="?" * 30)
@@ -98,8 +98,8 @@ class GoogleDefaultSchemaFactory(DjangoModelFactory):
 
     service_account_config = factory.SubFactory(GoogleServiceAccountConfigFactory)
     description = fake.lexify(text="?" * 200)
-    schema_id = fake.lexify(text="?" * 30)
-    type = fake.lexify(text="?" * 30)
+    schema_id = "User"
+    type = "object"
 
 
 class GoogleDefaultSchemaPropertyFactory(DjangoModelFactory):
@@ -110,7 +110,7 @@ class GoogleDefaultSchemaPropertyFactory(DjangoModelFactory):
     parent = None
     etag = fake.lexify(text="?" * 30)
     format = fake.lexify(text="?" * 30)
-    type = fake.lexify(text="?" * 30)
+    type = "string"
     description = fake.lexify(text="?" * 200)
 
 
