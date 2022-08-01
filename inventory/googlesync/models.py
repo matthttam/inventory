@@ -1,3 +1,4 @@
+from typing import Any
 from devices.models import Device
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -117,6 +118,14 @@ class GoogleCustomSchemaField(models.Model):
     numeric_indexing_spec_min_value = models.IntegerField(blank=True, null=True)
     numeric_indexing_spec_max_value = models.IntegerField(blank=True, null=True)
 
+    def __str__(self):
+        return self.dot_notation
+
+    @property
+    def dot_notation(self) -> str:
+        """Return a dot notation path for this custom schema field"""
+        return f"{self.schema.schema_name}.{self.field_name}"
+
 
 class GoogleDefaultSchema(models.Model):
     """
@@ -168,6 +177,7 @@ class GoogleDefaultSchemaProperty(models.Model):
         related_name="children",
     )
     etag = models.CharField(max_length=255)
+    format = models.CharField(max_length=255, blank=True, null=True)
     type = models.CharField(max_length=255, blank=True, null=True)
     description = models.CharField(max_length=1024, blank=True, null=True)
 
@@ -175,19 +185,43 @@ class GoogleDefaultSchemaProperty(models.Model):
         verbose_name_plural = "Google default schema properties"
 
     def __str__(self):
-        return self.dot_notation()
-        # return f"{self.schema.schema_id}.{self.etag}"
+        return self.dot_notation
 
+    @property
+    def is_custom(self):
+        return self.parent and self.parent.etag == "customSchemas"
+
+    def get_custom_field(self):
+        return GoogleCustomSchemaField.objects.get(etag=self.etag)
+
+    @property
     def dot_notation(self) -> str:
         """Return a dot notation path for this schema property"""
-        return_string = f"{self.etag}"
-        # current_schema = self.schema
         parent = self.parent
+        if self.is_custom:
+            etag = self.get_custom_field().dot_notation
+        else:
+            etag = self.etag
+        return_string = f"{etag}"
         while parent:
             return_string = f"{parent.etag}.{return_string}"
             parent = parent.parent
 
         return return_string
+
+    def get_type(self):
+        if self.is_custom:
+            ### Need to return
+            return str
+        elif self.type == "string":
+            return str
+        elif self.type == "boolean":
+            return bool
+        elif self.type == "array":
+            return list
+        elif self.type == "any":
+            """Type is basically unknown and will have to be figured out based on the data"""
+            return Any
 
 
 class GoogleDevice(models.Model):
@@ -300,6 +334,9 @@ class GooglePersonMapping(MappingAbstract):
     def get_absolute_url(self):
         return reverse("googlesync:person_mapping", kwargs={"pk": self.pk})
 
+    def get_type(self):
+        return self.from_field.get_type()
+
 
 class GoogleDeviceLinkMapping(MappingAbstract):
     sync_profile = models.ForeignKey(
@@ -327,7 +364,7 @@ class GoogleDeviceMapping(MappingAbstract):
     sync_profile = models.ForeignKey(
         GoogleDeviceSyncProfile, on_delete=models.PROTECT, related_name="mappings"
     )
-
+    from_field = models.CharField(max_length=255, blank=True, null=True, default=None)
     to_field = models.CharField(
         max_length=255,
         choices=[(f.name, f.verbose_name) for f in GoogleDevice._meta.fields],

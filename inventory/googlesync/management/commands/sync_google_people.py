@@ -1,14 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import F, Count, Q, When, Value, Case
+from django.db.models import Q
 from googlesync.exceptions import SyncProfileNotFound
-from googlesync.models import (
-    GoogleCustomSchema,
-    GoogleCustomSchemaField,
-    GoogleDefaultSchema,
-    GoogleDefaultSchemaProperty,
-    GooglePersonSyncProfile,
-)
+from googlesync.models import GoogleCustomSchema, GooglePersonSyncProfile
 from people.models import Person, PersonStatus
 
 from ._google_sync import GoogleSyncCommandAbstract
@@ -82,7 +76,6 @@ class Command(GoogleSyncCommandAbstract):
                 self.stdout.write(self.style.WARNING(f"Forcing reinitialization."))
         # Delete any schemas already stored
         GoogleCustomSchema.objects.all().delete()
-        self._initialize_person_sync_custom_schemas()
         self._delete_default_schemas("User")
         self._initialize_default_schema("User")
         # self._initialize_person_sync_default_schema("UserName")
@@ -91,82 +84,6 @@ class Command(GoogleSyncCommandAbstract):
         google_config = self._get_google_config()
         google_config.person_initialized = True
         google_config.save()
-
-    def _initialize_person_sync_custom_schemas(self):
-        schemas = self._get_schemas_service()
-        request = schemas.list(customerId=self.customer.get("id"))
-        response = request.execute()
-        google_schemas = response.get("schemas")
-
-        # Populate custom chema data
-        for gs in google_schemas:
-            current_schema = GoogleCustomSchema.objects.create(
-                service_account_config_id=self.google_config.get("id"),
-                schema_id=gs.get("schemaId"),
-                schema_name=gs.get("schemaName"),
-                display_name=gs.get("displayName"),
-                kind=gs.get("kind"),
-                etag=gs.get("etag"),
-            )
-
-            for f in gs.get("fields"):
-                GoogleCustomSchemaField.objects.create(
-                    schema=current_schema,
-                    field_name=f.get("fieldName"),
-                    field_id=f.get("fieldId"),
-                    field_type=f.get("fieldType"),
-                    multi_valued=f.get("multiValued", False),
-                    kind=f.get("kind"),
-                    etag=f.get("etag"),
-                    indexed=f.get("indexed", False),
-                    display_name=f.get("displayName"),
-                    read_access_type=f.get("readAccessType"),
-                    numeric_indexing_spec_min_value=f.get(
-                        "numericIndexingSpec", {}
-                    ).get("minValue", None),
-                    numeric_indexing_spec_max_value=f.get(
-                        "numericIndexingSpec", {}
-                    ).get("maxValue", None),
-                )
-
-    def _delete_default_schemas(self, schema_id):
-        GoogleDefaultSchema.objects.filter(schema_id=schema_id).delete()
-        GoogleDefaultSchema.objects.all().annotate(
-            property_count=Count("properties")
-        ).filter(property_count=0).delete()
-
-    def _initialize_default_schema(
-        self, schema_id, parent_property: GoogleDefaultSchemaProperty = None
-    ):
-
-        """Used to create default schema and handle recursion"""
-        schema = self._get_schema_by_name(schema_id)
-        current_schema = GoogleDefaultSchema.objects.create(
-            service_account_config_id=self.google_config.get("id"),
-            schema_id=schema.get("id"),
-            description=schema.get("description"),
-            type=schema.get("type"),
-        )
-        for etag, property in schema.get("properties").items():
-            print(etag)
-            print(property.get("type"))
-            current_property = GoogleDefaultSchemaProperty.objects.create(
-                schema=current_schema,
-                etag=etag,
-                type=property.get("type"),
-                description=property.get("description"),
-                parent=parent_property,
-            )
-
-            recursive_reference = property.get("$ref")
-            if recursive_reference is not None:
-                reference = self._initialize_default_schema(
-                    recursive_reference, current_property
-                )
-            # else:
-            #    reference = None
-
-        return current_schema
 
     def _get_person_sync_profile(self, profile_name):
         try:
@@ -268,7 +185,7 @@ class Command(GoogleSyncCommandAbstract):
             # Inactivate Records Not Found
             missing_records = (
                 Person.objects.exclude(google_id__isnull=True)
-                .filter(type=sync_profile.person_type)
+                .filter(type=sync_profile.person_type, status__is_inactive=False)
                 .difference(Person.objects.filter(id__in=found_record_ids))
             )
 
