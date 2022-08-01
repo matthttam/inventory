@@ -56,8 +56,9 @@ class GooglePersonSyncProfileAdmin(admin.ModelAdmin):
 class GoogleDeviceMappingAdmin(admin.ModelAdmin):
     list_display = (
         "sync_profile",
-        "from_field_original",
+        "from_field",
         "to_field",
+        "matching_priority",
     )
 
 
@@ -113,7 +114,7 @@ class GoogleDefaultSchema(admin.ModelAdmin):
 @admin.register(GoogleDefaultSchemaProperty)
 class GoogleDefaultSchemaProperty(admin.ModelAdmin):
 
-    list_display = ("__str__", "etag", "type", "description")
+    list_display = ("schema", "__str__", "etag", "type", "description")
 
     def has_change_permission(self, request, obj=None):
         return False

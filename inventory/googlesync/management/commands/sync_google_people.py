@@ -40,21 +40,28 @@ class Command(GoogleSyncCommandAbstract):
             self._initialize_person_sync(force=force)
         elif command == "sync":
             profile_names = options.get("profiles")
-            # Get each sync profile based on profile names passed
-            self.sync_profiles = []
-            for profile_name in profile_names:
-                self.sync_profiles.append(self._get_person_sync_profile(profile_name))
-            self._sync_google_profiles(self.sync_profiles)
+            if profile_names:
+                # Get each sync profile based on profile names passed
+                self.sync_profiles = []
+                for profile_name in profile_names:
+                    self.sync_profiles.append(
+                        self._get_person_sync_profile(profile_name)
+                    )
+            else:
+                self.sync_profiles = list(GooglePersonSyncProfile.objects.all())
+            self._sync_google_people_profiles(self.sync_profiles)
         else:
             return False
 
         self.stdout.write(self.style.SUCCESS("Done"))
 
-    def _sync_google_profiles(self, sync_profiles: list[GooglePersonSyncProfile]):
+    def _sync_google_people_profiles(
+        self, sync_profiles: list[GooglePersonSyncProfile]
+    ):
         for sync_profile in sync_profiles:
-            self._sync_google_profile(sync_profile)
+            self._sync_google_people_profile(sync_profile)
 
-    def _sync_google_profile(self, sync_profile: GooglePersonSyncProfile):
+    def _sync_google_people_profile(self, sync_profile: GooglePersonSyncProfile):
         self.stdout.write(
             self.style.SUCCESS(f"Starting people sync: {sync_profile.name!r}")
         )
@@ -62,7 +69,7 @@ class Command(GoogleSyncCommandAbstract):
 
     @transaction.atomic
     def _initialize_person_sync(self, force):
-        """Gets all schema information and saves it to the database."""
+        """Gets all User related schema information and saves it to the database."""
         self.stdout.write(self.style.SUCCESS(f"Starting people sync initialization."))
         if self.google_config.get("person_initialized"):
             if not force:
@@ -75,7 +82,6 @@ class Command(GoogleSyncCommandAbstract):
             else:
                 self.stdout.write(self.style.WARNING(f"Forcing reinitialization."))
         # Delete any schemas already stored
-        GoogleCustomSchema.objects.all().delete()
         self._delete_default_schemas("User")
         self._initialize_default_schema("User")
         # self._initialize_person_sync_default_schema("UserName")

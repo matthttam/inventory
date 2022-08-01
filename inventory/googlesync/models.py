@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import reverse
 from people.models import Person, PersonType
+from django.db.models import Q
 
 
 class GoogleConfigAbstract(models.Model):
@@ -49,6 +50,7 @@ class GoogleServiceAccountConfig(GoogleConfigAbstract):
         max_length=255, help_text="Google domain name to connect to (e.g. my.site.com)"
     )
     person_initialized = models.BooleanField(default=False)
+    device_initialized = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.project_id}"
@@ -288,9 +290,6 @@ class GoogleDeviceSyncProfile(GoogleSyncProfileAbstract):
 
 class MappingAbstract(models.Model):
     sync_profile = None
-    from_field_original = models.CharField(
-        max_length=255, blank=True, null=True, default=None
-    )
     to_field = models.CharField(max_length=255, blank=True, null=True, default=None)
     matching_priority = models.IntegerField(
         choices=[(x, x) for x in range(1, 10)], blank=True, null=True
@@ -338,6 +337,27 @@ class GooglePersonMapping(MappingAbstract):
         return self.from_field.get_type()
 
 
+class GoogleDeviceMapping(MappingAbstract):
+    sync_profile = models.ForeignKey(
+        GoogleDeviceSyncProfile, on_delete=models.PROTECT, related_name="mappings"
+    )
+    from_field = models.ForeignKey(
+        GoogleDefaultSchemaProperty,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        default=None,
+        limit_choices_to=Q(schema__schema_id="ChromeOsDevice"),
+    )
+    to_field = models.CharField(
+        max_length=255,
+        choices=[(f.name, f.verbose_name) for f in GoogleDevice._meta.fields],
+    )
+
+    def get_absolute_url(self):
+        return reverse("googlesync:device_mapping", kwargs={"pk": self.pk})
+
+
 class GoogleDeviceLinkMapping(MappingAbstract):
     sync_profile = models.ForeignKey(
         GoogleDeviceSyncProfile, on_delete=models.PROTECT, related_name="link_mappings"
@@ -358,20 +378,6 @@ class GoogleDeviceLinkMapping(MappingAbstract):
             (f.name, f.verbose_name) for f in Device._meta.fields if f.name != "id"
         ],
     )
-
-
-class GoogleDeviceMapping(MappingAbstract):
-    sync_profile = models.ForeignKey(
-        GoogleDeviceSyncProfile, on_delete=models.PROTECT, related_name="mappings"
-    )
-    from_field = models.CharField(max_length=255, blank=True, null=True, default=None)
-    to_field = models.CharField(
-        max_length=255,
-        choices=[(f.name, f.verbose_name) for f in GoogleDevice._meta.fields],
-    )
-
-    def get_absolute_url(self):
-        return reverse("googlesync:device_mapping", kwargs={"pk": self.pk})
 
 
 class TranslationAbstract(models.Model):

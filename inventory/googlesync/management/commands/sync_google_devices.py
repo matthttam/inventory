@@ -10,7 +10,7 @@ from googlesync.models import (
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.db import transaction
-
+from googlesync.models import GoogleCustomSchema, GooglePersonSyncProfile
 from ._google_sync import GoogleSyncCommandAbstract
 from devices.models import DeviceManufacturer, DeviceModel, DeviceStatus
 
@@ -19,24 +19,83 @@ class Command(GoogleSyncCommandAbstract):
     help = "Syncs google devices to inventory devices."
 
     def add_arguments(self, parser):
-        parser.add_argument("profiles", nargs="+")
+        # parser.add_argument("profiles", nargs="+")
+        subparsers = parser.add_subparsers(
+            title="Command Options", help="", dest="command"
+        )
+        ### init command ###
+        init_subparser = subparsers.add_parser(
+            "init",
+            help="Initialize google device sync by pulling chrome os schema data from google.",
+        )
+        init_subparser.add_argument(
+            "--force",
+            action="store_true",
+            help="Used to reinitialize the google device schema.",
+        )
+        ### profiles command ###
+        sync_subparser = subparsers.add_parser(
+            "sync", help="Used to initiate a sync of all profiles."
+        )
+        sync_subparser.add_argument(
+            "profiles", nargs="*", help="List of device profiles to sync."
+        )
 
     def handle(self, *args, **options):
-        profile_names = options.get("profiles")
-
-        # Get each sync profile based on profile names passed
-        self.sync_profiles = []
-        for profile_name in profile_names:
-            self.sync_profiles.append(self._get_device_sync_profile(profile_name))
-
-        # Loop over each sync profile and sync people
-        for sync_profile in self.sync_profiles:
-            self.stdout.write(
-                self.style.NOTICE(f"Starting devices sync: {sync_profile.name}")
-            )
-            self.sync_google_devices(sync_profile)
-
+        command = options.get("command")
+        if command == "init":
+            force = options.get("force")
+            self._initilaize_device_sync(force=force)
+        elif command == "sync":
+            profile_names = options.get("profiles")
+            if profile_names:
+                # Get each sync profile based on profile names passed
+                self.sync_profiles = []
+                for profile_name in profile_names:
+                    self.sync_profiles.append(
+                        self._get_device_sync_profile(profile_name)
+                    )
+            else:
+                self.sync_profiles = list(GoogleDeviceSyncProfile.objects.all())
+            self._sync_google_device_profiles(self.sync_profiles)
+        else:
+            return False
         self.stdout.write(self.style.SUCCESS("Done"))
+
+    @transaction.atomic
+    def _initilaize_device_sync(self, force):
+        """Gets all Device related schema information and saves it to the database."""
+        self.stdout.write(self.style.SUCCESS(f"Starting device sync initialization."))
+        if self.google_config.get("device_initialized"):
+            if not force:
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"Google Device Sync already initialized. Use --force to override."
+                    )
+                )
+                return
+            else:
+                self.stdout.write(self.style.WARNING(f"Forcing reinitialization."))
+        # Delete any schemas already stored
+        self._delete_default_schemas("ChromeOsDevice")
+        self._initialize_default_schema("ChromeOsDevice")
+
+        # Set acocunt as initialized
+        google_config = self._get_google_config()
+        google_config.person_initialized = True
+        google_config.save()
+
+    def _sync_google_device_profiles(
+        self, sync_profiles: list[GoogleDeviceSyncProfile]
+    ):
+        for sync_profile in self.sync_profiles:
+            self._sync_google_device_profile(sync_profile)
+
+    def _sync_google_device_profile(self, sync_profile: GoogleDeviceSyncProfile):
+        self.stdout.write(
+            self.style.NOTICE(f"Starting devices sync: {sync_profile.name}")
+        )
+        self.sync_google_devices(sync_profile)
 
     def _get_device_sync_profile(self, profile_name):
         try:
@@ -61,7 +120,7 @@ class Command(GoogleSyncCommandAbstract):
             if not google_devices:
                 self.stdout.write(
                     self.style.WARNING(
-                        f"No users found with google query: {query!r} within org path: {org_unit_path!r}"
+                        f"No devices found with google query: {query!r} within org path: {org_unit_path!r}"
                     )
                 )
                 return None
@@ -187,9 +246,9 @@ class Command(GoogleSyncCommandAbstract):
         self, sync_profile: GoogleDeviceSyncProfile, google_devices: list
     ) -> list[GoogleDevice]:
         device_records = []
-        for google_user in google_devices:
+        for google_device in google_devices:
             device = self.convert_google_device_to_google_device(
-                sync_profile, google_user
+                sync_profile, google_device
             )
             if not device:
                 continue
