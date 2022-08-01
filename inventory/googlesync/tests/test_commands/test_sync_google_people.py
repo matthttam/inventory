@@ -48,12 +48,14 @@ class SyncGooglePeopleTest(TestCase):
     @patch.object(GooglePeopleSyncCommand, "sync_google_people")
     def test__get_person_sync_profile_invalid_names(self, mock_sync_google_people):
         with self.assertRaises(SyncProfileNotFound) as context:
-            call_command("sync_google_people", "random_profile")
+            call_command("sync_google_people", "sync", "random_profile")
         self.assertEqual(str(context.exception), "'random_profile' profile not found")
 
         GooglePersonSyncProfileFactory(name="real_sync_profile")
         with self.assertRaises(SyncProfileNotFound) as context:
-            call_command("sync_google_people", "real_sync_profile", "fake_sync_profile")
+            call_command(
+                "sync_google_people", "sync", "real_sync_profile", "fake_sync_profile"
+            )
         self.assertEqual(
             str(context.exception), "'fake_sync_profile' profile not found"
         )
@@ -70,7 +72,7 @@ class SyncGooglePeopleTest(TestCase):
             name="another_real_sync_profile"
         )
 
-        call_command("sync_google_people", "real_sync_profile")
+        call_command("sync_google_people", "sync", "real_sync_profile")
 
         mock_sync_google_people.assert_called_with(google_person_sync1)
         mock_sync_google_people.asssert_not_called_with(google_person_sync2)

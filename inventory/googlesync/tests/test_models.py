@@ -21,6 +21,7 @@ from .factories import (
 from googlesync.models import (
     GoogleConfigAbstract,
     GoogleConfig,
+    GoogleDefaultSchemaProperty,
     GoogleDeviceLinkMapping,
     GoogleServiceAccountConfig,
     GoogleSyncProfileAbstract,
@@ -534,8 +535,9 @@ class MappingAbstractTest(TestCase):
     @patch("googlesync.models.MappingAbstract._meta.abstract", set())
     @patch("googlesync.models.MappingAbstract.sync_profile", "profile_name")
     def test___str__(self):
+        google_default_schema_property = GoogleDefaultSchemaProperty()
         google_person_mapping = MappingAbstract(
-            from_field="from field", to_field="to field"
+            from_field=google_default_schema_property, to_field="to field"
         )
         self.assertEqual(
             google_person_mapping.__str__(),

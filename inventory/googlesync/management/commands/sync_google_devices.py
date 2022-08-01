@@ -1,18 +1,13 @@
 from googlesync.exceptions import SyncProfileNotFound
 
 from googlesync.models import (
-    GoogleDeviceMapping,
-    GoogleDeviceTranslation,
     GoogleDeviceSyncProfile,
     GoogleDevice,
 )
 
 from django.core.exceptions import ValidationError
-from django.db.models import Q
 from django.db import transaction
-from googlesync.models import GoogleCustomSchema, GooglePersonSyncProfile
 from ._google_sync import GoogleSyncCommandAbstract
-from devices.models import DeviceManufacturer, DeviceModel, DeviceStatus
 
 
 class Command(GoogleSyncCommandAbstract):
