@@ -73,7 +73,10 @@ class GoogleSyncCommandAbstract(BaseCommand):
         )
         return service.schemas()
 
-    def _get_service(self, scopes: list[str] | str):
+    def _get_schema_by_name(self, schema_name: str):
+        return self._get_service().resources()._schema.get(schema_name)
+
+    def _get_service(self, scopes: list[str] | str = []):
         """
         Returns a service discovery service with provided scopes
 

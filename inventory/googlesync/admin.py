@@ -5,17 +5,15 @@ from .models import (
     GoogleCustomSchema,
     GoogleCustomSchemaField,
     GoogleServiceAccountConfig,
-)
-from .models import (
     GooglePersonSyncProfile,
     GooglePersonTranslation,
     GooglePersonMapping,
-)
-from .models import (
     GoogleDeviceSyncProfile,
     GoogleDeviceTranslation,
     GoogleDeviceMapping,
     GoogleDevice,
+    GoogleDefaultSchema,
+    GoogleDefaultSchemaProperty,
 )
 
 
@@ -58,7 +56,7 @@ class GooglePersonSyncProfileAdmin(admin.ModelAdmin):
 class GoogleDeviceMappingAdmin(admin.ModelAdmin):
     list_display = (
         "sync_profile",
-        "from_field",
+        "from_field_original",
         "to_field",
     )
 
@@ -88,11 +86,34 @@ class GoogleCustomSchema(admin.ModelAdmin):
     # pass
     list_display = ("display_name",)
 
+    def has_change_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(GoogleCustomSchemaField)
 class GoogleCustomSchemaField(admin.ModelAdmin):
 
     list_display = ("display_name", "field_type", "indexed", "multi_valued")
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(GoogleDefaultSchema)
+class GoogleDefaultSchema(admin.ModelAdmin):
+    list_display = (
+        "schema_id",
+        "description",
+    )
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(GoogleDefaultSchemaProperty)
+class GoogleDefaultSchemaProperty(admin.ModelAdmin):
+
+    list_display = ("__str__", "etag", "type", "description")
 
     def has_change_permission(self, request, obj=None):
         return False
