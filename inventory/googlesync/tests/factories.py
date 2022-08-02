@@ -74,7 +74,7 @@ class GoogleCustomSchemaFactory(DjangoModelFactory):
     etag = fake.lexify(text="?" * 80)
 
 
-class GoogleCustomSchemaFactory(DjangoModelFactory):
+class GoogleCustomSchemaFieldFactory(DjangoModelFactory):
     class Meta:
         model = GoogleCustomSchemaField
 
