@@ -1,11 +1,19 @@
 import factory
 from faker import Faker
-from faker.providers import internet as InternetProvider, date_time as DateTimeProvider
+from faker.providers import (
+    internet as InternetProvider,
+    date_time as DateTimeProvider,
+    misc as MiscProvider,
+)
 from factory.django import DjangoModelFactory
 from zoneinfo import ZoneInfo
 from django.utils import timezone
 from googlesync.models import (
     GoogleConfig,
+    GoogleCustomSchema,
+    GoogleCustomSchemaField,
+    GoogleDefaultSchema,
+    GoogleDefaultSchemaProperty,
     GoogleDeviceLinkMapping,
     GoogleServiceAccountConfig,
     GooglePersonSyncProfile,
@@ -26,6 +34,7 @@ fake = Faker()
 Faker.seed(0)
 fake.add_provider(InternetProvider)
 fake.add_provider(DateTimeProvider)
+fake.add_provider(MiscProvider)
 
 tz = ZoneInfo(timezone.settings.TIME_ZONE)
 
@@ -53,6 +62,58 @@ class GoogleServiceAccountConfigFactory(DjangoModelFactory):
     target = fake.url()
 
 
+class GoogleCustomSchemaFactory(DjangoModelFactory):
+    class Meta:
+        model = GoogleCustomSchema
+
+    service_account_config = factory.SubFactory(GoogleServiceAccountConfigFactory)
+    schema_id = fake.lexify(text="?" * 30)
+    schema_name = fake.lexify(text="?" * 30)
+    display_name = fake.lexify(text="?" * 30)
+    kind = "admin#directory#schema"
+    etag = fake.lexify(text="?" * 80)
+
+
+class GoogleCustomSchemaFieldFactory(DjangoModelFactory):
+    class Meta:
+        model = GoogleCustomSchemaField
+
+    schema = factory.SubFactory(GoogleCustomSchemaFactory)
+    field_name = fake.lexify(text="?" * 30)
+    field_id = fake.lexify(text="?" * 30)
+    field_type = "STRING"
+    multi_valued = fake.boolean()
+    kind = fake.lexify(text="?" * 30)
+    etag = fake.lexify(text="?" * 30)
+    indexed = fake.boolean()
+    display_name = fake.lexify(text="?" * 30)
+    read_access_type = fake.lexify(text="?" * 30)
+    numeric_indexing_spec_min_value = None
+    numeric_indexing_spec_max_value = None
+
+
+class GoogleDefaultSchemaFactory(DjangoModelFactory):
+    class Meta:
+        model = GoogleDefaultSchema
+
+    service_account_config = factory.SubFactory(GoogleServiceAccountConfigFactory)
+    description = fake.lexify(text="?" * 200)
+    schema_id = "User"
+    type = "object"
+
+
+class GoogleDefaultSchemaPropertyFactory(DjangoModelFactory):
+    class Meta:
+        model = GoogleDefaultSchemaProperty
+
+    schema = factory.SubFactory(GoogleDefaultSchemaFactory)
+    parent = None
+    etag = fake.lexify(text="?" * 30)
+    format = fake.lexify(text="?" * 30)
+    type = "string"
+    description = fake.lexify(text="?" * 200)
+
+
 class GooglePersonSyncProfileFactory(DjangoModelFactory):
     class Meta:
         model = GooglePersonSyncProfile
@@ -70,7 +131,7 @@ class GooglePersonMappingFactory(DjangoModelFactory):
         model = GooglePersonMapping
 
     sync_profile = factory.SubFactory(GooglePersonSyncProfileFactory)
-    from_field = fake.lexify(text="?" * 30)
+    from_field = factory.SubFactory(GoogleDefaultSchemaPropertyFactory)
     to_field = fake.random_elements(
         elements=[f.name for f in Person._meta.fields if f.name != "id"],
         length=1,
@@ -103,7 +164,7 @@ class GoogleDeviceMappingFactory(DjangoModelFactory):
         model = GoogleDeviceMapping
 
     sync_profile = factory.SubFactory(GoogleDeviceSyncProfileFactory)
-    from_field = fake.lexify(text="?" * 30)
+    from_field = factory.SubFactory(GoogleDefaultSchemaPropertyFactory)
     to_field = fake.random_elements(
         elements=[f.name for f in Device._meta.fields if f.name != "id"],
     )[0]

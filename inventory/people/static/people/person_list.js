@@ -18,7 +18,7 @@ $(document).ready(function () {
             { name: 'internal_id', data: 'internal_id'},
             { name: 'type__name', data: 'type__name'},
             { name: 'status__name', data: 'status__name'},
-            { name: 'building_name_list', data: 'building_name_list', orderable: false},
+            { name: 'primary_building__name', data: 'primary_building__name'},
             getActionColumnDef(),
         ]
     });

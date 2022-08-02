@@ -1,13 +1,20 @@
+from datetime import datetime
+from typing import Any
+from unittest import mock
 from django.test import TestCase
 from django.db.models import UniqueConstraint
+from django.db import models
 
-from unittest.mock import patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 from people.tests.factories import PersonTypeFactory
 from people.models import PersonType, Person
 from devices.models import Device
 from .factories import (
     GoogleConfigFactory,
+    GoogleCustomSchemaFactory,
+    GoogleDefaultSchemaFactory,
+    GoogleDefaultSchemaPropertyFactory,
     GoogleDeviceLinkMappingFactory,
     GoogleServiceAccountConfigFactory,
     GooglePersonSyncProfileFactory,
@@ -17,10 +24,15 @@ from .factories import (
     GooglePersonTranslationFactory,
     GoogleDeviceTranslationFactory,
     GoogleDeviceFactory,
+    GoogleCustomSchemaFieldFactory,
 )
 from googlesync.models import (
     GoogleConfigAbstract,
     GoogleConfig,
+    GoogleCustomSchema,
+    GoogleCustomSchemaField,
+    GoogleDefaultSchema,
+    GoogleDefaultSchemaProperty,
     GoogleDeviceLinkMapping,
     GoogleServiceAccountConfig,
     GoogleSyncProfileAbstract,
@@ -157,73 +169,55 @@ class GoogleServiceAccountConfigTest(TestCase):
         GoogleServiceAccountConfigFactory()
 
     def setUp(self):
-        self.google_service_account_config = GoogleServiceAccountConfig.objects.get(
-            id=1
-        )
+        self.google_schema = GoogleServiceAccountConfig.objects.get(id=1)
 
     def test_subclass(self):
         self.assertTrue(issubclass(GoogleServiceAccountConfig, GoogleConfigAbstract))
 
     def test_type_label(self):
-        field_label = self.google_service_account_config._meta.get_field(
-            "type"
-        ).verbose_name
+        field_label = self.google_schema._meta.get_field("type").verbose_name
         self.assertEqual(field_label, "type")
 
     def test_type_max_length(self):
-        max_length = self.google_service_account_config._meta.get_field(
-            "type"
-        ).max_length
+        max_length = self.google_schema._meta.get_field("type").max_length
         self.assertEqual(max_length, 255)
 
     def test_type_default_value(self):
-        default = self.google_service_account_config._meta.get_field("type").default
+        default = self.google_schema._meta.get_field("type").default
         self.assertEqual(default, "service_account")
 
     def test_private_key_id_label(self):
-        field_label = self.google_service_account_config._meta.get_field(
-            "private_key_id"
-        ).verbose_name
+        field_label = self.google_schema._meta.get_field("private_key_id").verbose_name
         self.assertEqual(field_label, "private key id")
 
     def test_private_key_id_max_length(self):
-        max_length = self.google_service_account_config._meta.get_field(
-            "private_key_id"
-        ).max_length
+        max_length = self.google_schema._meta.get_field("private_key_id").max_length
         self.assertEqual(max_length, 255)
 
     def test_private_key_label(self):
-        field_label = self.google_service_account_config._meta.get_field(
-            "private_key"
-        ).verbose_name
+        field_label = self.google_schema._meta.get_field("private_key").verbose_name
         self.assertEqual(field_label, "private key")
 
     def test_private_key_max_length(self):
-        max_length = self.google_service_account_config._meta.get_field(
-            "private_key"
-        ).max_length
+        max_length = self.google_schema._meta.get_field("private_key").max_length
         self.assertEqual(max_length, 2048)
 
     def test_client_email_label(self):
-        field_label = self.google_service_account_config._meta.get_field(
-            "client_email"
-        ).verbose_name
+        field_label = self.google_schema._meta.get_field("client_email").verbose_name
         self.assertEqual(field_label, "client email")
 
     def test_client_email_max_length(self):
-        max_length = self.google_service_account_config._meta.get_field(
-            "client_email"
-        ).max_length
+        max_length = self.google_schema._meta.get_field("client_email").max_length
         self.assertEqual(max_length, 255)
 
     def test_client_x509_cert_url_label(self):
-        field_label = self.google_service_account_config._meta.get_field(
+        field_label = self.google_schema._meta.get_field(
             "client_x509_cert_url"
         ).verbose_name
         self.assertEqual(field_label, "client x509 cert url")
 
     def test_client_x509_cert_url_max_length(self):
-        max_length = self.google_service_account_config._meta.get_field(
+        max_length = self.google_schema._meta.get_field(
             "client_x509_cert_url"
         ).max_length
         self.assertEqual(max_length, 255)
@@ -231,50 +225,36 @@ class GoogleServiceAccountConfigTest(TestCase):
     def test_client_x509_cert_url_type_urlfield(self):
         self.assertEqual(
             type(
-                self.google_service_account_config._meta.get_field(
-                    "auth_provider_x509_cert_url"
-                )
+                self.google_schema._meta.get_field("auth_provider_x509_cert_url")
             ).__name__,
             "URLField",
         )
 
     def test_delegate_label(self):
-        field_label = self.google_service_account_config._meta.get_field(
-            "delegate"
-        ).verbose_name
+        field_label = self.google_schema._meta.get_field("delegate").verbose_name
         self.assertEqual(field_label, "delegate")
 
     def test_delegate_max_length(self):
-        max_length = self.google_service_account_config._meta.get_field(
-            "delegate"
-        ).max_length
+        max_length = self.google_schema._meta.get_field("delegate").max_length
         self.assertEqual(max_length, 255)
 
     def test_delegate_help_text(self):
-        help_text = self.google_service_account_config._meta.get_field(
-            "delegate"
-        ).help_text
+        help_text = self.google_schema._meta.get_field("delegate").help_text
         self.assertEqual(
             help_text,
             "User account to impersonate when accessing Google. User must have rights to the resources needed.",
         )
 
     def test_target_label(self):
-        field_label = self.google_service_account_config._meta.get_field(
-            "target"
-        ).verbose_name
+        field_label = self.google_schema._meta.get_field("target").verbose_name
         self.assertEqual(field_label, "target")
 
     def test_target_max_length(self):
-        max_length = self.google_service_account_config._meta.get_field(
-            "target"
-        ).max_length
+        max_length = self.google_schema._meta.get_field("target").max_length
         self.assertEqual(max_length, 255)
 
     def test_target_help_text(self):
-        help_text = self.google_service_account_config._meta.get_field(
-            "target"
-        ).help_text
+        help_text = self.google_schema._meta.get_field("target").help_text
         self.assertEqual(
             help_text,
             "Google domain name to connect to (e.g. my.site.com)",
@@ -282,19 +262,473 @@ class GoogleServiceAccountConfigTest(TestCase):
 
     ### Functions ###
     def test___str__(self):
-        google_service_account_config = GoogleServiceAccountConfigFactory(
+        google_schema = GoogleServiceAccountConfigFactory(
             private_key_id="test_project_id"
         )
         self.assertEqual(
-            google_service_account_config.__str__(),
-            f"{google_service_account_config.project_id}",
+            google_schema.__str__(),
+            f"{google_schema.project_id}",
         )
 
     def test_get_absolute_url(self):
         self.assertEqual(
-            self.google_service_account_config.get_absolute_url(),
+            self.google_schema.get_absolute_url(),
             "/googlesync/serviceaccount/",
         )
+
+
+class GoogleCustomSchemaTest(TestCase):
+    # service_account_config
+    def test_service_account_config_foreign_key(self):
+        self.assertEqual(
+            GoogleCustomSchema._meta.get_field("service_account_config").related_model,
+            GoogleServiceAccountConfig,
+        )
+
+    # schema_id
+    def test_schema_id_label(self):
+        field_label = GoogleCustomSchema._meta.get_field("schema_id").verbose_name
+        self.assertEqual(field_label, "schema id")
+
+    def test_schema_id_max_length(self):
+        max_length = GoogleCustomSchema._meta.get_field("schema_id").max_length
+        self.assertEqual(max_length, 255)
+
+    # schema_name
+    def test_schema_name_label(self):
+        field_label = GoogleCustomSchema._meta.get_field("schema_name").verbose_name
+        self.assertEqual(field_label, "schema name")
+
+    def test_schema_name_max_length(self):
+        max_length = GoogleCustomSchema._meta.get_field("schema_name").max_length
+        self.assertEqual(max_length, 255)
+
+    # display_name
+    def test_display_name_label(self):
+        field_label = GoogleCustomSchema._meta.get_field("display_name").verbose_name
+        self.assertEqual(field_label, "display name")
+
+    def test_display_name_max_length(self):
+        max_length = GoogleCustomSchema._meta.get_field("display_name").max_length
+        self.assertEqual(max_length, 255)
+
+    # kind
+    def test_kind_label(self):
+        field_label = GoogleCustomSchema._meta.get_field("kind").verbose_name
+        self.assertEqual(field_label, "kind")
+
+    def test_kind_max_length(self):
+        max_length = GoogleCustomSchema._meta.get_field("kind").max_length
+        self.assertEqual(max_length, 255)
+
+    # etag
+    def test_etag_label(self):
+        field_label = GoogleCustomSchema._meta.get_field("etag").verbose_name
+        self.assertEqual(field_label, "etag")
+
+    def test_etag_max_length(self):
+        max_length = GoogleCustomSchema._meta.get_field("etag").max_length
+        self.assertEqual(max_length, 255)
+
+
+class GoogleCustomSchemaFieldTest(TestCase):
+    # schema
+    def test_schema_foreign_key(self):
+        self.assertEqual(
+            GoogleCustomSchemaField._meta.get_field("schema").related_model,
+            GoogleCustomSchema,
+        )
+
+    # field_name
+    def test_field_name_label(self):
+        field_label = GoogleCustomSchemaField._meta.get_field("field_name").verbose_name
+        self.assertEqual(field_label, "field name")
+
+    def test_field_name_max_length(self):
+        max_length = GoogleCustomSchemaField._meta.get_field("field_name").max_length
+        self.assertEqual(max_length, 255)
+
+    # field_id
+    def test_field_id_label(self):
+        field_label = GoogleCustomSchemaField._meta.get_field("field_id").verbose_name
+        self.assertEqual(field_label, "field id")
+
+    def test_field_id_max_length(self):
+        max_length = GoogleCustomSchemaField._meta.get_field("field_id").max_length
+        self.assertEqual(max_length, 255)
+
+    # field_type
+    def test_field_type_label(self):
+        field_label = GoogleCustomSchemaField._meta.get_field("field_type").verbose_name
+        self.assertEqual(field_label, "field type")
+
+    def test_field_type_max_length(self):
+        max_length = GoogleCustomSchemaField._meta.get_field("field_type").max_length
+        self.assertEqual(max_length, 255)
+
+    # multi_valued
+    def test_multi_valued_label(self):
+        field_label = GoogleCustomSchemaField._meta.get_field(
+            "multi_valued"
+        ).verbose_name
+        self.assertEqual(field_label, "multi valued")
+
+    def test_multi_valued_default(self):
+        default = GoogleCustomSchemaField._meta.get_field("multi_valued").default
+        self.assertFalse(default, msg="multi_valued defualt is expected to be False")
+
+    # kind
+    def test_kind_label(self):
+        field_label = GoogleCustomSchemaField._meta.get_field("kind").verbose_name
+        self.assertEqual(field_label, "kind")
+
+    def test_kind_max_length(self):
+        max_length = GoogleCustomSchemaField._meta.get_field("kind").max_length
+        self.assertEqual(max_length, 255)
+
+    # etag
+    def test_etag_label(self):
+        field_label = GoogleCustomSchemaField._meta.get_field("etag").verbose_name
+        self.assertEqual(field_label, "etag")
+
+    def test_etag_max_length(self):
+        max_length = GoogleCustomSchemaField._meta.get_field("etag").max_length
+        self.assertEqual(max_length, 255)
+
+    # indexed
+    def test_indexed_label(self):
+        field_label = GoogleCustomSchemaField._meta.get_field("indexed").verbose_name
+        self.assertEqual(field_label, "indexed")
+
+    def test_indexed_default(self):
+        default = GoogleCustomSchemaField._meta.get_field("indexed").default
+        self.assertFalse(default, msg="indexed defualt is expected to be False")
+
+    # display_name
+    def test_display_name_label(self):
+        field_label = GoogleCustomSchemaField._meta.get_field(
+            "display_name"
+        ).verbose_name
+        self.assertEqual(field_label, "display name")
+
+    def test_display_name_max_length(self):
+        max_length = GoogleCustomSchemaField._meta.get_field("display_name").max_length
+        self.assertEqual(max_length, 255)
+
+    # read_access_type
+    def test_read_access_type_label(self):
+        field_label = GoogleCustomSchemaField._meta.get_field(
+            "read_access_type"
+        ).verbose_name
+        self.assertEqual(field_label, "read access type")
+
+    def test_read_access_type_max_length(self):
+        max_length = GoogleCustomSchemaField._meta.get_field(
+            "read_access_type"
+        ).max_length
+        self.assertEqual(max_length, 255)
+
+    # numeric_indexing_spec_min_value
+    def numeric_indexing_spec_min_value_optional(self):
+        blank = GoogleCustomSchemaField._meta.get_field(
+            "numeric_indexing_spec_min_value"
+        ).blank
+        null = GoogleCustomSchemaField._meta.get_field(
+            "numeric_indexing_spec_min_value"
+        ).null
+        self.assertTrue(blank)
+        self.assertTrue(null)
+
+    # numeric_indexing_spec_max_value
+    def numeric_indexing_spec_max_value_optional(self):
+        blank = GoogleCustomSchemaField._meta.get_field(
+            "numeric_indexing_spec_max_value"
+        ).blank
+        null = GoogleCustomSchemaField._meta.get_field(
+            "numeric_indexing_spec_max_value"
+        ).null
+        self.assertTrue(blank)
+        self.assertTrue(null)
+
+    ### Functions ###
+    @patch.object(GoogleCustomSchemaField, "__str__")
+    def test___str__(self, mock___str___command):
+        mock___str___command.return_value = "dot.notation.example"
+        custom_schema_field = GoogleCustomSchemaFieldFactory()
+
+        self.assertEqual(str(custom_schema_field), "dot.notation.example")
+
+    def test_get_type(self):
+        regular_BOOL = GoogleCustomSchemaFieldFactory(
+            etag="custom_etag", field_type="BOOL"
+        )
+        regular_DATE = GoogleCustomSchemaFieldFactory(
+            etag="custom_etag", field_type="DATE"
+        )
+        regular_DOUBLE = GoogleCustomSchemaFieldFactory(
+            etag="custom_etag", field_type="DOUBLE"
+        )
+        regular_EMAIL = GoogleCustomSchemaFieldFactory(
+            etag="custom_etag", field_type="EMAIL"
+        )
+        regular_INT64 = GoogleCustomSchemaFieldFactory(
+            etag="custom_etag", field_type="INT64"
+        )
+        regular_PHONE = GoogleCustomSchemaFieldFactory(
+            etag="custom_etag", field_type="PHONE"
+        )
+        regular_STRING = GoogleCustomSchemaFieldFactory(
+            etag="custom_etag", field_type="STRING"
+        )
+
+        self.assertEqual(regular_BOOL.get_type(), bool)
+        self.assertEqual(regular_DATE.get_type(), datetime)
+        self.assertEqual(regular_DOUBLE.get_type(), float)
+        self.assertEqual(regular_EMAIL.get_type(), str)
+        self.assertEqual(regular_INT64.get_type(), int)
+        self.assertEqual(regular_PHONE.get_type(), str)
+        self.assertEqual(regular_STRING.get_type(), str)
+
+
+class GoogleDefaultSchemaTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        GoogleDefaultSchemaFactory(schema_id=1)
+
+    def setUp(self):
+        self.google_default_schema = GoogleDefaultSchema.objects.get(schema_id=1)
+        self.service_account_config = self.google_default_schema._meta.get_field(
+            "service_account_config"
+        )
+        self.description = self.google_default_schema._meta.get_field("description")
+        self.schema_id = self.google_default_schema._meta.get_field("schema_id")
+        self.type = self.google_default_schema._meta.get_field("type")
+
+    # service_account_config
+    def test_service_account_config_foreign_key(self):
+        self.assertEqual(
+            self.service_account_config.related_model,
+            GoogleServiceAccountConfig,
+        )
+
+    # description
+    def test_description_label(self):
+        field_label = self.description.verbose_name
+        self.assertEqual(field_label, "description")
+
+    def test_description_max_length(self):
+        max_length = self.description.max_length
+        self.assertEqual(max_length, 1024)
+
+    def test_description_optional(self):
+        blank = self.description.blank
+        null = self.description.null
+        self.assertTrue(blank)
+        self.assertTrue(null)
+
+    # schema_id
+    def test_schema_id_label(self):
+        field_label = self.schema_id.verbose_name
+        self.assertEqual(field_label, "schema id")
+
+    def test_schema_id_max_length(self):
+        max_length = self.schema_id.max_length
+        self.assertEqual(max_length, 255)
+
+    # type
+    def test_type_label(self):
+        field_label = self.type.verbose_name
+        self.assertEqual(field_label, "type")
+
+    def test_type_max_length(self):
+        max_length = self.type.max_length
+        self.assertEqual(max_length, 255)
+
+    def test___str__(self):
+        self.assertEqual(
+            self.google_default_schema.__str__(), self.google_default_schema.schema_id
+        )
+
+
+class GoogleDefaultSchemaPropertyTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        GoogleDefaultSchemaPropertyFactory(etag="test")
+
+    def setUp(self):
+        self.google_default_schema_property = GoogleDefaultSchemaProperty.objects.get(
+            etag="test"
+        )
+        self.schema = self.google_default_schema_property._meta.get_field("schema")
+        self.parent = self.google_default_schema_property._meta.get_field("parent")
+        self.etag = self.google_default_schema_property._meta.get_field("etag")
+        self.format = self.google_default_schema_property._meta.get_field("format")
+        self.type = self.google_default_schema_property._meta.get_field("type")
+        self.description = self.google_default_schema_property._meta.get_field(
+            "description"
+        )
+
+    # schema
+    def test_schema_foreign_key(self):
+        self.assertEqual(
+            self.schema.related_model,
+            GoogleDefaultSchema,
+        )
+
+    # parent
+    def test_parent_foreign_key(self):
+        self.assertEqual(
+            self.parent.related_model,
+            GoogleDefaultSchemaProperty,
+        )
+
+    # etag
+    def test_etag_label(self):
+        field_label = self.etag.verbose_name
+        self.assertEqual(field_label, "etag")
+
+    def test_etag_max_length(self):
+        max_length = self.etag.max_length
+        self.assertEqual(max_length, 255)
+
+    # format
+    def test_format_label(self):
+        field_label = self.format.verbose_name
+        self.assertEqual(field_label, "format")
+
+    def test_format_max_length(self):
+        max_length = self.format.max_length
+        self.assertEqual(max_length, 255)
+
+    def test_format_optional(self):
+        blank = self.format.blank
+        null = self.format.null
+        self.assertTrue(blank)
+        self.assertTrue(null)
+
+    # type
+    def test_type_label(self):
+        field_label = self.type.verbose_name
+        self.assertEqual(field_label, "type")
+
+    def test_type_max_length(self):
+        max_length = self.type.max_length
+        self.assertEqual(max_length, 255)
+
+    def test_type_optional(self):
+        blank = self.type.blank
+        null = self.type.null
+        self.assertTrue(blank)
+        self.assertTrue(null)
+
+    # description
+    def test_description_label(self):
+        field_label = self.description.verbose_name
+        self.assertEqual(field_label, "description")
+
+    def test_description_max_length(self):
+        max_length = self.description.max_length
+        self.assertEqual(max_length, 1024)
+
+    def test_description_optional(self):
+        blank = self.description.blank
+        null = self.description.null
+        self.assertTrue(blank)
+        self.assertTrue(null)
+
+    ### Functions ###
+    def test___str__(self):
+        with patch.object(
+            GoogleDefaultSchemaProperty,
+            "dot_notation",
+            "test.dot.notation",
+        ):
+            default_schema_property = GoogleDefaultSchemaPropertyFactory()
+            test = default_schema_property.__str__()
+            self.assertEqual(test, "test.dot.notation")
+
+    def test_is_custom(self):
+        custom_parent = GoogleDefaultSchemaPropertyFactory(etag="customSchemas")
+        regular = GoogleDefaultSchemaPropertyFactory(etag="test")
+        custom = GoogleDefaultSchemaPropertyFactory(
+            etag="test_custom", parent=custom_parent
+        )
+        self.assertTrue(custom.is_custom)
+        self.assertFalse(regular.is_custom)
+
+    def test_get_custom_field(self):
+        custom_schema_field = GoogleCustomSchemaFieldFactory(etag="custom_etag")
+        custom_parent = GoogleDefaultSchemaPropertyFactory(etag="customSchemas")
+        regular = GoogleDefaultSchemaPropertyFactory(etag="custom_etag")
+        custom = GoogleDefaultSchemaPropertyFactory(
+            etag="custom_etag", parent=custom_parent
+        )
+        self.assertIsNone(regular.get_custom_field())
+        self.assertEqual(custom.get_custom_field(), custom_schema_field)
+
+    def test_dot_notation(self):
+
+        default_schema = GoogleDefaultSchemaFactory(schema_id="schema_id")
+        default_schema_property = GoogleDefaultSchemaPropertyFactory(
+            etag="customSchemas", schema=default_schema
+        )
+        custom_schema = GoogleCustomSchemaFactory(
+            schema_id="custom_schema_id", schema_name="custom_schema_name"
+        )
+        custom_schema_field = GoogleCustomSchemaFieldFactory(
+            schema=custom_schema, etag="custom_etag", field_name="custom_field_name"
+        )
+        with patch.object(
+            default_schema_property, "get_custom_field", custom_schema_field
+        ):
+            regular = GoogleDefaultSchemaPropertyFactory(etag="custom_etag")
+
+            custom = GoogleDefaultSchemaPropertyFactory(
+                etag="custom_etag", parent=default_schema_property
+            )
+
+            self.assertEqual(regular.dot_notation, "custom_etag")
+            self.assertEqual(
+                custom.dot_notation,
+                "customSchemas.custom_schema_name.custom_field_name",
+            )
+
+    def test_get_type(self):
+        custom_schema_field = GoogleCustomSchemaFieldFactory(etag="custom_etag")
+        custom_parent = GoogleDefaultSchemaPropertyFactory(etag="customSchemas")
+        regular_string = GoogleDefaultSchemaPropertyFactory(
+            etag="custom_etag", type="string"
+        )
+        regular_boolean = GoogleDefaultSchemaPropertyFactory(
+            etag="custom_etag", type="boolean"
+        )
+        regular_array = GoogleDefaultSchemaPropertyFactory(
+            etag="custom_etag", type="array"
+        )
+        regular_any = GoogleDefaultSchemaPropertyFactory(etag="custom_etag", type="any")
+
+        default_schema_property = GoogleDefaultSchemaPropertyFactory(
+            etag="custom_etag", parent=custom_parent
+        )
+
+        self.assertEqual(regular_string.get_type(), str)
+        self.assertEqual(regular_boolean.get_type(), bool)
+        self.assertEqual(regular_array.get_type(), list)
+        self.assertEqual(regular_any.get_type(), Any)
+
+        my_mock_type = mock.Mock()
+        my_mock = mock.Mock(**{"get_type": my_mock_type})
+        with patch.object(
+            default_schema_property,
+            "get_custom_field",
+            return_value=my_mock,
+        ):
+            test = default_schema_property.get_type()
+            my_mock.get_type.assert_called()
+
+
+class GoogleDeviceTest(TestCase):
+    pass
 
 
 class GoogleSyncProfileAbstractTest(TestCase):
@@ -309,7 +743,7 @@ class GoogleSyncProfileAbstractTest(TestCase):
         max_length = GoogleSyncProfileAbstract._meta.get_field("name").max_length
         self.assertEqual(max_length, 255)
 
-    def test_google_service_account_config_foreign_key(self):
+    def test_google_schema_foreign_key(self):
         self.assertEqual(
             GoogleSyncProfileAbstract._meta.get_field(
                 "google_service_account_config"
@@ -479,14 +913,6 @@ class MappingAbstractTest(TestCase):
     def test_is_abstract(self):
         self.assertTrue(MappingAbstract._meta.abstract)
 
-    def test_from_field_label(self):
-        field_label = MappingAbstract._meta.get_field("from_field").verbose_name
-        self.assertEqual(field_label, "from field")
-
-    def test_from_field_max_length(self):
-        max_length = MappingAbstract._meta.get_field("from_field").max_length
-        self.assertEqual(max_length, 255)
-
     def test_to_field_label(self):
         field_label = MappingAbstract._meta.get_field("to_field").verbose_name
         self.assertEqual(field_label, "to field")
@@ -533,14 +959,33 @@ class MappingAbstractTest(TestCase):
     ### Functions ###
     @patch("googlesync.models.MappingAbstract._meta.abstract", set())
     @patch("googlesync.models.MappingAbstract.sync_profile", "profile_name")
+    # @patch("googlesync.models.MappingAbstract.sync_profile", "from_field", create=True)
+    # @patch("googlesync.models.MappingAbstract")
     def test___str__(self):
-        google_person_mapping = MappingAbstract(
-            from_field="from field", to_field="to field"
-        )
-        self.assertEqual(
-            google_person_mapping.__str__(),
-            "profile_name: from field => to field",
-        )
+        # mock_mapping_abstract.from_field = "from_field"
+
+        mapping_abstract = MappingAbstract(to_field="to field")
+        with patch.object(
+            mapping_abstract,
+            "from_field",
+            "from field",
+            create=True,
+        ):
+
+            # print(mock_mapping_abstract.from_field)
+            # self.assertEqual(mock_mapping_abstract.from_field, "from_field")
+            # mock_mapping_abstract = MagicMock(MappingAbstract)
+            ## with patch.object(MappingAbstract) as a:
+            # mock_mapping_abstract.from_field = "from field"
+            # mock_mapping_abstract.to_field = "to field"
+            # mock_mapping_abstract.sync_profile = "profile_name"
+            # mock_mapping_abstract.from_field.name.return_value = "from field"
+            # google_default_schema_property = GoogleDefaultSchemaProperty()
+            # google_person_mapping = MappingAbstract(to_field="to field")
+            self.assertEqual(
+                mapping_abstract.__str__(),
+                "profile_name: from field => to field",
+            )
 
 
 class GooglePersonMappingTest(TestCase):
@@ -554,10 +999,18 @@ class GooglePersonMappingTest(TestCase):
     def test_subclass(self):
         self.assertTrue(issubclass(GooglePersonMapping, MappingAbstract))
 
+    # sync_profile
     def test_sync_profile_foreign_key(self):
         self.assertEqual(
             self.google_person_mapping._meta.get_field("sync_profile").related_model,
             GooglePersonSyncProfile,
+        )
+
+    # from_field
+    def test_from_field_foreign_key(self):
+        self.assertEqual(
+            self.google_person_mapping._meta.get_field("from_field").related_model,
+            GoogleDefaultSchemaProperty,
         )
 
     def test_translations_related_name(self):
@@ -606,10 +1059,18 @@ class GoogleDeviceMappingTest(TestCase):
     def test_subclass(self):
         self.assertTrue(issubclass(GoogleDeviceMapping, MappingAbstract))
 
+    # sync_profile
     def test_sync_profile_foreign_key(self):
         self.assertEqual(
             self.google_device_mapping._meta.get_field("sync_profile").related_model,
             GoogleDeviceSyncProfile,
+        )
+
+    # from_field
+    def test_from_field_foreign_key(self):
+        self.assertEqual(
+            self.google_device_mapping._meta.get_field("from_field").related_model,
+            GoogleDefaultSchemaProperty,
         )
 
     def test_translations_related_name(self):

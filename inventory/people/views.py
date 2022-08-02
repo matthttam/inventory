@@ -43,7 +43,7 @@ class PersonDatatableServerSideProcessingView(
         "internal_id",
         "type__name",
         "status__name",
-        "building_name_list",
+        "primary_building__name",
     ]
 
 
@@ -62,7 +62,7 @@ class PersonListView(PermissionRequiredMixin, TemplateView):
                     "Internal ID",
                     "Type",
                     "Status",
-                    "Buildings",
+                    "Building",
                     "Actions",
                 ],
             }
