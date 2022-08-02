@@ -68,16 +68,25 @@ class SyncGoogleDevicesTest(TestCase):
             GoogleDevicesSyncCommand.help, "Syncs google devices to inventory devices."
         )
 
+    def test__sync_google_device_profiles(self):
+        self.skipTest("Need to test")
+
+    def test__sync_google_device_profile(self):
+        self.skipTest("Need to test")
+
+    def test__initilaize_device_sync(self):
+        self.skipTest("Need to test")
+
     @patch.object(GoogleDevicesSyncCommand, "sync_google_devices")
     def test__get_device_sync_profile_invalid_names(self, mock_sync_google_devices):
         with self.assertRaises(SyncProfileNotFound) as context:
-            call_command("sync_google_devices", "random_profile")
+            call_command("sync_google_devices", "sync", "random_profile")
         self.assertEqual(str(context.exception), "'random_profile' profile not found")
 
         GoogleDeviceSyncProfileFactory(name="real_sync_profile")
         with self.assertRaises(SyncProfileNotFound) as context:
             call_command(
-                "sync_google_devices", "real_sync_profile", "fake_sync_profile"
+                "sync_google_devices", "sync", "real_sync_profile", "fake_sync_profile"
             )
         self.assertEqual(
             str(context.exception), "'fake_sync_profile' profile not found"
@@ -95,14 +104,17 @@ class SyncGoogleDevicesTest(TestCase):
             name="another_real_sync_profile"
         )
 
-        call_command("sync_google_devices", "real_sync_profile")
+        call_command("sync_google_devices", "sync", "real_sync_profile")
 
         mock_sync_google_devices.assert_called_with(google_device_sync1)
         mock_sync_google_devices.asssert_not_called_with(google_device_sync2)
 
         mock_sync_google_devices.reset_mock()
         call_command(
-            "sync_google_devices", "real_sync_profile", "another_real_sync_profile"
+            "sync_google_devices",
+            "sync",
+            "real_sync_profile",
+            "another_real_sync_profile",
         )
         self.assertEqual(mock_sync_google_devices.call_count, 2)
 

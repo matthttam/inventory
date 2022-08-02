@@ -43,6 +43,15 @@ class SyncGooglePeopleTest(TestCase):
             GooglePeopleSyncCommand.help, "Syncs google users to inventory people."
         )
 
+    def test__sync_google_people_profiles(self):
+        self.skipTest("Need to test")
+
+    def test__sync_google_people_profile(self):
+        self.skipTest("Need to test")
+
+    def test__initialize_person_sync(self):
+        self.skipTest("Need to test")
+
     @patch.object(GooglePeopleSyncCommand, "sync_google_people")
     def test__get_person_sync_profile_invalid_names(self, mock_sync_google_people):
         with self.assertRaises(SyncProfileNotFound) as context:
