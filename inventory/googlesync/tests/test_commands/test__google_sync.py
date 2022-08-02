@@ -103,7 +103,7 @@ class GoogleSyncTest(TestCase):
     def test__get_customer_service(self):
         mock_resource = Mock()
         mock_service = Mock()
-        mock_service.users.return_value = mock_resource
+        mock_service.customers.return_value = mock_resource
 
         with patch.object(
             GoogleSyncCommandAbstract, "_get_service", return_value=mock_service
@@ -113,7 +113,7 @@ class GoogleSyncTest(TestCase):
             mock_get_service.assert_called_with(
                 "https://www.googleapis.com/auth/admin.directory.customer.readonly"
             )
-            mock_service.chromeosdevices.assert_called()
+            mock_service.customers.assert_called()
             self.assertEqual(return_value, mock_resource)
 
     def test__get_chromeosdevices_service(self):
@@ -127,7 +127,10 @@ class GoogleSyncTest(TestCase):
             command = GoogleSyncCommandAbstract()
             return_value = command._get_chromeosdevices_service()
             mock_get_service.assert_called_with(
-                "https://www.googleapis.com/auth/admin.directory.user.readonly"
+                [
+                    "https://www.googleapis.com/auth/admin.directory.device.chromeos.readonly",
+                    "https://www.googleapis.com/auth/admin.directory.device.chromeos",
+                ]
             )
             mock_service.chromeosdevices.assert_called()
             self.assertEqual(return_value, mock_resource)
@@ -151,7 +154,7 @@ class GoogleSyncTest(TestCase):
     def test__get_schemas_service(self):
         mock_resource = Mock()
         mock_service = Mock()
-        mock_service.users.return_value = mock_resource
+        mock_service.schemas.return_value = mock_resource
 
         with patch.object(
             GoogleSyncCommandAbstract, "_get_service", return_value=mock_service
@@ -295,13 +298,13 @@ class GoogleSyncTest(TestCase):
         self.assertEqual(return_value, expected_output)
 
     def test__convert_to_type(self):
-        pass
+        self.skipTest("Need to test")
 
     def test__initialize_custom_schemas(self):
-        pass
+        self.skipTest("Need to test")
 
     def test__delete_default_schemas(self):
-        pass
+        self.skipTest("Need to test")
 
     def test__initialize_default_schema(self):
-        pass
+        self.skipTest("Need to test")

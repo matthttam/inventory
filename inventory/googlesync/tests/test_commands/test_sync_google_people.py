@@ -3,8 +3,6 @@ from unittest.mock import Mock, call, patch
 from django.core.management import call_command
 from django.forms import model_to_dict
 from django.test import TestCase
-from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import Resource
 from googlesync.exceptions import SyncProfileNotFound
 from googlesync.management.commands._google_sync import GoogleSyncCommandAbstract
 from googlesync.management.commands.sync_google_people import (
@@ -79,7 +77,10 @@ class SyncGooglePeopleTest(TestCase):
 
         mock_sync_google_people.reset_mock()
         call_command(
-            "sync_google_people", "real_sync_profile", "another_real_sync_profile"
+            "sync_google_people",
+            "sync",
+            "real_sync_profile",
+            "another_real_sync_profile",
         )
         self.assertEqual(mock_sync_google_people.call_count, 2)
 
