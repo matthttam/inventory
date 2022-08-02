@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 from devices.models import Device
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -128,6 +129,25 @@ class GoogleCustomSchemaField(models.Model):
         """Return a dot notation path for this custom schema field"""
         return f"{self.schema.schema_name}.{self.field_name}"
 
+    def get_type(self):
+
+        if self.field_type == "BOOL":
+            return bool
+        elif self.field_type == "DATE":
+            return datetime
+        elif self.field_type == "DOUBLE":
+            return float
+        elif self.field_type == "EMAIL":
+            return str
+        elif self.field_type == "INT64":
+            return int
+        elif self.field_type == "PHONE":
+            return str
+        elif self.field_type == "STRING":
+            return str
+        else:
+            raise TypeError()
+
 
 class GoogleDefaultSchema(models.Model):
     """
@@ -194,7 +214,9 @@ class GoogleDefaultSchemaProperty(models.Model):
         return self.parent and self.parent.etag == "customSchemas"
 
     def get_custom_field(self):
-        return GoogleCustomSchemaField.objects.get(etag=self.etag)
+        if self.is_custom:
+            return GoogleCustomSchemaField.objects.get(etag=self.etag)
+        return None
 
     @property
     def dot_notation(self) -> str:
@@ -213,8 +235,8 @@ class GoogleDefaultSchemaProperty(models.Model):
 
     def get_type(self):
         if self.is_custom:
-            ### Need to return
-            return str
+            related_custom_field = self.get_custom_field()
+            return related_custom_field.get_type()
         elif self.type == "string":
             return str
         elif self.type == "boolean":
