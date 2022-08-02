@@ -100,89 +100,96 @@ class GoogleSyncTest(TestCase):
 
         self.assertEqual(return_value, mock_request_execute_result)
 
-    @patch("googleapiclient.discovery.build")
-    @patch.object(GoogleSyncCommandAbstract, "_get_google_credentials")
-    def test__get_customer_service(
-        self, mock__get_google_credentials, mock_googleapiclient_discovery_build
-    ):
-
-        mock_credentials = Mock(Credentials)
+    def test__get_customer_service(self):
         mock_resource = Mock()
-        mock_customer_resource = Mock()
-
-        mock__get_google_credentials.return_value = mock_credentials
-        mock_googleapiclient_discovery_build.return_value = mock_resource
-        mock_resource.customers.return_value = mock_customer_resource
-
-        command = GoogleSyncCommandAbstract()
-        return_value = command._get_customer_service()
-
-        mock__get_google_credentials.assert_called_with(
-            scopes=["https://www.googleapis.com/auth/admin.directory.customer.readonly"]
-        )
-        mock_googleapiclient_discovery_build.assert_called_with(
-            "admin", "directory_v1", credentials=mock_credentials
-        )
-        mock_resource.customers.assert_called()
-        self.assertEqual(return_value, mock_customer_resource)
-
-    @patch("googleapiclient.discovery.build")
-    @patch.object(GoogleSyncCommandAbstract, "_get_google_credentials")
-    def test__get_chromeosdevices_service(
-        self, mock__get_google_credentials, mock_googleapiclient_discovery_build
-    ):
-        # Mock Basic Credentials
-        mock_credentials = Mock(Credentials)
         mock_service = Mock()
-        mock_chromeosdevices_resource = Mock()
+        mock_service.users.return_value = mock_resource
 
-        mock__get_google_credentials.return_value = mock_credentials
-        mock_googleapiclient_discovery_build.return_value = mock_service
-        mock_service.chromeosdevices.return_value = mock_chromeosdevices_resource
+        with patch.object(
+            GoogleSyncCommandAbstract, "_get_service", return_value=mock_service
+        ) as mock_get_service:
+            command = GoogleSyncCommandAbstract()
+            return_value = command._get_customer_service()
+            mock_get_service.assert_called_with(
+                "https://www.googleapis.com/auth/admin.directory.customer.readonly"
+            )
+            mock_service.chromeosdevices.assert_called()
+            self.assertEqual(return_value, mock_resource)
 
-        command = GoogleSyncCommandAbstract()
-        return_value = command._get_chromeosdevices_service()
+    def test__get_chromeosdevices_service(self):
+        mock_resource = Mock()
+        mock_service = Mock()
+        mock_service.chromeosdevices.return_value = mock_resource
 
-        mock__get_google_credentials.assert_called_with(
-            scopes=[
-                "https://www.googleapis.com/auth/admin.directory.device.chromeos.readonly",
-                "https://www.googleapis.com/auth/admin.directory.device.chromeos",
-            ]
-        )
-        mock_googleapiclient_discovery_build.assert_called_with(
-            "admin", "directory_v1", credentials=mock_credentials
-        )
-        mock_service.chromeosdevices.assert_called_with()
-        self.assertEqual(return_value, mock_chromeosdevices_resource)
+        with patch.object(
+            GoogleSyncCommandAbstract, "_get_service", return_value=mock_service
+        ) as mock_get_service:
+            command = GoogleSyncCommandAbstract()
+            return_value = command._get_chromeosdevices_service()
+            mock_get_service.assert_called_with(
+                "https://www.googleapis.com/auth/admin.directory.user.readonly"
+            )
+            mock_service.chromeosdevices.assert_called()
+            self.assertEqual(return_value, mock_resource)
+
+    def test__get_users_service(self):
+        mock_resource = Mock()
+        mock_service = Mock()
+        mock_service.users.return_value = mock_resource
+
+        with patch.object(
+            GoogleSyncCommandAbstract, "_get_service", return_value=mock_service
+        ) as mock_get_service:
+            command = GoogleSyncCommandAbstract()
+            return_value = command._get_users_service()
+            mock_get_service.assert_called_with(
+                "https://www.googleapis.com/auth/admin.directory.user.readonly"
+            )
+            mock_service.users.assert_called()
+            self.assertEqual(return_value, mock_resource)
+
+    def test__get_schemas_service(self):
+        mock_resource = Mock()
+        mock_service = Mock()
+        mock_service.users.return_value = mock_resource
+
+        with patch.object(
+            GoogleSyncCommandAbstract, "_get_service", return_value=mock_service
+        ) as mock_get_service:
+            command = GoogleSyncCommandAbstract()
+            return_value = command._get_schemas_service()
+            mock_get_service.assert_called_with(
+                "https://www.googleapis.com/auth/admin.directory.userschema.readonly"
+            )
+            mock_service.schemas.assert_called()
+            self.assertEqual(return_value, mock_resource)
+
+    def test__get_schema_by_name(self):
+        self.skipTest("Need to test")
 
     @patch("googleapiclient.discovery.build")
     @patch.object(GoogleSyncCommandAbstract, "_get_google_credentials")
-    def test__get_users_service(
+    def test__get_service(
         self, mock__get_google_credentials, mock_googleapiclient_discovery_build
     ):
         # Mock Basic Credentials
         mock_credentials = Mock(Credentials)
         mock__get_google_credentials.return_value = mock_credentials
+        # Mock discovery.build
+        mock_service = Mock()
+        mock_googleapiclient_discovery_build.return_value = mock_service
 
         # Mock discovery.build
         mock_service = Mock()
         mock_googleapiclient_discovery_build.return_value = mock_service
 
-        # Mock resource
-        mock_users_resource = Mock()
-        mock_service.users.return_value = mock_users_resource
-
         command = GoogleSyncCommandAbstract()
-        return_value = command._get_users_service()
-
-        mock__get_google_credentials.assert_called_with(
-            scopes=["https://www.googleapis.com/auth/admin.directory.user.readonly"]
-        )
+        return_value = command._get_service("test_scope")
+        mock__get_google_credentials.assert_called_with(scopes=["test_scope"])
         mock_googleapiclient_discovery_build.assert_called_with(
             "admin", "directory_v1", credentials=mock_credentials
         )
-        mock_service.users.assert_called_with()
-        self.assertEqual(return_value, mock_users_resource)
+        self.assertEqual(return_value, mock_service)
 
     @parameterized.expand(
         [
@@ -286,3 +293,15 @@ class GoogleSyncTest(TestCase):
         command = GoogleSyncCommandAbstract()
         return_value = command._map_dictionary(sync_profile, google_user)
         self.assertEqual(return_value, expected_output)
+
+    def test__convert_to_type(self):
+        pass
+
+    def test__initialize_custom_schemas(self):
+        pass
+
+    def test__delete_default_schemas(self):
+        pass
+
+    def test__initialize_default_schema(self):
+        pass
