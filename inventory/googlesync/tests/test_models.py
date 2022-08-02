@@ -647,14 +647,6 @@ class MappingAbstractTest(TestCase):
     def test_is_abstract(self):
         self.assertTrue(MappingAbstract._meta.abstract)
 
-    def test_from_field_label(self):
-        field_label = MappingAbstract._meta.get_field("from_field").verbose_name
-        self.assertEqual(field_label, "from field")
-
-    def test_from_field_max_length(self):
-        max_length = MappingAbstract._meta.get_field("from_field").max_length
-        self.assertEqual(max_length, 255)
-
     def test_to_field_label(self):
         field_label = MappingAbstract._meta.get_field("to_field").verbose_name
         self.assertEqual(field_label, "to field")
@@ -701,32 +693,33 @@ class MappingAbstractTest(TestCase):
     ### Functions ###
     @patch("googlesync.models.MappingAbstract._meta.abstract", set())
     @patch("googlesync.models.MappingAbstract.sync_profile", "profile_name")
+    # @patch("googlesync.models.MappingAbstract.sync_profile", "from_field", create=True)
+    # @patch("googlesync.models.MappingAbstract")
     def test___str__(self):
-        def from_field():
-            return "from_field"
+        # mock_mapping_abstract.from_field = "from_field"
 
         mapping_abstract = MappingAbstract(to_field="to field")
         with patch.object(
             mapping_abstract,
             "from_field",
+            "from field",
             create=True,
-            new_callable=PropertyMock("from_field"),
-        ) as mock:
-            # mock.return_value = "from_field"
-            print(mapping_abstract.from_field)
-            self.assertEqual(mapping_abstract.from_field, "from_field")
+        ):
+
+            # print(mock_mapping_abstract.from_field)
+            # self.assertEqual(mock_mapping_abstract.from_field, "from_field")
             # mock_mapping_abstract = MagicMock(MappingAbstract)
             ## with patch.object(MappingAbstract) as a:
-            # mock_mapping_abstract.from_field.return_value = "from field"
-            # mock_mapping_abstract.to_field.return_value = "to field"
-            # mock_mapping_abstract.sync_profile.return_value = "profile_name"
+            # mock_mapping_abstract.from_field = "from field"
+            # mock_mapping_abstract.to_field = "to field"
+            # mock_mapping_abstract.sync_profile = "profile_name"
             # mock_mapping_abstract.from_field.name.return_value = "from field"
             # google_default_schema_property = GoogleDefaultSchemaProperty()
             # google_person_mapping = MappingAbstract(to_field="to field")
-            # self.assertEqual(
-            #    mapping_abstract.__str__(),
-            #    "profile_name: from field => to field",
-            # )
+            self.assertEqual(
+                mapping_abstract.__str__(),
+                "profile_name: from field => to field",
+            )
 
 
 class GooglePersonMappingTest(TestCase):
@@ -740,10 +733,18 @@ class GooglePersonMappingTest(TestCase):
     def test_subclass(self):
         self.assertTrue(issubclass(GooglePersonMapping, MappingAbstract))
 
+    # sync_profile
     def test_sync_profile_foreign_key(self):
         self.assertEqual(
             self.google_person_mapping._meta.get_field("sync_profile").related_model,
             GooglePersonSyncProfile,
+        )
+
+    # from_field
+    def test_from_field_foreign_key(self):
+        self.assertEqual(
+            self.google_person_mapping._meta.get_field("from_field").related_model,
+            GoogleDefaultSchemaProperty,
         )
 
     def test_translations_related_name(self):
@@ -792,10 +793,18 @@ class GoogleDeviceMappingTest(TestCase):
     def test_subclass(self):
         self.assertTrue(issubclass(GoogleDeviceMapping, MappingAbstract))
 
+    # sync_profile
     def test_sync_profile_foreign_key(self):
         self.assertEqual(
             self.google_device_mapping._meta.get_field("sync_profile").related_model,
             GoogleDeviceSyncProfile,
+        )
+
+    # from_field
+    def test_from_field_foreign_key(self):
+        self.assertEqual(
+            self.google_device_mapping._meta.get_field("from_field").related_model,
+            GoogleDefaultSchemaProperty,
         )
 
     def test_translations_related_name(self):
