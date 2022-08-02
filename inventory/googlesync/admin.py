@@ -14,6 +14,7 @@ from .models import (
     GoogleDevice,
     GoogleDefaultSchema,
     GoogleDefaultSchemaProperty,
+    DeviceBuildingToGoogleOUMapping,
 )
 
 
@@ -118,3 +119,9 @@ class GoogleDefaultSchemaProperty(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+@admin.register(DeviceBuildingToGoogleOUMapping)
+class DeviceBuildingToGoogleOUMapping(admin.ModelAdmin):
+
+    list_display = ("building", "organization_unit")

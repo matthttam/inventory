@@ -1,11 +1,16 @@
 from django.db import models
 from django.db.models import F, Count, Q, When, Value, Case
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.urls import reverse
+from django.apps import apps
 
 from auditlog.registry import auditlog
 from auditlog.models import AuditlogHistoryField
 
 from locations.models import Room, Building
+
+# from googlesync.models import DeviceBuildingToOUMapping
 
 
 class DeviceStatus(models.Model):
@@ -97,6 +102,30 @@ class Device(models.Model):
 
     def display_name(self):
         return f"{self} - {self.device_model}"
+
+
+@receiver(post_save, sender="assignments.DeviceAssignment")
+def device_assignment_actions(sender, instance, update_fields, **kwargs):
+    """When assigned to a person the device building should be the person's primary building"""
+    person = instance.person
+    device = instance.device
+    if person.primary_building != "" and person.primary_building != device.building:
+        device.building = person.primary_building
+        device.save()
+
+
+@receiver(post_save, sender="devices.Device")
+def device_building_change_actions(sender, instance, **kwargs):
+    """When updated if the assigned building's mapped OU isn't the same as the google synced OU run a command to fix it."""
+    DeviceBuildingToGoogleOUMapping_model = apps.get_model(
+        "googlesync.DeviceBuildingToGoogleOUMapping"
+    )
+    mapping = DeviceBuildingToGoogleOUMapping_model.objects.filter(
+        building=instance.building
+    ).first()
+    if mapping is not None and instance.google_device is not None:
+        if mapping.organization_unit != instance.google_device.organization_unit:
+            print("update!")
 
 
 class DeviceAccessory(models.Model):

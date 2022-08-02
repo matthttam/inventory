@@ -1,12 +1,8 @@
-from django.test import SimpleTestCase, TestCase
-from django.template import Context, Template
-from bs4 import BeautifulSoup
 import copy
-from people.tests.factories import PersonFactory
-from django.urls import reverse
-from zoneinfo import ZoneInfo
-from authentication.tests.factories import SuperuserUserFactory
-from datetime import datetime
+
+from bs4 import BeautifulSoup
+from django.template import Context, Template
+from django.test import SimpleTestCase
 
 list_link_selector = 'a[href="/people/"]'
 update_link_selector = 'a[href="/people/1/edit/"]'
@@ -20,7 +16,7 @@ default_context = Context(
             "first_name": "Test First Name",
             "last_name": "Test Last Name",
             "email": "Test Email",
-            "primary_building" "Test Primary Building",
+            "primary_building": "Test Primary Building",
             "internal_id": "Test Internal ID",
             "type": "Test Type",
             "status": "Test Status",
