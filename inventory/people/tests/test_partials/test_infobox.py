@@ -20,6 +20,7 @@ default_context = Context(
             "first_name": "Test First Name",
             "last_name": "Test Last Name",
             "email": "Test Email",
+            "primary_building" "Test Primary Building",
             "internal_id": "Test Internal ID",
             "type": "Test Type",
             "status": "Test Status",
@@ -60,6 +61,10 @@ class PersonInfoboxTest(SimpleTestCase):
             {
                 "label": "Email :",
                 "value": self.context["person"]["email"],
+            },
+            {
+                "label": "Primary Building :",
+                "value": self.context["person"]["primary_building"],
             },
             {
                 "label": "Internal ID :",
