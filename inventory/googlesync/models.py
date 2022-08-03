@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import Any
+
 from devices.models import Device
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.urls import reverse
-from people.models import Person, PersonType
 from django.db.models import Q
+from django.urls import reverse
+from locations.models import Building
+from people.models import Person, PersonType
 
 
 class GoogleConfigAbstract(models.Model):
@@ -432,3 +432,11 @@ class GoogleDeviceTranslation(TranslationAbstract):
 
     def __str__(self):
         return f"Translate {self.google_device_mapping.to_field!r} from {self.translate_from!r} to {self.translate_to!r}"
+
+
+class DeviceBuildingToGoogleOUMapping(models.Model):
+    person_type = models.ForeignKey(
+        PersonType, on_delete=models.PROTECT, blank=True, null=True
+    )
+    building = models.ForeignKey(Building, on_delete=models.CASCADE)
+    organization_unit = models.CharField(max_length=1024)
