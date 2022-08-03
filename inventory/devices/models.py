@@ -132,11 +132,13 @@ def device_building_change_actions(device, person_type, **kwargs):
                 mapping.organization_unit,
                 device.google_device.id,
             )
-            print("update!")
             if response == "":
                 device.google_device.organization_unit = mapping.organization_unit
                 device.google_device.save()
-                print("update!")
+                # Log a change
+            else:
+                # Log an error
+                pass
 
 
 class DeviceAccessory(models.Model):
