@@ -435,5 +435,8 @@ class GoogleDeviceTranslation(TranslationAbstract):
 
 
 class DeviceBuildingToGoogleOUMapping(models.Model):
+    person_type = models.ForeignKey(
+        PersonType, on_delete=models.PROTECT, blank=True, null=True
+    )
     building = models.ForeignKey(Building, on_delete=models.CASCADE)
     organization_unit = models.CharField(max_length=1024)
