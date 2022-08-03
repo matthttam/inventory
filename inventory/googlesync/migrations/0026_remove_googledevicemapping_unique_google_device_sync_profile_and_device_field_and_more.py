@@ -14,18 +14,18 @@ class Migration(migrations.Migration):
 
     operations = [
         # migrations.AlterField(
-        #    model_name='Example',
-        #    name='something',
+        #    model_name='googlepersonmapping',
+        #    name='google_person_sync_profile_id',
         #    field=models.ForeignKey('Something', db_constraint=False, db_index=True, null=False)
         # ),
-        migrations.RemoveConstraint(
-            model_name="googledevicemapping",
-            name="unique_google_device_sync_profile_and_device_field",
-        ),
-        migrations.RemoveConstraint(
-            model_name="googlepersonmapping",
-            name="unique_google_person_sync_profile_and_person_field",
-        ),
+        # migrations.RemoveConstraint(
+        #    model_name="googledevicemapping",
+        #    name="unique_google_device_sync_profile_and_device_field",
+        # ),
+        # migrations.RemoveConstraint(
+        #    model_name="googlepersonmapping",
+        #    name="unique_google_person_sync_profile_and_person_field",
+        # ),
         migrations.RenameField(
             model_name="googledevicemapping",
             old_name="google_field",
