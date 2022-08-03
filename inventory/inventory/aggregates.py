@@ -6,12 +6,12 @@ class GroupConcat(Aggregate):
     function = "GROUP_CONCAT"
     template = ""
 
-    def __init__(self, expression=None, delimiter=None, **extra):
+    def __init__(self, expression=None, delimiter=None, distinct=False, **extra):
         db_engine = settings.DATABASES["default"]["ENGINE"]
         if db_engine == "django.db.backends.sqlite3":
-            self.as_sqlite3(expression, delimiter, extra)
+            self.as_sqlite3(expression, delimiter, **extra)
         elif db_engine == "django.db.backends.mysql":
-            self.as_mysql(expression, extra)
+            self.as_mysql(expression, distinct=distinct, separator=delimiter, **extra)
         elif db_engine == "django.db.backends.postgresql":
             return self.as_postgresql(extra.pop("compiler"), extra.pop("connection"))
         else:
@@ -19,7 +19,7 @@ class GroupConcat(Aggregate):
                 f"DB Engine {db_engine!r} not supported for {self.function!r}"
             )
 
-    def as_mysql(self, expression, extra):
+    def as_mysql(self, expression, distinct, separator=",", **extra):
         self.template = "%(function)s(%(distinct)s%(expressions)s%(separator)s)"
         output_field = extra.pop("output_field", CharField())
         distinct = "DISTINCT " if distinct else ""
@@ -32,7 +32,7 @@ class GroupConcat(Aggregate):
             **extra,
         )
 
-    def as_sqlite3(self, expression, delimiter, extra):
+    def as_sqlite3(self, expression, delimiter, **extra):
         self.template = "%(function)s(%(expressions)s)"
         output_field = extra.pop("output_field", CharField())
         delimiter = Value(delimiter)
