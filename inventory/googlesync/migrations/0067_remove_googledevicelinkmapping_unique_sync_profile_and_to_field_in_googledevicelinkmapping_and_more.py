@@ -14,26 +14,26 @@ class Migration(migrations.Migration):
         #    model_name='googledevicelinkmapping',
         #    name='unique_sync_profile_and_to_field_in_googledevicelinkmapping',
         # ),
-        migrations.RemoveConstraint(
-            model_name="googledevicelinkmapping",
-            name="unique_sync_profile_and_matching_priority_in_googledevicelinkmapping",
-        ),
         # migrations.RemoveConstraint(
-        #    model_name='googledevicemapping',
-        #    name='unique_sync_profile_and_to_field_in_googledevicemapping',
+        #    model_name="googledevicelinkmapping",
+        #    name="unique_sync_profile_and_matching_priority_in_googledevicelinkmapping",
         # ),
-        migrations.RemoveConstraint(
-            model_name="googledevicemapping",
-            name="unique_sync_profile_and_matching_priority_in_googledevicemapping",
-        ),
+        ## migrations.RemoveConstraint(
+        ##    model_name='googledevicemapping',
+        ##    name='unique_sync_profile_and_to_field_in_googledevicemapping',
+        ## ),
         # migrations.RemoveConstraint(
-        #    model_name='googlepersonmapping',
-        #    name='unique_sync_profile_and_to_field_in_googlepersonmapping',
+        #    model_name="googledevicemapping",
+        #    name="unique_sync_profile_and_matching_priority_in_googledevicemapping",
         # ),
-        migrations.RemoveConstraint(
-            model_name="googlepersonmapping",
-            name="unique_sync_profile_and_matching_priority_in_googlepersonmapping",
-        ),
+        ## migrations.RemoveConstraint(
+        ##    model_name='googlepersonmapping',
+        ##    name='unique_sync_profile_and_to_field_in_googlepersonmapping',
+        ## ),
+        # migrations.RemoveConstraint(
+        #    model_name="googlepersonmapping",
+        #    name="unique_sync_profile_and_matching_priority_in_googlepersonmapping",
+        # ),
         migrations.AddConstraint(
             model_name="googledevicelinkmapping",
             constraint=models.UniqueConstraint(
