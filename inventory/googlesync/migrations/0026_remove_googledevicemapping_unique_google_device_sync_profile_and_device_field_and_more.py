@@ -13,28 +13,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddConstraint(
-            model_name="googledevicemapping",
-            constraint=models.UniqueConstraint(
-                fields=("sync_profile", "to_field"),
-                name="unique_sync_profile_and_to_field_in_googledevicemapping",
-            ),
-        ),
-        migrations.AddConstraint(
-            model_name="googlepersonmapping",
-            constraint=models.UniqueConstraint(
-                fields=("sync_profile", "to_field"),
-                name="unique_sync_profile_and_to_field_in_googlepersonmapping",
-            ),
-        ),
-        migrations.RemoveConstraint(
-            model_name="googledevicemapping",
-            name="unique_google_device_sync_profile_and_device_field",
-        ),
-        migrations.RemoveConstraint(
-            model_name="googlepersonmapping",
-            name="unique_google_person_sync_profile_and_person_field",
-        ),
         migrations.RenameField(
             model_name="googledevicemapping",
             old_name="google_field",
@@ -64,5 +42,27 @@ class Migration(migrations.Migration):
             model_name="googlepersonmapping",
             old_name="person_field",
             new_name="to_field",
+        ),
+        migrations.AddConstraint(
+            model_name="googledevicemapping",
+            constraint=models.UniqueConstraint(
+                fields=("sync_profile", "to_field"),
+                name="unique_sync_profile_and_to_field_in_googledevicemapping",
+            ),
+        ),
+        migrations.AddConstraint(
+            model_name="googlepersonmapping",
+            constraint=models.UniqueConstraint(
+                fields=("sync_profile", "to_field"),
+                name="unique_sync_profile_and_to_field_in_googlepersonmapping",
+            ),
+        ),
+        migrations.RemoveConstraint(
+            model_name="googledevicemapping",
+            name="unique_google_device_sync_profile_and_device_field",
+        ),
+        migrations.RemoveConstraint(
+            model_name="googlepersonmapping",
+            name="unique_google_person_sync_profile_and_person_field",
         ),
     ]
