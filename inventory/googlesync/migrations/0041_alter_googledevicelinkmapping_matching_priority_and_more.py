@@ -27,14 +27,14 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='googledevicelinkmapping',
-            constraint=models.UniqueConstraint(fields=('sync_profile', 'matching_priority'), name='unique_sync_profile_and_matching_priority_in_googledevicelinkmapping'),
+            constraint=models.UniqueConstraint(fields=('sync_profile', 'matching_priority'), name='u_sync_profile_and_matching_priority_googledevicelinkmapping'),
         ),
         migrations.AddConstraint(
             model_name='googledevicemapping',
-            constraint=models.UniqueConstraint(fields=('sync_profile', 'matching_priority'), name='unique_sync_profile_and_matching_priority_in_googledevicemapping'),
+            constraint=models.UniqueConstraint(fields=('sync_profile', 'matching_priority'), name='u_sync_profile_and_matching_priority_googledevicemapping'),
         ),
         migrations.AddConstraint(
             model_name='googlepersonmapping',
-            constraint=models.UniqueConstraint(fields=('sync_profile', 'matching_priority'), name='unique_sync_profile_and_matching_priority_in_googlepersonmapping'),
+            constraint=models.UniqueConstraint(fields=('sync_profile', 'matching_priority'), name='u_sync_profile_and_matching_priority_googlepersonmapping'),
         ),
     ]
