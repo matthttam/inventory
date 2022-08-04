@@ -7,30 +7,46 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('googlesync', '0015_alter_googlepersonmapping_person_field_and_more'),
+        ("googlesync", "0015_alter_googlepersonmapping_person_field_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='googlepersontranslation',
-            name='google_person_sync_profile',
+            model_name="googlepersontranslation",
+            name="google_person_sync_profile",
         ),
         migrations.RemoveField(
-            model_name='googlepersontranslation',
-            name='person_field',
+            model_name="googlepersontranslation",
+            name="person_field",
         ),
         migrations.AddField(
-            model_name='googlepersontranslation',
-            name='google_person_mapping',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='googlesync.googlepersonmapping'),
+            model_name="googlepersontranslation",
+            name="google_person_mapping",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="googlesync.googlepersonmapping",
+            ),
         ),
         migrations.AlterField(
-            model_name='googlepersonmapping',
-            name='person_field',
-            field=models.CharField(choices=[('first_name', 'first name'), ('middle_name', 'middle name'), ('last_name', 'last name'), ('email', 'email'), ('internal_id', 'internal id'), ('type', 'type'), ('status', 'status'), ('google_id', 'google id')], max_length=255),
+            model_name="googlepersonmapping",
+            name="person_field",
+            field=models.CharField(
+                choices=[
+                    ("first_name", "first name"),
+                    ("middle_name", "middle name"),
+                    ("last_name", "last name"),
+                    ("email", "email"),
+                    ("internal_id", "internal id"),
+                    ("type", "type"),
+                    ("status", "status"),
+                    ("google_id", "google id"),
+                ],
+                max_length=255,
+            ),
         ),
-        migrations.AddConstraint(
-            model_name='googlepersonmapping',
-            constraint=models.UniqueConstraint(fields=('google_person_sync_profile', 'person_field'), name='unique_google_person_sync_profile_and_person_field'),
-        ),
+        # migrations.AddConstraint(
+        #    model_name='googlepersonmapping',
+        #    constraint=models.UniqueConstraint(fields=('google_person_sync_profile', 'person_field'), name='unique_google_person_sync_profile_and_person_field'),
+        # ),
     ]

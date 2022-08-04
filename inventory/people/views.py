@@ -31,9 +31,8 @@ class PersonDatatableServerSideProcessingView(
     PermissionRequiredMixin, ServerSideDatatableMixin
 ):
     permission_required = "people.view_person"
-    queryset = Person.objects.all().annotate(
-        building_name_list=GroupConcat("buildings__name", ", ")
-    )
+    queryset = Person.objects.all()
+    # .annotate(        building_name_list=GroupConcat("buildings__name", ", ")    )
     columns = [
         "id",
         "first_name",

@@ -322,11 +322,11 @@ class MappingAbstract(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["sync_profile", "to_field"],
-                name="unique_sync_profile_and_to_field_in_%(class)s",
+                name="u_sync_profile_and_to_field_%(class)s",
             ),
             models.UniqueConstraint(
                 fields=["sync_profile", "matching_priority"],
-                name="unique_sync_profile_and_matching_priority_in_%(class)s",
+                name="u_sync_profile_and_matching_priority_%(class)s",
             ),
         ]
 

@@ -6,54 +6,68 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('googlesync', '0025_rename_auth_provider_x09_cert_url_googleconfig_auth_provider_x509_cert_url_and_more'),
+        (
+            "googlesync",
+            "0025_rename_auth_provider_x09_cert_url_googleconfig_auth_provider_x509_cert_url_and_more",
+        ),
     ]
 
     operations = [
-        migrations.RemoveConstraint(
-            model_name='googledevicemapping',
-            name='unique_google_device_sync_profile_and_device_field',
-        ),
-        migrations.RemoveConstraint(
-            model_name='googlepersonmapping',
-            name='unique_google_person_sync_profile_and_person_field',
+        # migrations.AlterField(
+        #    model_name='googlepersonmapping',
+        #    name='google_person_sync_profile_id',
+        #    field=models.ForeignKey('Something', db_constraint=False, db_index=True, null=False)
+        # ),
+        # migrations.RemoveConstraint(
+        #    model_name="googledevicemapping",
+        #    name="unique_google_device_sync_profile_and_device_field",
+        # ),
+        # migrations.RemoveConstraint(
+        #    model_name="googlepersonmapping",
+        #    name="unique_google_person_sync_profile_and_person_field",
+        # ),
+        migrations.RenameField(
+            model_name="googledevicemapping",
+            old_name="google_field",
+            new_name="from_field",
         ),
         migrations.RenameField(
-            model_name='googledevicemapping',
-            old_name='google_field',
-            new_name='from_field',
+            model_name="googledevicemapping",
+            old_name="google_device_sync_profile",
+            new_name="sync_profile",
         ),
         migrations.RenameField(
-            model_name='googledevicemapping',
-            old_name='google_device_sync_profile',
-            new_name='sync_profile',
+            model_name="googledevicemapping",
+            old_name="device_field",
+            new_name="to_field",
         ),
         migrations.RenameField(
-            model_name='googledevicemapping',
-            old_name='device_field',
-            new_name='to_field',
+            model_name="googlepersonmapping",
+            old_name="google_field",
+            new_name="from_field",
         ),
         migrations.RenameField(
-            model_name='googlepersonmapping',
-            old_name='google_field',
-            new_name='from_field',
+            model_name="googlepersonmapping",
+            old_name="google_person_sync_profile",
+            new_name="sync_profile",
         ),
         migrations.RenameField(
-            model_name='googlepersonmapping',
-            old_name='google_person_sync_profile',
-            new_name='sync_profile',
-        ),
-        migrations.RenameField(
-            model_name='googlepersonmapping',
-            old_name='person_field',
-            new_name='to_field',
+            model_name="googlepersonmapping",
+            old_name="person_field",
+            new_name="to_field",
         ),
         migrations.AddConstraint(
-            model_name='googledevicemapping',
-            constraint=models.UniqueConstraint(fields=('sync_profile', 'to_field'), name='unique_sync_profile_and_to_field_in_googledevicemapping'),
+            model_name="googledevicemapping",
+            constraint=models.UniqueConstraint(
+                fields=("sync_profile", "to_field"),
+                name="unique_sync_profile_and_to_field_in_googledevicemapping",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='googlepersonmapping',
-            constraint=models.UniqueConstraint(fields=('sync_profile', 'to_field'), name='unique_sync_profile_and_to_field_in_googlepersonmapping'),
+            model_name="googlepersonmapping",
+            constraint=models.UniqueConstraint(
+                fields=("sync_profile", "to_field"),
+                name="unique_sync_profile_and_to_field_in_googlepersonmapping",
+            ),
         ),
     ]
