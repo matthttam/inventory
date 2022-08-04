@@ -54,7 +54,7 @@ class PersonDetailViewAuthenticatedWithPermissionTest(TestCase):
 
     def test_valid_person(self):
         person = PersonFactory(first_name="TestName123")
-        response = self.client.get(reverse("people:detail", args=[1]))
+        response = self.client.get(reverse("people:detail", args=[person.id]))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "people/person_detail.html")
         self.assertTemplateUsed(response, "people/partials/person_auditlog.html")
@@ -115,9 +115,9 @@ class PersonCreateViewAuthenticatedWithPermissionTest(TestCase):
             "google_id": "",
         }
         response = self.client.post(reverse("people:new"), person_dict)
-        person_object = Person.objects.last()
+        person_object = Person.objects.get(internal_id=person_dict['internal_id'])
         self.assertIsNotNone(person_object)
-        self.assertEqual(person_object, person)
+        self.assertEqual(person_object.id, person.id)
         self.assertRedirects(
             response,
             reverse("people:detail", kwargs={"pk": person_object.pk}),
