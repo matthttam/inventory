@@ -1,12 +1,8 @@
-from datetime import tzinfo
 import factory
 from faker import Faker
-
 from zoneinfo import ZoneInfo
 from django.utils import timezone
-
 from factory.django import DjangoModelFactory
-
 from assignments.models import DeviceAssignment, DeviceAccessoryAssignment
 from devices.tests.factories import DeviceFactory
 from people.tests.factories import PersonFactory
@@ -16,8 +12,6 @@ from devices.tests.factories import DeviceFactory, DeviceAccessoryFactory
 fake = Faker()
 Faker.seed(0)
 
-# tz = timezone.settings.TIME_ZONE
-# tz = timezone.timezone()
 tz = ZoneInfo(timezone.settings.TIME_ZONE)
 
 
@@ -29,6 +23,12 @@ class DeviceAssignmentFactory(DjangoModelFactory):
     return_datetime = None
     person = factory.SubFactory(PersonFactory)
     device = factory.SubFactory(DeviceFactory)
+
+
+class DeviceAssignmentWithReturnDatetimeFactory(DeviceAssignmentFactory):
+    return_datetime = factory.lazy_attribute(
+        lambda o: fake.date_time_between(start_date=o.assignment_datetime, tzinfo=tz)
+    )
 
 
 class DeviceAccessoryAssignmentFactory(DjangoModelFactory):

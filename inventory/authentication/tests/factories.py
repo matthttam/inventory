@@ -30,6 +30,11 @@ class UserFactory(DjangoModelFactory):
     email = factory.SelfAttribute("username")
     is_active = True
     is_staff = False
+    is_superuser = False
+
+
+class SuperuserUserFactory(UserFactory):
+    is_superuser = True
 
 
 class StaffUserFactory(UserFactory):

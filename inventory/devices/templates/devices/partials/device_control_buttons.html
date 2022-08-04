@@ -1,0 +1,16 @@
+{% url 'devices:edit' device.id as edit_url%}
+{% url 'devices:delete' device.id as delete_url%}
+{% url 'devices:index' as index_url%}
+
+
+{% if perms.devices.view_device %}
+  {% include 'partials/button.html' with value="Device List" href=index_url %}  
+{% endif %}
+
+{% if perms.devices.change_device %}
+  {% include 'partials/button.html' with value="Edit Device" href=edit_url %}
+{% endif %}
+
+{% if perms.devices.delete_device %}
+  {% include 'partials/button.html' with value="Delete Device" href=delete_url class='danger' %}
+{% endif %}

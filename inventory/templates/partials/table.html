@@ -1,0 +1,19 @@
+{% extends 'base_table.html' %}
+
+{% block table_id %}{{ table_id }}{% endblock %}
+
+{% block thead %}
+    <tr>
+        {{ block.super }}
+        {% if thead_template %}
+            {% include thead_template %}
+        {% endif %}
+    </tr>
+{% endblock thead %}
+
+{% block tbody %}
+    {{ block.super }}
+    {% if tbody_template %}
+        {% include tbody_template %}
+    {% endif %}
+{% endblock tbody %}

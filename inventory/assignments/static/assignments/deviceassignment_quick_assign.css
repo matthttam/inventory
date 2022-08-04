@@ -1,0 +1,30 @@
+/* override the width size for select2 to prevent overflowing the container */
+.select2 {
+    width: 100% !important;
+}
+
+/* checkbox sizes */
+.checkbox-lg .custom-control-label::before, 
+.checkbox-lg .custom-control-label::after {
+    top: .8rem;
+    width: 1.55rem;
+    height: 1.55rem;
+}
+
+.checkbox-lg .custom-control-label {
+    padding-top: 13px;
+    padding-left: 6px;
+}
+
+
+.checkbox-xl .custom-control-label::before, 
+.checkbox-xl .custom-control-label::after {
+    top: 1.2rem;
+    width: 1.85rem;
+    height: 1.85rem;
+}
+
+.checkbox-xl .custom-control-label {
+    padding-top: 23px;
+    padding-left: 10px;
+}

@@ -10,7 +10,8 @@ from .models import (
 
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
-    list_display = ("serial_number", "asset_id")
+    list_display = ("serial_number", "asset_id", "status")
+    search_fields = ("serial_number", "asset_id")
 
 
 @admin.register(DeviceManufacturer)
@@ -20,7 +21,8 @@ class DeviceManufacturerAdmin(admin.ModelAdmin):
 
 @admin.register(DeviceModel)
 class DeviceModel(admin.ModelAdmin):
-    pass
+    list_display = ("manufacturer", "name")
+    search_fields = ("manufacturer", "name")
 
 
 @admin.register(DeviceStatus)

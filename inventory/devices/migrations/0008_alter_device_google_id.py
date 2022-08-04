@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('devices', '0007_alter_device_google_id'),
+        # ("devices", "0007_alter_device_google_id"),
+        ("devices", "0007_device_google_sync_profile")
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='device',
-            name='google_id',
-            field=models.CharField(blank=True, default=None, max_length=255, null=True, unique=True),
+            model_name="device",
+            name="google_id",
+            field=models.CharField(
+                blank=True, default=None, max_length=255, null=True, unique=True
+            ),
         ),
     ]

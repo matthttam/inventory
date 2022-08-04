@@ -1,0 +1,17 @@
+{% extends "dashboard/dashboard.html" %}
+
+{% block title %}Inventory - Assignment Confirm Delete{% endblock %}
+
+{% block content %}
+
+    <form method="post">{% csrf_token %}
+        <p>Are you sure you want to delete "{{ object }}"?</p>
+        <div class="col-md-6">
+        {% include './partials/deviceassignment_infobox.html'%}
+        </div>
+        {{ form }}
+        <button class="button btn btn-danger mx-3 p-3" type="submit">Delete {{ object }}</button>
+        <a class="button btn btn-primary mx-3 p-3" href="{%url 'assignments:detail' object.id%}">Cancel</a>
+    </form>
+
+{% endblock content %}

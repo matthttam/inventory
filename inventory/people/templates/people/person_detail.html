@@ -4,23 +4,21 @@
 
 {% block content %}
 
-{% if person %}
+    {% if person %}
 
-    <ul>
+        <div class="row">
+            <div class="col md-6">
+                {% include './partials/person_infobox.html' with bottom_infobox_card='./person_control_buttons.html' %}
+            </div>
+            <div class="col md-3">
+                {% include './partials/person_auditlog.html' %}
+            </div>
+        </div>
 
-        <li>Person Type: {{person.type}}</li>
-        <li>Person Internal ID: {{person.internal_id}}</li>
-        <li>Person First Name: {{person.first_name}}</li>
-        <li>Person Last Name: {{person.last_name}}</li>
-
-    </ul>
-    <a class="btn btn-primary m-2" role="button" href="{% url 'people:edit' person.id%}">Edit Person</a>
-    <a class="btn btn-primary m-2" role="button" href="{% url 'people:index' %}">Person List</a>
-
-{% else %}
+    {% else %}
 
     <p>Person Not Found</p>
 
-{% endif %}
+    {% endif %}
 
 {% endblock content %}

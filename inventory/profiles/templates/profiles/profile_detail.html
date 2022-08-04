@@ -1,0 +1,22 @@
+{% extends "dashboard/dashboard.html" %}
+
+{% block title %}Inventory - Profile Detail{% endblock %}
+
+{% block content %}
+
+{% if profile %}
+
+    <ul>
+
+        <li>Timezone: {{profile.timezone}}</li>
+
+    </ul>
+    <a class="btn btn-primary m-2" role="button" href="{% url 'profile:edit'%}">Edit Profile</a>
+
+{% else %}
+
+    <p>Profile Not Found</p>
+
+{% endif %}
+
+{% endblock content %}

@@ -36,11 +36,14 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "debug_toolbar",
+    "auditlog",
     "dashboard",
     "devices",
     "locations",
     "people",
     "assignments",
+    "profiles",
+    "googlesync",
 ]
 
 MIDDLEWARE = [
@@ -53,6 +56,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    "auditlog.middleware.AuditlogMiddleware",
 ]
 
 ROOT_URLCONF = "inventory.urls"
@@ -137,6 +141,10 @@ FORMAT_MODULE_PATH = [
 STATIC_URL = env("STATIC_URL")
 STATIC_ROOT = Path(BASE_DIR.parent).joinpath(env("STATIC_PATH"))
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
@@ -158,6 +166,7 @@ LOGIN_REQUIRED_IGNORE_PATHS = [
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
     #'authentication'
 ]
+
 
 # Controls if the django-debug-toolbar is displayed
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
@@ -189,21 +198,21 @@ LOGGING = {
         "timestamp": {
             "format": "{asctime} {levelname} {message}",
             "style": "{",
-            }
-        },
+        }
+    },
     "handlers": {
         "file": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
             "filename": LOG_PATH,
-            "formatter":"timestamp",
+            "formatter": "timestamp",
         },
     },
     "loggers": {
         "django": {
             "handlers": ["file"],
             "level": "DEBUG",
-            "propagate": True,
+            "propagate": False,
         },
     },
 }
