@@ -77,7 +77,7 @@ class Command(GoogleSyncCommandAbstract):
 
         # Set acocunt as initialized
         google_config = self._get_google_config()
-        google_config.person_initialized = True
+        google_config.device_initialized = True
         google_config.save()
 
     def _sync_google_device_profiles(
@@ -142,42 +142,42 @@ class Command(GoogleSyncCommandAbstract):
         records_to_create = []
         records_to_skip = []
 
-        unique_field_values = {}
-        unique_fields = [
-            {"name": x.name, "blank": x.blank}
-            for x in GoogleDevice._meta.fields
-            if x.unique == True and x.name != "id"
-        ]
+        #unique_field_values = {}
+        #unique_fields = [
+        #    {"name": x.name, "blank": x.blank}
+        #    for x in GoogleDevice._meta.fields
+        #    if x.unique == True and x.name != "id"
+        #]
 
-        for unique_field in unique_fields:
-            unique_field_values[unique_field["name"]] = []
+        #for unique_field in unique_fields:
+        #    unique_field_values[unique_field["name"]] = []
 
         for device_record in device_records:
-            id = GoogleDevice.objects.filter(id=device_record.id).only("id").first().id
-            if id:
-                device_record.id = id
+            google_device = GoogleDevice.objects.filter(id=device_record.id).only("id").first()
+            if google_device:
+                device_record.id = google_device.id
                 records_to_update.append(device_record)
             else:
-
+                records_to_create.append(device_record)
                 # if device_record.status != inactive_device_status:
                 # Valid Uniqueness for bulk creation
-                is_valid = True
-                for unique_field in unique_fields:
-                    device_record_value = getattr(device_record, unique_field["name"])
-                    if device_record_value in unique_field_values[unique_field["name"]]:
-                        is_valid = False
-                        self.stdout.write(
-                            self.style.ERROR(
-                                f"Uniqueness constraint for {unique_field['name']!r} failed when creating device: {device_record}"
-                            )
-                        )
-                    else:
-                        if device_record_value is not None:
-                            unique_field_values[unique_field["name"]].append(
-                                device_record_value
-                            )
-                if is_valid:
-                    records_to_create.append(device_record)
+                ## is_valid = True
+                ## for unique_field in unique_fields:
+                ##     device_record_value = getattr(device_record, unique_field["name"])
+                ##     if device_record_value in unique_field_values[unique_field["name"]]:
+                ##         is_valid = False
+                ##         self.stdout.write(
+                ##             self.style.ERROR(
+                ##                 f"Uniqueness constraint for {unique_field['name']!r} failed when creating device: {device_record}"
+                ##             )
+                ##         )
+                ##     else:
+                ##         if device_record_value is not None:
+                ##             unique_field_values[unique_field["name"]].append(
+                ##                 device_record_value
+                ##             )
+                ## if is_valid:
+                ##     records_to_create.append(device_record)
                 # else:
                 #    records_to_skip.append(device_record)
 
@@ -193,7 +193,6 @@ class Command(GoogleSyncCommandAbstract):
                 for x in GoogleDevice._meta.fields
                 if (x.name not in excluded_fields)
             ]
-            print(fields)
             GoogleDevice.objects.bulk_update(records_to_update, fields=fields)
 
         # Create New Records
