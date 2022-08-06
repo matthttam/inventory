@@ -5,7 +5,7 @@ from django.views.generic import (
     UpdateView,
     CreateView,
     DeleteView,
-    FormView
+    FormView,
 )
 from django.views.generic.base import TemplateView
 from django.utils import timezone
@@ -18,6 +18,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse, reverse_lazy
 from django.db.models.functions import Concat
 from django.db.models import CharField, Value as V, Q
+from django.shortcuts import redirect
 
 from auditlog.models import LogEntry
 
@@ -73,7 +74,15 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["permitted_actions"] = get_permitted_actions(
-            self.request, "assignments", "deviceassignment"
+            self.request,
+            "assignments",
+            "deviceassignment",
+            action_paths=[
+                ("view", "detail"),
+                ("change", "edit"),
+                ("turnin", "turnin"),
+                ("delete", "delete"),
+            ],
         )
         return context
 
@@ -94,10 +103,22 @@ class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):
 class DeviceAssignmentUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "assignments.change_deviceassignment"
     model = DeviceAssignment
-    #template_name = "assignments/deviceassignment_turnin_form.html"
-    template_name_suffix = '_turnin_form'
+    fields = ["person", "device", "return_datetime"]
+
+
+class DeviceAssignmentTurninView(PermissionRequiredMixin, UpdateView):
+    permission_required = "assignments.turnin_deviceassignment"
+    template_name = "assignments/deviceassignment_turnin_form.html"
     form_class = DeviceAssignmentTurninForm
-    #readonly_fields = ['return_datetime']
+    model = DeviceAssignment
+
+    # Don't allow turnin if already turned in
+    def render_to_response(self, context, **response_kwargs):
+        assignment = context.get("object")
+        if assignment.return_datetime is not None:
+            return redirect(reverse("assignments:detail", args=[assignment.id]))
+        return super().render_to_response(context, **response_kwargs)
+
 
 class DeviceAssignmentCreateView(PermissionRequiredMixin, CreateView):
     permission_required = "assignments.add_deviceassignment"

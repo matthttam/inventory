@@ -22,7 +22,9 @@ Assignment
       <div class="col-md-4 fw-bold text-end">Return Date :</div><div class="col md-1 text-start">{{deviceassignment.return_datetime|localtime|date:"SHORT_DATETIME_FORMAT"|default:""}}</div>
     </div>
     {% if bottom_infobox_card %}
+    <div class="d-flex align-items-center justify-content-evenly mt-5">
       {% include bottom_infobox_card %}
+    </div>
     {% endif %}
   </p>
 {% endblock card_body_content %}
