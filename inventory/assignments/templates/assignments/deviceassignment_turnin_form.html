@@ -1,0 +1,50 @@
+{% extends "dashboard/dashboard.html" %}
+
+{% block title %}Inventory - Assignment Edit{% endblock %}
+
+{% block content %}
+
+    <form method="post">
+        {% csrf_token %}
+        <form>
+            {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                <ol>
+                    {% for error in form.subject.errors %}
+                        <li><strong>{{ error|escape }}</strong></li>
+                    {% endfor %}
+                    </ol>
+            </div>
+            {% endif %} 
+            <div class="form-group row">
+              <label for="{{ form.person.id_for_label }}" class="col-sm-2 col-form-label">Person:</label>
+              <div class="col-sm-10">
+                {{ form.person }}
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="{{ form.device.id_for_label }}" class="col-sm-2 col-form-label">Device:</label>
+              <div class="col-sm-10">
+                {{ form.device }}
+              </div>
+            </div>
+            <div class="form-group row">
+
+                <label for="{{ form.return_datetime.id_for_label }}" class="col-sm-2 col-form-label">Return Date:</label>
+                <div class="col-sm-10">
+                    <div class="input-group">
+
+                    <div class="input-group mb-3">
+                        {{ form.return_datetime }}
+                        <button class="btn btn-outline-secondary" type="button" name="set_return_date" id="set_return_date">Set Date</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+          </form>
+
+        <button class="btn btn-primary m-2" role="button" type="submit">Save</button>
+        <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:index' %}">Cancel</a>
+    </form>
+
+{% endblock content %}

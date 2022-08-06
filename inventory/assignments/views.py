@@ -5,6 +5,7 @@ from django.views.generic import (
     UpdateView,
     CreateView,
     DeleteView,
+    FormView
 )
 from django.views.generic.base import TemplateView
 from django.utils import timezone
@@ -23,13 +24,12 @@ from auditlog.models import LogEntry
 from inventory.utils import (
     get_permitted_actions,
     get_history_table_context,
-    get_table_context,
 )
 from inventory.views import JSONListView, JSONFormView
 from people.models import Person
 from devices.models import Device
 from .models import DeviceAssignment
-from .forms import DeviceAssignmentForm
+from .forms import DeviceAssignmentForm, DeviceAssignmentTurninForm
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -94,8 +94,10 @@ class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):
 class DeviceAssignmentUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "assignments.change_deviceassignment"
     model = DeviceAssignment
-    fields = ["return_datetime"]
-
+    #template_name = "assignments/deviceassignment_turnin_form.html"
+    template_name_suffix = '_turnin_form'
+    form_class = DeviceAssignmentTurninForm
+    #readonly_fields = ['return_datetime']
 
 class DeviceAssignmentCreateView(PermissionRequiredMixin, CreateView):
     permission_required = "assignments.add_deviceassignment"
