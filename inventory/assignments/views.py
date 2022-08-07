@@ -97,6 +97,7 @@ class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):
         context["log_entries"] = LogEntry.objects.filter(
             object_id=self.object.id
         ).order_by("timestamp")
+        context["infobox"] = get_deviceassignment_infobox_data(context.get("object"))
         return context
 
 
@@ -111,6 +112,11 @@ class DeviceAssignmentTurninView(PermissionRequiredMixin, UpdateView):
     template_name = "assignments/deviceassignment_turnin_form.html"
     form_class = DeviceAssignmentTurninForm
     model = DeviceAssignment
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["infobox"] = get_deviceassignment_infobox_data(context.get("object"))
+        return context
 
     # Don't allow turnin if already turned in
     def render_to_response(self, context, **response_kwargs):
@@ -130,6 +136,11 @@ class DeviceAssignmentDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = "assignments.delete_deviceassignment"
     model = DeviceAssignment
     success_url = reverse_lazy("assignments:index")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["infobox"] = get_deviceassignment_infobox_data(context.get("object"))
+        return context
 
 
 class DeviceAssignmentQuickAssignView(PermissionRequiredMixin, TemplateView):
@@ -197,3 +208,14 @@ class QuickAssignDeviceListJSONView(PermissionRequiredMixin, JSONListView):
 class QuickAssignSubmitView(PermissionRequiredMixin, JSONFormView):
     permission_required = "assignments.add_deviceassignment"
     form_class = DeviceAssignmentForm
+
+
+def get_deviceassignment_infobox_data(deviceassignment) -> list:
+
+    return [
+        {"label": "Assignment ID :", "value": deviceassignment.id},
+        {"label": "Person :", "value": deviceassignment.person},
+        {"label": "Device :", "value": deviceassignment.device},
+        {"label": "Assignment Date :", "value": deviceassignment.assignment_datetime},
+        {"label": "Return Date :", "value": deviceassignment.return_datetime},
+    ]

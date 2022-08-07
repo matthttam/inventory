@@ -1,34 +1,27 @@
-{% extends 'partials/card.html' %}
-{% load tz %}
+{% comment %}
+params:
+  infobox: Array of dicitonaries containing label and value
+  infobox_footer: Url of parial to load at the bottom of the infobox
+{% endcomment %}
 
-{% block card_title_content %}{{card_title}}{% endblock %}
+{% if infobox %}
 
-{% block card_body_content%}
+  {% for row in infobox%}
 
-  <p class="card-text">
+    {% include 'partials/card_body_row.html' with label=row.label value=row.value %}
+  
+  {% endfor %}
 
-    {% if infobox %}
+{% endif %}
 
-      {% for row in infobox%}
 
-        {% include 'partials/card_body_row.html' with label=row.label value=row.value %}
-      
-      {% endfor %}
-    
-    {% endif %}
+{% if infobox_footer %}
 
-    
-    {% if bottom_infobox_card %}
+  <hr class="border border-secondary border-2 opacity-35">
+  <div class="d-flex justify-content-md-center">
 
-      <hr class="border border-secondary border-2 opacity-35">
-      <div class="d-flex justify-content-md-center">
+  {% include infobox_footer %}
 
-        {% include bottom_infobox_card %}
+  </div>
 
-      </div>
-
-    {% endif %}
-    
-  </p>
-
-{% endblock card_body_content %}
+{% endif %}

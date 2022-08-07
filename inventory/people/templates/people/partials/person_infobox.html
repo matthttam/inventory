@@ -1,31 +1,14 @@
 {% extends 'partials/card.html' %}
-{% load tz %}
 
 {% block card_title_content %}Person{% endblock %}
 
 {% block card_body_content%}
 
-  <p name="person_card_body" class="card-text fs-1">
+  <p class="card-text">
 
     {% if infobox %}
 
-      {% for row in infobox%}
-
-        {% include 'partials/card_body_row.html' with label=row.label value=row.value %}
-      
-      {% endfor %}
-    
-    {% endif %}
-
-    
-    {% if bottom_infobox_card %}
-
-      <hr class="border border-secondary border-2 opacity-35">
-      <div class="d-flex justify-content-md-center">
-
-        {% include bottom_infobox_card %}
-
-      </div>
+      {% include 'partials/infobox.html' %}
 
     {% endif %}
     

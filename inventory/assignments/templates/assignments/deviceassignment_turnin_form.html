@@ -1,6 +1,6 @@
 {% extends "dashboard/dashboard.html" %}
 
-{% block title %}Inventory - Assignment Edit{% endblock %}
+{% block title %}Inventory - Assignment Turnin{% endblock %}
 
 {% block content %}
 
@@ -21,7 +21,7 @@
 
         <div class="row">
             <div class="col md-6">
-                {% include './partials/deviceassignment_infobox.html' with bottom_infobox_card='./deviceassignment_turnin_buttons.html'%}
+                {% include './partials/deviceassignment_infobox.html' with infobox_footer='assignments/partials/deviceassignment_turnin_buttons.html' col_label_class="col md-6"%}
             </div>
         </div>
 

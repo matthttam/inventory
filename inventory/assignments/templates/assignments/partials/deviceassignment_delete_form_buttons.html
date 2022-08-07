@@ -1,0 +1,7 @@
+{% load inventory_extras %}
+{% url 'assignments:delete' object.id as delete_url %}
+{% url 'assignments:detail' object.id as detail_url %}
+
+
+{% include 'partials/submit_button.html' with value=object|prepend:"Delete " href="{{ delete_url }}" btn_class='btn-danger' %}
+{% include 'partials/button.html' with value="Cancel" href=detail_url %}

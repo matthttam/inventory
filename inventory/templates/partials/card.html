@@ -1,4 +1,19 @@
- <div class="card {{card_class}}" style="{{card_style|default:"width: 100%;"}}">
+{% comment %}
+params:
+    card_class: Additional classes to apply to the card
+    card_style: Style of card. Default: width: 100%;
+    card_header_class: Additional classes applied to the card header
+    card_title_class: Additional classes applied to the card-title
+    card_body_class: Additional classes applied to the card body
+
+blocks:
+    card_title: Replace the entire card title section
+    card_title_content: Replace the inner section of the card title
+    card_body: Replace the entire card body section
+    card_body_content: Replace the inner section of hte card body
+{% endcomment %}
+
+<div class="card {{card_class}}" style="{{card_style|default:"width: 100%;"}}">
 
     {% block card_title %}
     <div class="card-header {{card_header_class}}">
