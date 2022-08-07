@@ -19,7 +19,7 @@ from .models import (
 
 
 @admin.register(GoogleDevice)
-class GoogleDevice(admin.ModelAdmin):
+class GoogleDeviceAdmin(admin.ModelAdmin):
     list_display = [field.name for field in GoogleDevice._meta.get_fields()]
 
 
@@ -42,6 +42,14 @@ class GooglePersonMappingAdmin(admin.ModelAdmin):
         "matching_priority",
     )
 
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        print(db_field.name)
+        if db_field.name == "from_field":
+            kwargs["queryset"] = GoogleDefaultSchemaProperty.objects.filter(
+                schema__schema_id__in=["User", "UserName"]
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 @admin.register(GooglePersonTranslation)
 class GooglePersonTranslationAdmin(admin.ModelAdmin):
@@ -61,6 +69,13 @@ class GoogleDeviceMappingAdmin(admin.ModelAdmin):
         "to_field",
         "matching_priority",
     )
+
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        if db_field.name == "from_field":
+            kwargs["queryset"] = GoogleDefaultSchemaProperty.objects.filter(
+                schema__schema_id__in=["ChromeOsDevice"]
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(GoogleDeviceLinkMapping)
@@ -84,7 +99,7 @@ class GoogleDeviceSyncProfileAdmin(admin.ModelAdmin):
 
 
 @admin.register(GoogleCustomSchema)
-class GoogleCustomSchema(admin.ModelAdmin):
+class GoogleCustomSchemaAdmin(admin.ModelAdmin):
     # pass
     list_display = ("display_name",)
 
@@ -93,7 +108,7 @@ class GoogleCustomSchema(admin.ModelAdmin):
 
 
 @admin.register(GoogleCustomSchemaField)
-class GoogleCustomSchemaField(admin.ModelAdmin):
+class GoogleCustomSchemaFieldAdmin(admin.ModelAdmin):
 
     list_display = ("__str__", "field_type", "indexed", "multi_valued")
 
@@ -102,7 +117,7 @@ class GoogleCustomSchemaField(admin.ModelAdmin):
 
 
 @admin.register(GoogleDefaultSchema)
-class GoogleDefaultSchema(admin.ModelAdmin):
+class GoogleDefaultSchemaAdmin(admin.ModelAdmin):
     list_display = (
         "schema_id",
         "description",
@@ -113,7 +128,7 @@ class GoogleDefaultSchema(admin.ModelAdmin):
 
 
 @admin.register(GoogleDefaultSchemaProperty)
-class GoogleDefaultSchemaProperty(admin.ModelAdmin):
+class GoogleDefaultSchemaPropertyAdmin(admin.ModelAdmin):
 
     list_display = ("schema", "__str__", "etag", "type", "description")
 
@@ -122,6 +137,6 @@ class GoogleDefaultSchemaProperty(admin.ModelAdmin):
 
 
 @admin.register(DeviceBuildingToGoogleOUMapping)
-class DeviceBuildingToGoogleOUMapping(admin.ModelAdmin):
+class DeviceBuildingToGoogleOUMappingAdmin(admin.ModelAdmin):
 
     list_display = ("building", "organization_unit")
