@@ -1,28 +1,15 @@
 {% extends 'partials/card.html' %}
 {% load tz %}
 
-{% block card_title_content %}
-Assignment
-{% endblock %} 
+{% block card_title_content %}Assignment{% endblock %}
+
 {% block card_body_content %}
-  <p name="assignment_card_body" class="card-text fs-5">
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">Assignment ID :</div><div class="col md-1 text-start">{{deviceassignment.id}}</div>
-    </div>
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">Person :</div><div class="col md-1 text-start">{{deviceassignment.person}}</div>
-    </div>
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">Device :</div><div class="col md-1 text-start">{{deviceassignment.device}}</div>
-    </div>
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">Assignment Date :</div><div class="col md-1 text-start">{{deviceassignment.assignment_datetime|localtime|date:"SHORT_DATETIME_FORMAT"}}</div>
-    </div>
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">Return Date :</div><div class="col md-1 text-start">{{deviceassignment.return_datetime|localtime|date:"SHORT_DATETIME_FORMAT"|default:""}}</div>
-    </div>
-    {% if bottom_infobox_card %}
-      {% include bottom_infobox_card %}
+
+  <p class="card-text">
+    {% if infobox %}
+
+      {% include 'partials/infobox.html' %}
+
     {% endif %}
   </p>
 {% endblock card_body_content %}

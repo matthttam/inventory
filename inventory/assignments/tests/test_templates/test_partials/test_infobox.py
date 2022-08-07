@@ -98,15 +98,15 @@ class DeviceAssignmentInfoboxTest(SimpleTestCase):
                 msg=f"Failed to match up value for {info_div.select('div')}",
             )
 
-    def test_bottom_infobox_card(self):
-        """Verify providing a template for bottom_infobox_card loads that template"""
+    def test_infobox_footer(self):
+        """Verify providing a template for infobox_footer loads that template"""
         context = copy.deepcopy(default_context)
         template = Template(
-            "{% include 'assignments/partials/deviceassignment_infobox.html' with bottom_infobox_card='assignments/partials/deviceassignment_control_buttons.html' %}"
+            "{% include 'assignments/partials/deviceassignment_infobox.html' with infobox_footer='assignments/partials/deviceassignment_control_buttons.html' %}"
         )
         rendered = template.render(context)
-        bottom_infobox_card_template = Template(
+        infobox_footer_template = Template(
             "{% include 'assignments/partials/deviceassignment_control_buttons.html' %}"
         )
-        bottom_infobox_card_rendered = bottom_infobox_card_template.render(context)
-        self.assertIn(bottom_infobox_card_rendered, rendered)
+        infobox_footer_rendered = infobox_footer_template.render(context)
+        self.assertIn(infobox_footer_rendered, rendered)

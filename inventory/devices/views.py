@@ -68,6 +68,7 @@ class DeviceDetailView(PermissionRequiredMixin, DetailView):
         context["log_entries"] = LogEntry.objects.filter(
             object_id=self.object.id
         ).order_by("timestamp")
+        context["infobox"] = get_device_infobox_data(context.get("object"))
         return context
 
 
@@ -87,3 +88,21 @@ class DeviceDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = "devices.delete_device"
     model = Device
     success_url = reverse_lazy("devices:index")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["infobox"] = get_device_infobox_data(context.get("object"))
+        return context
+
+
+def get_device_infobox_data(device) -> list:
+
+    return [
+        {"label": "Device ID :", "value": device.id},
+        {"label": "Serial Number :", "value": device.serial_number},
+        {"label": "Asset Tag :", "value": device.asset_id},
+        {"label": "Status :", "value": device.status},
+        {"label": "Model :", "value": device.device_model},
+        {"label": "Building :", "value": device.building},
+        {"label": "Room :", "value": device.room},
+    ]
