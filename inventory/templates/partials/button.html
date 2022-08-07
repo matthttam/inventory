@@ -1,1 +1,1 @@
-<a class="btn btn-{{ class|default:"primary" }} mx-3 p-3 btn-lg" style="{{style|default:"width:150px"}}" role="button" href="{{ href }}" {{ anchor_tag }}>{{ value }}</a>
+<a class="{{class|default:'btn mx-3 p-3 btn-lg'}} {{ btn_class|default:"btn-primary" }}" style="{{style|default:"min-width:150px"}}" role="{{ role|default:"button" }}" href="{{ href|default:"#" }}">{{ value }}</a>

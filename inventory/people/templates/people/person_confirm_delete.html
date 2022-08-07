@@ -5,13 +5,11 @@
 {% block content %}
 
     <form method="post">{% csrf_token %}
-        <p>Are you sure you want to delete "{{ object }}"?</p>
+        <h1 clas="display-3">Are you sure you want to delete "{{ object }}"?</h1>
         {% block infobox %}
-        {% include './partials/person_infobox.html'%}
+        {% include './partials/person_infobox.html' with bottom_infobox_card='./person_delete_form_buttons.html'%}
         {% endblock infobox %}
         {{ form }}
-        <button class="button btn btn-danger mx-3 p-3" type="submit">Delete {{ object }}</button>
-        <a class="button btn btn-primary mx-3 p-3" href="{%url 'people:detail' object.id%}">Cancel</a>
     </form>
 
 {% endblock content %}
