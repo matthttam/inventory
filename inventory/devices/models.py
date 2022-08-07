@@ -114,8 +114,6 @@ def device_assignment_actions(sender, instance, update_fields, **kwargs):
         device_building_change_actions(device, person.person_type)
 
 
-# @receiver(post_save, sender="devices.Device")
-# @sync_to_async
 def device_building_change_actions(device, person_type, **kwargs):
     """When updated if the assigned building's mapped OU isn't the same as the google synced OU run a command to fix it."""
     if device.google_device is None:
