@@ -87,6 +87,9 @@ class GoogleCustomSchema(models.Model):
     kind = models.CharField(max_length=255)
     etag = models.CharField(max_length=255)
 
+    def __str__(self):
+        return f"{self.schema_name}"
+
 
 class GoogleCustomSchemaField(models.Model):
     """
@@ -108,7 +111,9 @@ class GoogleCustomSchemaField(models.Model):
     }
     """
 
-    schema = models.ForeignKey(GoogleCustomSchema, on_delete=models.CASCADE)
+    schema = models.ForeignKey(
+        GoogleCustomSchema, on_delete=models.CASCADE, related_name="fields"
+    )
     field_name = models.CharField(max_length=255)
     field_id = models.CharField(max_length=255)
     field_type = models.CharField(max_length=255)
@@ -214,16 +219,19 @@ class GoogleDefaultSchemaProperty(models.Model):
         return self.parent and self.parent.etag == "customSchemas"
 
     def get_custom_field(self):
-        if self.is_custom:
-            return GoogleCustomSchemaField.objects.get(etag=self.etag)
-        return None
+        return GoogleCustomSchemaField.objects.filter(etag=self.etag).first()
 
     @property
     def dot_notation(self) -> str:
         """Return a dot notation path for this schema property"""
         parent = self.parent
         if self.is_custom:
-            etag = self.get_custom_field().dot_notation
+
+            custom_field = self.get_custom_field()
+            if custom_field:
+                etag = self.get_custom_field().dot_notation
+            else:
+                etag = self.etag
         else:
             etag = self.etag
         return_string = f"{etag}"
@@ -250,7 +258,7 @@ class GoogleDefaultSchemaProperty(models.Model):
 
 class GoogleDevice(models.Model):
     id = models.CharField(max_length=255, primary_key=True)
-    serial_number = models.CharField(max_length=255, unique=True, blank=True, null=True)
+    serial_number = models.CharField(max_length=255, blank=True, null=True)
     device_model = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=255, blank=True, null=True)
     organization_unit = models.CharField(max_length=255, blank=True, null=True)

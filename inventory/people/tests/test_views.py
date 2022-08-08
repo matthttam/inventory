@@ -115,9 +115,9 @@ class PersonCreateViewAuthenticatedWithPermissionTest(TestCase):
             "google_id": "",
         }
         response = self.client.post(reverse("people:new"), person_dict)
-        person_object = Person.objects.get(internal_id=person_dict['internal_id'])
+        person_object = Person.objects.get(internal_id=person_dict["internal_id"])
         self.assertIsNotNone(person_object)
-        self.assertEqual(person_object.id, person.id)
+        self.assertEqual(person_object.internal_id, person.internal_id)
         self.assertRedirects(
             response,
             reverse("people:detail", kwargs={"pk": person_object.pk}),
