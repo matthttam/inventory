@@ -139,4 +139,4 @@ class GoogleDefaultSchemaPropertyAdmin(admin.ModelAdmin):
 @admin.register(DeviceBuildingToGoogleOUMapping)
 class DeviceBuildingToGoogleOUMappingAdmin(admin.ModelAdmin):
 
-    list_display = ("building", "organization_unit")
+    list_display = ("person_type", "building", "organization_unit")
