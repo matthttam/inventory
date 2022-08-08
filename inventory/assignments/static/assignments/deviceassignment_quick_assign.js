@@ -6,7 +6,6 @@ function get_ajax_url(key){
 $(document).ready(function() {
 
     
-    
     function get_person_text(obj){
         text = `${obj.last_name}, ${obj.first_name} - ${obj.internal_id}`
         text += obj.is_active ? "": " (inactive)"
@@ -119,7 +118,8 @@ $(document).ready(function() {
             }
         }).fail(function(){
             // Splash unknown error
-            CreateSplash('alert-danger', 'An unknown error occurred.');
+            CreateSplash('alert-danger', 'An unknown error occurred. Refresh this page to continue.');
+            submit_button.attr("disabled", true)
         }).always(function(e){
             // Unlock Submit Button
             submit_button.attr("disabled", false)
