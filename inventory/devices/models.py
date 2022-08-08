@@ -111,14 +111,15 @@ def device_assignment_actions(sender, instance, update_fields, **kwargs):
     if person.primary_building != "" and person.primary_building != device.building:
         device.building = person.primary_building
         device.save()
+    if device.google_device is not None:
         device_building_change_actions(device, person.type)
 
 
 def device_building_change_actions(device, person_type, **kwargs):
     """When updated if the assigned building's mapped OU isn't the same as the google synced OU run a command to fix it."""
+
     if device.google_device is None:
         return
-
     mapping_model = apps.get_model("googlesync.DeviceBuildingToGoogleOUMapping")
     mapping = mapping_model.objects.filter(
         building=device.building, person_type=person_type
