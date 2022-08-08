@@ -178,7 +178,7 @@ class QuickAssignPersonListJSONView(PermissionRequiredMixin, JSONListView):
             "first_name",
             "last_name",
             "internal_id",
-            "has_outstanding_assignment",
+            "is_currently_assigned",
             "email",
             "is_active",
         ).order_by("-is_active", "is_currently_assigned", "type", "last_name")

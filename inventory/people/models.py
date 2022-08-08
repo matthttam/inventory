@@ -36,14 +36,6 @@ class PersonManager(models.Manager):
             )
         )
 
-        # Set if they have an outstanding assignment or not
-        qs = qs.annotate(
-            has_outstanding_assignment=Case(
-                When(outstanding_assignment_count__gt=0, then=True),
-                default=False,
-            )
-        )
-        # Alias of has_outstanding_assignment
         qs = qs.annotate(
             is_currently_assigned=Case(
                 When(outstanding_assignment_count__gt=0, then=True),
