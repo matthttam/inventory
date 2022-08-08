@@ -19,42 +19,7 @@ $(document).ready(function() {
         return text
     }
 
-    var personSelect = $('#person').select2({
-        ajax: {
-            url:  get_ajax_url('people'), //'ajax/people/',
-            delay: 250,
-            dataType: 'json',
-            processResults: function (data) {            
-                
-                var searchTerm = personSelect.data("select2").$dropdown.find("input").val();
-                
-                if (
-                        data.results.length == 1 && 
-                        data.results[0].internal_id == searchTerm && 
-                        data.results[0].is_active &&
-                        !data.results[0].is_currently_assigned
-                    ) {
-                    personSelect.append($("<option />")
-                        .attr("value", data.results[0].id)
-                        .html(get_person_text(data.results[0]))
-                    ).val(data.results[0].id).trigger("change").select2('close').trigger('select2:select');
-                    return {'results':[]};
-                }
-                
-                $.map(data.results, function (obj) {
-                    obj.text = get_person_text(obj)
-                    obj.disabled = ! obj.is_active || obj.is_currently_assigned
-                    return obj;
-                })
-                return data;
-            },
-        },
-        theme: 'bootstrap-5',
-        placeholder: "ID, Email, or Name",
-        minimumInputLength: 3,
-        dropdownParent: $('div[name=person_search]'),
-    })
-
+ 
     var deviceSelect = $('#device').select2({
         ajax: {
             url: get_ajax_url('devices'),
@@ -63,7 +28,13 @@ $(document).ready(function() {
 
             processResults: function (data) {                    
                 var searchTerm = deviceSelect.data("select2").$dropdown.find("input").val();
-                if (data.results.length == 1 && (data.results[0].asset_id == searchTerm || data.results[0].serial_number == searchTerm))  {
+                console.log(data.results[0])
+                if (
+                        data.results.length == 1 && 
+                        data.results[0].is_active && 
+                        ! data.results[0].is_currently_assigned && 
+                        (data.results[0].asset_id == searchTerm || data.results[0].serial_number == searchTerm)
+                    )  {
                     deviceSelect.append($("<option />")
                         .attr("value", data.results[0].id)
                         .html(get_device_text(data.results[0]))
@@ -87,6 +58,45 @@ $(document).ready(function() {
     .on('select2:select', function(e) {
         $('#person').focus().select2('open');
     });
+
+    var personSelect = $('#person').select2({
+        ajax: {
+            url:  get_ajax_url('people'),
+            delay: 250,
+            dataType: 'json',
+            processResults: function (data) {            
+                
+                var searchTerm = personSelect.data("select2").$dropdown.find("input").val();
+
+                if (
+                        data.results.length == 1 && 
+                        data.results[0].internal_id == searchTerm && 
+                        data.results[0].is_active &&
+                        !data.results[0].is_currently_assigned
+                    ) {
+
+                    personSelect.append($("<option />")
+                        .attr("value", data.results[0].id)
+                        .html(get_person_text(data.results[0]))
+                    ).val(data.results[0].id).trigger("change").select2('close').trigger('select2:select');
+                    $('form').find('[type=submit]').focus()
+                    return {'results':[]};
+                }
+                
+                $.map(data.results, function (obj) {
+                    obj.text = get_person_text(obj)
+                    obj.disabled = ! obj.is_active || obj.is_currently_assigned
+                    return obj;
+                })
+                return data;
+            },
+        },
+        theme: 'bootstrap-5',
+        placeholder: "ID, Email, or Name",
+        minimumInputLength: 3,
+        dropdownParent: $('div[name=person_search]'),
+    })
+
 
     $(document).on('submit', 'form#check_form', function(e){
         var form = $('form#check_form')
