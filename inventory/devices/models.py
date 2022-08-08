@@ -111,7 +111,7 @@ def device_assignment_actions(sender, instance, update_fields, **kwargs):
     if person.primary_building != "" and person.primary_building != device.building:
         device.building = person.primary_building
         device.save()
-        device_building_change_actions(device, person.person_type)
+        device_building_change_actions(device, person.type)
 
 
 def device_building_change_actions(device, person_type, **kwargs):
