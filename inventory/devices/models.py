@@ -158,7 +158,7 @@ def change_device_ou(ou, device, **kwargs):
     response = call_command(
         "move_google_devices",
         ou,
-        device.id,
+        device.google_device.id,
     )
     if response == "":
         device.google_device.organization_unit = ou
