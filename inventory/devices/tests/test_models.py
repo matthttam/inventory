@@ -113,7 +113,7 @@ class DeviceTest(TestCase):
 
     def test_asset_id_not_required(self):
         self.assertEqual(self.device._meta.get_field("asset_id").blank, True)
-        self.assertEqual(self.device._meta.get_field("asset_id").null, False)
+        self.assertEqual(self.device._meta.get_field("asset_id").null, True)
 
     def test_asset_id_max_length(self):
         max_length = self.device._meta.get_field("asset_id").max_length
