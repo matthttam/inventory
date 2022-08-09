@@ -215,10 +215,10 @@ class DeviceTest(TestCase):
 class DeviceAccessoryTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        DeviceAccessoryFactory(id=1)
+        DeviceAccessoryFactory(name="test")
 
     def setUp(self):
-        self.device_accessory = DeviceAccessory.objects.get(id=1)
+        self.device_accessory = DeviceAccessory.objects.get(name="test")
 
     def test_name_label(self):
         name_label = self.device_accessory._meta.get_field("name").verbose_name
@@ -249,9 +249,7 @@ class DeviceAccessoryTest(TestCase):
             2, manufacturer=device_manufacturer
         )
         # device_accessory = DeviceAccessory(name="test", device_models=device_models)
-        device_accessory = DeviceAccessoryFactory.create(
-            name="test", device_models=device_models
-        )
+        device_accessory = DeviceAccessoryFactory.create(device_models=device_models)
         device_models = device_accessory.device_models.all()
         device_model_names = ",".join([x.name for x in device_models])
         self.assertEqual(
