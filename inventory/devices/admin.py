@@ -20,16 +20,16 @@ class DeviceManufacturerAdmin(admin.ModelAdmin):
 
 
 @admin.register(DeviceModel)
-class DeviceModel(admin.ModelAdmin):
+class DeviceModelAdmin(admin.ModelAdmin):
     list_display = ("manufacturer", "name")
     search_fields = ("manufacturer", "name")
 
 
 @admin.register(DeviceStatus)
-class DeviceStatus(admin.ModelAdmin):
+class DeviceStatusAdmin(admin.ModelAdmin):
     pass
 
 
 @admin.register(DeviceAccessory)
-class DeviceAccessory(admin.ModelAdmin):
+class DeviceAccessoryAdmin(admin.ModelAdmin):
     pass

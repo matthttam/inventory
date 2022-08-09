@@ -24,7 +24,7 @@ class DeviceStatus(models.Model):
 
 
 class DeviceManufacturer(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -34,6 +34,13 @@ class DeviceModel(models.Model):
     name = models.CharField(max_length=255)
     manufacturer = models.ForeignKey("DeviceManufacturer", on_delete=models.CASCADE)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["manufacturer", "name"],
+                name="unique_manufacturer_and_name",
+            )
+        ]
     def __str__(self):
         return f"{self.manufacturer} {self.name}"
 
