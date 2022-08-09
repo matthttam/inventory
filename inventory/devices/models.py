@@ -41,6 +41,7 @@ class DeviceModel(models.Model):
                 name="unique_manufacturer_and_name",
             )
         ]
+
     def __str__(self):
         return f"{self.manufacturer} {self.name}"
 
@@ -118,33 +119,54 @@ def device_assignment_actions(sender, instance, update_fields, **kwargs):
     if person.primary_building != "" and person.primary_building != device.building:
         device.building = person.primary_building
         device.save()
+
+    # If Google Device
     if device.google_device is not None:
-        device_building_change_actions(device, person.type)
+        if instance.return_datetime is None:
+            device_assignment_creation_action(person, device)
+        else:
+            device_turnin_action(person, device)
+        # change_device_ou(device, person.type)
 
 
-def device_building_change_actions(device, person_type, **kwargs):
-    """When updated if the assigned building's mapped OU isn't the same as the google synced OU run a command to fix it."""
-
-    if device.google_device is None:
-        return
+def device_assignment_creation_action(person, device):
     mapping_model = apps.get_model("googlesync.DeviceBuildingToGoogleOUMapping")
     mapping = mapping_model.objects.filter(
-        building=device.building, person_type=person_type
+        building=device.building, person_type=person.type
     ).first()
-    if mapping is not None:
-        if mapping.organization_unit != device.google_device.organization_unit:
-            response = call_command(
-                "move_google_devices",
-                mapping.organization_unit,
-                device.google_device.id,
-            )
-            if response == "":
-                device.google_device.organization_unit = mapping.organization_unit
-                device.google_device.save()
-                # Log a change
-            else:
-                # Log an error
-                pass
+    if (
+        mapping is not None
+        and mapping.organization_unit != device.google_device.organization_unit
+    ):
+        response = change_device_ou(
+            mapping.organization_unit,
+            device,
+        )
+
+
+def device_turnin_action(person, device):
+    # Get unassigned location based on profile of person assigned
+    # For now hard code it...
+    response = change_device_ou(
+        "/Unassigned Devices",
+        device,
+    )
+
+
+def change_device_ou(ou, device, **kwargs):
+    """Function to change a single device's OU"""
+    response = call_command(
+        "move_google_devices",
+        ou,
+        device.id,
+    )
+    if response == "":
+        device.google_device.organization_unit = ou
+        device.google_device.save()
+        # Log a change
+    else:
+        # Log an error
+        pass
 
 
 class DeviceAccessory(models.Model):
