@@ -22,7 +22,7 @@ class DeviceManufacturerAdmin(admin.ModelAdmin):
 @admin.register(DeviceModel)
 class DeviceModelAdmin(admin.ModelAdmin):
     list_display = ("manufacturer", "name")
-    search_fields = ("manufacturer", "name")
+    search_fields = ("manufacturer__name", "name")
 
 
 @admin.register(DeviceStatus)
