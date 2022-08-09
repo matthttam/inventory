@@ -73,7 +73,7 @@ class DeviceManager(models.Manager):
 
 class Device(models.Model):
     serial_number = models.CharField(max_length=255, unique=True)
-    asset_id = models.CharField(max_length=255, unique=True, blank=True)
+    asset_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
     notes = models.CharField(max_length=255, blank=True)
     status = models.ForeignKey(DeviceStatus, on_delete=models.PROTECT)
     device_model = models.ForeignKey(DeviceModel, on_delete=models.PROTECT)
