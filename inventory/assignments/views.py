@@ -94,9 +94,7 @@ class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["log_entries"] = LogEntry.objects.filter(
-            object_id=self.object.id
-        ).order_by("timestamp")
+        context["log_entries"] = self.object.history.all().order_by("timestamp")
         context["infobox"] = get_deviceassignment_infobox_data(context.get("object"))
         return context
 
@@ -178,7 +176,7 @@ class QuickAssignPersonListJSONView(PermissionRequiredMixin, JSONListView):
             "first_name",
             "last_name",
             "internal_id",
-            "has_outstanding_assignment",
+            "is_currently_assigned",
             "email",
             "is_active",
         ).order_by("-is_active", "is_currently_assigned", "type", "last_name")

@@ -139,17 +139,17 @@ class PersonTest(TestCase):
         person = Person.objects.get(id=1)
         self.assertEqual(person.outstanding_assignment_count, 1)
 
-    def test_has_outstanding_assignment(self):
+    def test_is_currently_assigned(self):
         person = Person.objects.get(id=1)
-        self.assertFalse(person.has_outstanding_assignment)
+        self.assertFalse(person.is_currently_assigned)
         DeviceAssignmentWithReturnDatetimeFactory(person=person, return_datetime=None)
         person = Person.objects.get(id=1)
-        self.assertTrue(person.has_outstanding_assignment)
+        self.assertTrue(person.is_currently_assigned)
         person.deviceassignment_set.update(
             return_datetime=datetime.now(tz=ZoneInfo(key="America/Chicago"))
         )
         person = Person.objects.get(id=1)
-        self.assertFalse(person.has_outstanding_assignment)
+        self.assertFalse(person.is_currently_assigned)
 
     def test_is_active(self):
         active_status = PersonStatusFactory(name="Active", is_inactive=False)

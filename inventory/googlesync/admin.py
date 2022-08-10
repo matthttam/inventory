@@ -20,6 +20,7 @@ from .models import (
 
 @admin.register(GoogleDevice)
 class GoogleDeviceAdmin(admin.ModelAdmin):
+    search_fields = ("serial_number", "annotated_asset_id")
     list_display = [field.name for field in GoogleDevice._meta.get_fields()]
 
 
@@ -139,4 +140,4 @@ class GoogleDefaultSchemaPropertyAdmin(admin.ModelAdmin):
 @admin.register(DeviceBuildingToGoogleOUMapping)
 class DeviceBuildingToGoogleOUMappingAdmin(admin.ModelAdmin):
 
-    list_display = ("building", "organization_unit")
+    list_display = ("person_type", "building", "organization_unit")
