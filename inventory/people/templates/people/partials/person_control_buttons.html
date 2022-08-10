@@ -4,13 +4,13 @@
 
 
 {% if perms.people.view_person %}
-  {% include 'partials/button.html' with value="Person List" href=index_url %}  
+  {% include 'partials/button.html' with value="List" href=index_url %}  
 {% endif %}
 
 {% if perms.people.change_person %}
-  {% include 'partials/button.html' with value="Edit Person" href=edit_url %}
+  {% include 'partials/button.html' with value="Edit" href=edit_url %}
 {% endif %}
 
 {% if perms.people.delete_person %}
-  {% include 'partials/button.html' with value="Delete Person" href=delete_url class='danger' %}
+  {% include 'partials/button.html' with value="Delete" href=delete_url btn_class='btn-danger' %}
 {% endif %}

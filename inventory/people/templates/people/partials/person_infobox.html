@@ -1,36 +1,17 @@
 {% extends 'partials/card.html' %}
-{% load tz %}
-{% block card_title_content %} 
-Person
-{% endblock %}
+
+{% block card_title_content %}Person{% endblock %}
+
 {% block card_body_content%}
-  <p name="person_card_body" class="card-text fs-5">
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">Person ID :</div><div class="col md-1 text-start">{{person.id}}</div>
-    </div>
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">First name :</div><div class="col md-1 text-start">{{person.first_name}}</div>
-    </div>
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">Last name :</div><div class="col md-1 text-start">{{person.last_name}}</div>
-    </div>
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">Email :</div><div class="col md-1 text-start">{{person.email}}</div>
-    </div>
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">Primary Building :</div><div class="col md-1 text-start">{{person.primary_building}}</div>
-    </div>
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">Internal ID :</div><div class="col md-1 text-start">{{person.internal_id}}</div>
-    </div>
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">Type :</div><div class="col md-1 text-start">{{person.type}}</div>
-    </div>
-    <div class="row mb-2">
-      <div class="col-md-4 fw-bold text-end">Status :</div><div class="col md-1 text-start">{{person.status}}</div>
-    </div>
-    {% if bottom_infobox_card %}
-      {% include bottom_infobox_card %}
+
+  <p class="card-text">
+
+    {% if infobox %}
+
+      {% include 'partials/infobox.html' %}
+
     {% endif %}
+    
   </p>
-{% endblock %}
+
+{% endblock card_body_content %}

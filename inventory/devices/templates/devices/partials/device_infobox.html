@@ -1,36 +1,17 @@
 {% extends 'partials/card.html' %}
-{% load tz %}
 
-{% block card_title_content %} 
-Device
-{% endblock %}
+{% block card_title_content %}Device{% endblock %}
+
 {% block card_body_content%}
-<p name="device_card_body" class="card-text fs-5">
-  <div class="row mb-2">
-    <div class="col-md-4 fw-bold text-end">Device ID :</div><div class="col md-1 text-start">{{device.id}}</div>
-  </div>
-  <div class="row mb-2">
-    <div class="col-md-4 fw-bold text-end">Serial :</div><div class="col md-1 text-start">{{device.serial_number}}</div>
-  </div>
-  <div class="row mb-2">
-    <div class="col-md-4 fw-bold text-end">Asset :</div><div class="col md-1 text-start">{{device.asset_id}}</div>
-  </div>
-  <div class="row mb-2">
-    <div class="col-md-4 fw-bold text-end">Status :</div><div class="col md-1 text-start">{{device.status}}</div>
-  </div>
-  <div class="row mb-2">
-    <div class="col-md-4 fw-bold text-end">Model :</div><div class="col md-1 text-start">{{device.device_model}}</div>
-  </div>
-  <div class="row mb-2">
-    <div class="col-md-4 fw-bold text-end">Building :</div><div class="col md-1 text-start">{{device.building}}</div>
-  </div>
-  <div class="row mb-2">
-    <div class="col-md-4 fw-bold text-end">Room :</div><div class="col md-1 text-start">{{device.room}}</div>
-  </div>
-  <div name="device_bottom_infobox" class="d-flex justify-content-center">
-    {% if bottom_infobox_card %}
-      {% include bottom_infobox_card %}
-    {% endif %}
-  </div>
+
+<p class="card-text">
+
+  {% if infobox %}
+
+    {% include 'partials/infobox.html' %}
+
+  {% endif %}
+
 </p>
-{% endblock %}
+
+{% endblock card_body_content %}

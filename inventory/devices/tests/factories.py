@@ -22,7 +22,7 @@ class DeviceManufacturerFactory(DjangoModelFactory):
     class Meta:
         model = DeviceManufacturer
 
-    name = fake.company()
+    name = factory.LazyFunction(lambda: fake.unique.company())
 
 
 class DeviceStatusFactory(DjangoModelFactory):
@@ -38,7 +38,7 @@ class DeviceModelFactory(DjangoModelFactory):
     class Meta:
         model = DeviceModel
 
-    name = "test_model"
+    name = factory.Sequence(lambda n: f"DeviceModel-{n}")
     manufacturer = factory.SubFactory(DeviceManufacturerFactory)
 
 

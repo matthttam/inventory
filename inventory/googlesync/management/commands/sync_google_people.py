@@ -83,9 +83,9 @@ class Command(GoogleSyncCommandAbstract):
             else:
                 self.stdout.write(self.style.WARNING(f"Forcing reinitialization."))
         # Delete any schemas already stored
+        self._delete_custom_schemas()
         self._delete_default_schemas("User")
         self._initialize_default_schema("User")
-        # self._initialize_person_sync_default_schema("UserName")
 
         # Set acocunt as initialized
         google_config = self._get_google_config()
@@ -195,7 +195,7 @@ class Command(GoogleSyncCommandAbstract):
             missing_records = (
                 Person.objects.exclude(google_id__isnull=True)
                 .filter(type=sync_profile.person_type, status__is_inactive=False)
-                .difference(Person.objects.filter(id__in=found_record_ids))
+                .exclude(id__in=found_record_ids)
             )
 
             with transaction.atomic():

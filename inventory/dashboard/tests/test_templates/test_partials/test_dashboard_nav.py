@@ -16,6 +16,7 @@ import copy
 devices_link_selector = 'a[href="/devices/"]'
 people_link_selector = 'a[href="/people/"]'
 assignments_link_selector = 'a[href="/assignments/"]'
+admin_link_selector = 'a[href="/admin/"]'
 
 default_context = Context(
     {
@@ -29,6 +30,11 @@ default_context = Context(
             "people": {
                 "view_person": True,
             },
+        },
+        "request": {
+            "user": {
+                "is_staff": True,
+            }
         },
     }
 )
@@ -46,14 +52,17 @@ class DashboardNavTest(SimpleTestCase):
         devices_link = soup.select(devices_link_selector)
         people_link = soup.select(people_link_selector)
         assignments_link = soup.select(assignments_link_selector)
+        admin_link = soup.select(admin_link_selector)
 
         self.assertEqual(len(devices_link), 1)
         self.assertEqual(len(people_link), 1)
         self.assertEqual(len(assignments_link), 1)
+        self.assertEqual(len(admin_link), 1)
 
         self.assertInHTML(devices_link[0].contents[0], "Devices")
         self.assertInHTML(people_link[0].contents[0], "People")
         self.assertInHTML(assignments_link[0].contents[0], "Assignments")
+        self.assertInHTML(admin_link[0].contents[0], "Admin")
 
 
 class DashboardNavWithoutPermissionTest(SimpleTestCase):
@@ -66,30 +75,25 @@ class DashboardNavWithoutPermissionTest(SimpleTestCase):
         rendered = self.template.render(self.context)
         soup = BeautifulSoup(rendered, "html.parser")
         devices_link = soup.select(devices_link_selector)
-        people_link = soup.select(people_link_selector)
-        assignments_link = soup.select(assignments_link_selector)
         self.assertEqual(len(devices_link), 0)
-        self.assertEqual(len(people_link), 1)
-        self.assertEqual(len(assignments_link), 1)
 
     def test_people_link_missing(self):
         self.context["perms"]["people"]["view_person"] = False
         rendered = self.template.render(self.context)
         soup = BeautifulSoup(rendered, "html.parser")
-        devices_link = soup.select(devices_link_selector)
         people_link = soup.select(people_link_selector)
-        assignments_link = soup.select(assignments_link_selector)
-        self.assertEqual(len(devices_link), 1)
         self.assertEqual(len(people_link), 0)
-        self.assertEqual(len(assignments_link), 1)
 
     def test_assignments_link_missing(self):
         self.context["perms"]["assignments"]["view_deviceassignment"] = False
         rendered = self.template.render(self.context)
         soup = BeautifulSoup(rendered, "html.parser")
-        devices_link = soup.select(devices_link_selector)
-        people_link = soup.select(people_link_selector)
         assignments_link = soup.select(assignments_link_selector)
-        self.assertEqual(len(devices_link), 1)
-        self.assertEqual(len(people_link), 1)
         self.assertEqual(len(assignments_link), 0)
+
+    def test_admin_link_missing(self):
+        self.context["request"]["user"]["is_staff"] = False
+        rendered = self.template.render(self.context)
+        soup = BeautifulSoup(rendered, "html.parser")
+        admin_link = soup.select(admin_link_selector)
+        self.assertEqual(len(admin_link), 0)

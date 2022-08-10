@@ -40,9 +40,9 @@ class PersonControlButtonsTest(SimpleTestCase):
         self.assertEqual(len(update_link), 1)
         self.assertEqual(len(delete_link), 1)
 
-        self.assertInHTML(list_link[0].contents[0], "Person List")
-        self.assertInHTML(update_link[0].contents[0], "Edit Person")
-        self.assertInHTML(delete_link[0].contents[0], "Delete Person")
+        self.assertInHTML(list_link[0].contents[0], "List")
+        self.assertInHTML(update_link[0].contents[0], "Edit")
+        self.assertInHTML(delete_link[0].contents[0], "Delete")
 
 
 class PersonControlButtonsWithoutPermissionTest(SimpleTestCase):

@@ -659,7 +659,7 @@ class GoogleDefaultSchemaPropertyTest(TestCase):
     def test_get_custom_field(self):
         custom_schema_field = GoogleCustomSchemaFieldFactory(etag="custom_etag")
         custom_parent = GoogleDefaultSchemaPropertyFactory(etag="customSchemas")
-        regular = GoogleDefaultSchemaPropertyFactory(etag="custom_etag")
+        regular = GoogleDefaultSchemaPropertyFactory(etag="custom_etag2")
         custom = GoogleDefaultSchemaPropertyFactory(
             etag="custom_etag", parent=custom_parent
         )

@@ -98,6 +98,32 @@ class DeviceAssignmentUpdateViewAuthenticatedWithPermissionTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
+class DeviceAssignmentTurninViewAuthenticatedWithPermissionTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory(id=1)
+
+    def setUp(self):
+        self.user = User.objects.get(id=1)
+        self.client.force_login(self.user)
+        self.user.user_permissions.add(
+            get_permission(DeviceAssignment, "turnin_deviceassignment")
+        )
+
+    def test_invalid_deviceassignment(self):
+        response = self.client.get(reverse("assignments:turnin", args=[1]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_valid_deviceassignment(self):
+        current_time = timezone.now()
+        device_assignment = DeviceAssignmentFactory(id=1)
+        response = self.client.get(reverse("assignments:turnin", args=[1]))
+        self.assertTemplateUsed(
+            response, "assignments/deviceassignment_turnin_form.html"
+        )
+        self.assertEqual(response.status_code, 200)
+
+
 class DeviceAssignmentCreateViewAuthenticatedWithPermissionTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -198,6 +224,10 @@ class DeviceAssignmentViewUnauthenticatedTest(TestCase):
         pass
 
     @assert_redirect_to_login(reverse("assignments:edit", args=[1]))
+    def test_device_assignment_update_redirects_to_login(self):
+        pass
+
+    @assert_redirect_to_login(reverse("assignments:turnin", args=[1]))
     def test_device_assignment_update_redirects_to_login(self):
         pass
 

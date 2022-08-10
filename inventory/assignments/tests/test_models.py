@@ -32,7 +32,7 @@ class AssignmentAbstractTest(TestCase):
 
     def test_assignment_datetime_auto_now(self):
         self.assertTrue(
-            AssignmentAbstract._meta.get_field("assignment_datetime").auto_now
+            AssignmentAbstract._meta.get_field("assignment_datetime").auto_now_add
         )
 
     def test_return_datetime_label(self):

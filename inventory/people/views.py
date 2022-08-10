@@ -83,9 +83,8 @@ class PersonDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["log_entries"] = LogEntry.objects.filter(
-            object_id=self.object.id
-        ).order_by("timestamp")
+        context["log_entries"] = self.object.history.all().order_by("timestamp")
+        context["infobox"] = get_person_infobox_data(context.get("object"))
         return context
 
 
@@ -113,3 +112,22 @@ class PersonDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = "people.delete_person"
     model = Person
     success_url = reverse_lazy("people:index")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["infobox"] = get_person_infobox_data(context.get("object"))
+        return context
+
+
+def get_person_infobox_data(person) -> list:
+
+    return [
+        {"label": "Person ID :", "value": person.id},
+        {"label": "First name :", "value": person.first_name},
+        {"label": "Last name :", "value": person.last_name},
+        {"label": "Email :", "value": person.email},
+        {"label": "Primary Building :", "value": person.primary_building},
+        {"label": "Internal ID :", "value": person.internal_id},
+        {"label": "Type :", "value": person.type},
+        {"label": "Status :", "value": person.status},
+    ]

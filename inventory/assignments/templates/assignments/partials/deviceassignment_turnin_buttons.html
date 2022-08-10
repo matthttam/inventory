@@ -1,0 +1,7 @@
+{% load inventory_extras %}
+{% url 'assignments:turnin' object.id as turnin_url %}
+{% url 'assignments:detail' object.id as detail_url %}
+
+
+{% include 'partials/submit_button.html' with value=object|prepend:"Turnin " href="{{ turnin_url }}" %}
+{% include 'partials/button.html' with value="Cancel" href=detail_url btn_class='btn-secondary' %}

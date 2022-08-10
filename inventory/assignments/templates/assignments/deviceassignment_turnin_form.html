@@ -1,0 +1,40 @@
+{% extends "dashboard/dashboard.html" %}
+
+{% block title %}Inventory - Assignment Turnin{% endblock %}
+
+{% block content %}
+
+{% if deviceassignment %}
+
+    <form method="post">
+        {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                <ol>
+                    {% for error in form.errors %}
+                        <li><strong>{{ error|escape }}</strong></li>
+                    {% endfor %}
+                </ol>
+            </div>
+            {% endif %} 
+
+        <div class="row">
+            <div class="col md-6">
+                {% include './partials/deviceassignment_infobox.html' with infobox_footer='assignments/partials/deviceassignment_turnin_buttons.html' col_label_class="col md-6"%}
+            </div>
+        </div>
+
+    </form>
+
+        
+
+    {% else %}
+
+    <p>Assignment Not Found</p>
+
+    {% endif %}
+
+    
+
+{% endblock content %}

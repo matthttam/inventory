@@ -15,7 +15,7 @@ class AssignmentManager(models.Manager):
 
 class AssignmentAbstract(models.Model):
     assignment_datetime = models.DateTimeField(
-        verbose_name="assignment date", auto_now=True
+        verbose_name="assignment date", auto_now_add=True
     )
     return_datetime = models.DateTimeField(
         blank=True,
@@ -42,6 +42,9 @@ class AssignmentAbstract(models.Model):
 class DeviceAssignment(AssignmentAbstract):
     device = models.ForeignKey(Device, on_delete=models.PROTECT)
     history = AuditlogHistoryField()
+
+    class Meta:
+        permissions = (("turnin_deviceassignment", "Can turn in a device assignment"),)
 
     def get_absolute_url(self):
         return reverse("assignments:detail", kwargs={"pk": self.pk})

@@ -6,6 +6,7 @@ function getActionButtons(row){
      * @param {object} - row - Datatable row object
      */
     const actions = JSON.parse(document.getElementById('permitted_actions').textContent);
+    console.log(actions)
     if(!actions) return ""
 
     ActionButtons = 
@@ -20,6 +21,9 @@ function getActionButtons(row){
     if(actions.change.allowed) {
         ActionButtons += `<a href="${actions.change.path.replace("__id_placeholder__", row.id)}" type="button" class="btn btn-primary" alt="edit"><i class="bi bi-pencil"></i></a>`
     }
+    /*if(actions.turnin.allowed) {
+        ActionButtons += `<a href="${actions.turnin.path.replace("__id_placeholder__", row.id)}" type="button" class="btn btn-primary" alt="edit"><i class="bi bi-box-arrow-in-up"></i></a>`
+    }*/
     if(actions.delete.allowed) {
         ActionButtons += `<a href="${actions.delete.path.replace("__id_placeholder__", row.id)}" type="button" class="btn btn-primary alt="delete"><i class="bi bi-trash2"></i></a>`
     }

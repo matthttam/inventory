@@ -1,0 +1,27 @@
+{% comment %}
+params:
+  infobox: Array of dicitonaries containing label and value
+  infobox_footer: Url of parial to load at the bottom of the infobox
+{% endcomment %}
+
+{% if infobox %}
+
+  {% for row in infobox%}
+
+    {% include 'partials/card_body_row.html' with label=row.label value=row.value %}
+  
+  {% endfor %}
+
+{% endif %}
+
+
+{% if infobox_footer %}
+
+  <hr class="border border-secondary border-2 opacity-35">
+  <div class="d-flex justify-content-md-center">
+
+  {% include infobox_footer %}
+
+  </div>
+
+{% endif %}

@@ -40,9 +40,9 @@ class DeviceAssignmentControlButtonsTest(SimpleTestCase):
         self.assertEqual(len(update_link), 1)
         self.assertEqual(len(delete_link), 1)
 
-        self.assertInHTML(list_link[0].contents[0], "Device List")
-        self.assertInHTML(update_link[0].contents[0], "Edit Device")
-        self.assertInHTML(delete_link[0].contents[0], "Delete Device")
+        self.assertInHTML(list_link[0].contents[0], "List")
+        self.assertInHTML(update_link[0].contents[0], "Edit")
+        self.assertInHTML(delete_link[0].contents[0], "Delete")
 
 
 class DeviceAssignmentControlButtonsWithoutPermissionTest(SimpleTestCase):
