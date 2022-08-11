@@ -23,7 +23,9 @@ from googlesync.models import (
     GoogleDeviceMapping,
     GoogleDeviceTranslation,
     GoogleDevice,
+    DeviceBuildingToGoogleOUMapping,
 )
+from locations.tests.factories import BuildingFactory
 
 from people.tests.factories import PersonTypeFactory
 from people.models import Person
@@ -37,6 +39,15 @@ fake.add_provider(DateTimeProvider)
 fake.add_provider(MiscProvider)
 
 tz = ZoneInfo(timezone.settings.TIME_ZONE)
+
+
+class DeviceBuildingToGoogleOUMappingFactory(DjangoModelFactory):
+    class Meta:
+        model = DeviceBuildingToGoogleOUMapping
+
+    person_type = factory.SubFactory(PersonTypeFactory)
+    building = factory.SubFactory(BuildingFactory)
+    organization_unit = "/" + "/".join(fake.words(3))
 
 
 class GoogleConfigFactory(DjangoModelFactory):
