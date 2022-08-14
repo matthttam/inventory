@@ -37,8 +37,3 @@ class LoginViewTest(TestCase):
         )
         user = auth.get_user(self.client)
         self.assertFalse(user.is_authenticated)
-
-
-class LoggedOutViewTest(TestCase):
-    def logged_out_redirect(self):
-        pass
