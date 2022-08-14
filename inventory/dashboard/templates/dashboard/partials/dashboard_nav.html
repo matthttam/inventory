@@ -23,11 +23,10 @@
                         <a class="nav-link {% if request.resolver_match.namespace == "assignments" %}active{% endif %}" aria-current="page" href="{% url "assignments:index" %}">Assignments</a>
                     </li>
                 {% endif %}
-                {% if user.is_superuser %}
+                {% if request.user.is_staff %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Admin Config</a>
                         <ul class="dropdown-menu dropdown-menu-dark">
-                            <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == "googlesync" %}active{% endif %}" aria-current="page"  href="">Google Sync</a></li>
                             <li class="nav-item"><a class="nav-link {% if request.resolver_match.namespace == "admin" %}active{% endif %}" aria-current="page"  href="{%url 'admin:index'%}">Admin</a></li>
                         </ul>
                     </li>

@@ -10,6 +10,7 @@ from .views import (
     QuickAssignPersonListJSONView,
     QuickAssignDeviceListJSONView,
     QuickAssignSubmitView,
+    DeviceAssignmentTurninView,
 )
 
 app_name = "assignments"
@@ -22,6 +23,7 @@ urlpatterns = [
     ),
     path("<int:pk>/", DeviceAssignmentDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", DeviceAssignmentUpdateView.as_view(), name="edit"),
+    path("<int:pk>/turnin/", DeviceAssignmentTurninView.as_view(), name="turnin"),
     path("new/", DeviceAssignmentCreateView.as_view(), name="new"),
     path("quickassign/", DeviceAssignmentQuickAssignView.as_view(), name="quickassign"),
     path("<int:pk>/delete/", DeviceAssignmentDeleteView.as_view(), name="delete"),

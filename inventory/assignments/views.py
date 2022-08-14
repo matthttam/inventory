@@ -5,6 +5,7 @@ from django.views.generic import (
     UpdateView,
     CreateView,
     DeleteView,
+    FormView,
 )
 from django.views.generic.base import TemplateView
 from django.utils import timezone
@@ -17,19 +18,19 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse, reverse_lazy
 from django.db.models.functions import Concat
 from django.db.models import CharField, Value as V, Q
+from django.shortcuts import redirect
 
 from auditlog.models import LogEntry
 
 from inventory.utils import (
     get_permitted_actions,
     get_history_table_context,
-    get_table_context,
 )
 from inventory.views import JSONListView, JSONFormView
 from people.models import Person
 from devices.models import Device
 from .models import DeviceAssignment
-from .forms import DeviceAssignmentForm
+from .forms import DeviceAssignmentForm, DeviceAssignmentTurninForm
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -73,7 +74,15 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["permitted_actions"] = get_permitted_actions(
-            self.request, "assignments", "deviceassignment"
+            self.request,
+            "assignments",
+            "deviceassignment",
+            action_paths=[
+                ("view", "detail"),
+                ("change", "edit"),
+                ("turnin", "turnin"),
+                ("delete", "delete"),
+            ],
         )
         return context
 
@@ -85,16 +94,34 @@ class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["log_entries"] = LogEntry.objects.filter(
-            object_id=self.object.id
-        ).order_by("timestamp")
+        context["log_entries"] = self.object.history.all().order_by("timestamp")
+        context["infobox"] = get_deviceassignment_infobox_data(context.get("object"))
         return context
 
 
 class DeviceAssignmentUpdateView(PermissionRequiredMixin, UpdateView):
     permission_required = "assignments.change_deviceassignment"
     model = DeviceAssignment
-    fields = ["return_datetime"]
+    fields = ["person", "device", "return_datetime"]
+
+
+class DeviceAssignmentTurninView(PermissionRequiredMixin, UpdateView):
+    permission_required = "assignments.turnin_deviceassignment"
+    template_name = "assignments/deviceassignment_turnin_form.html"
+    form_class = DeviceAssignmentTurninForm
+    model = DeviceAssignment
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["infobox"] = get_deviceassignment_infobox_data(context.get("object"))
+        return context
+
+    # Don't allow turnin if already turned in
+    def render_to_response(self, context, **response_kwargs):
+        assignment = context.get("object")
+        if assignment.return_datetime is not None:
+            return redirect(reverse("assignments:detail", args=[assignment.id]))
+        return super().render_to_response(context, **response_kwargs)
 
 
 class DeviceAssignmentCreateView(PermissionRequiredMixin, CreateView):
@@ -107,6 +134,11 @@ class DeviceAssignmentDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = "assignments.delete_deviceassignment"
     model = DeviceAssignment
     success_url = reverse_lazy("assignments:index")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["infobox"] = get_deviceassignment_infobox_data(context.get("object"))
+        return context
 
 
 class DeviceAssignmentQuickAssignView(PermissionRequiredMixin, TemplateView):
@@ -144,7 +176,7 @@ class QuickAssignPersonListJSONView(PermissionRequiredMixin, JSONListView):
             "first_name",
             "last_name",
             "internal_id",
-            "has_outstanding_assignment",
+            "is_currently_assigned",
             "email",
             "is_active",
         ).order_by("-is_active", "is_currently_assigned", "type", "last_name")
@@ -174,3 +206,14 @@ class QuickAssignDeviceListJSONView(PermissionRequiredMixin, JSONListView):
 class QuickAssignSubmitView(PermissionRequiredMixin, JSONFormView):
     permission_required = "assignments.add_deviceassignment"
     form_class = DeviceAssignmentForm
+
+
+def get_deviceassignment_infobox_data(deviceassignment) -> list:
+
+    return [
+        {"label": "Assignment ID :", "value": deviceassignment.id},
+        {"label": "Person :", "value": deviceassignment.person},
+        {"label": "Device :", "value": deviceassignment.device},
+        {"label": "Assignment Date :", "value": deviceassignment.assignment_datetime},
+        {"label": "Return Date :", "value": deviceassignment.return_datetime},
+    ]

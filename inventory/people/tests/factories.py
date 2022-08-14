@@ -50,6 +50,8 @@ class PersonFactory(DjangoModelFactory):
     def buildings(self, create, extracted, **kwargs):
         if not create or not extracted:
             return
+        if not extracted:
+            extracted = BuildingFactory.create_batch(10)
         self.buildings.add(*extracted)
 
     @factory.post_generation

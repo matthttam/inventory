@@ -15,6 +15,7 @@ from googlesync.models import (
     GoogleServiceAccountConfig,
     GoogleSyncProfileAbstract,
 )
+from django.db.models import ProtectedError
 
 
 class GoogleSyncCommandAbstract(BaseCommand):
@@ -160,45 +161,79 @@ class GoogleSyncCommandAbstract(BaseCommand):
         google_schemas = response.get("schemas")
         # Populate custom schema data
         for gs in google_schemas:
-            current_schema = GoogleCustomSchema.objects.create(
+            current_schema = GoogleCustomSchema.objects.update_or_create(
                 service_account_config_id=self.google_config.get("id"),
                 schema_id=gs.get("schemaId"),
-                schema_name=gs.get("schemaName"),
-                display_name=gs.get("displayName"),
-                kind=gs.get("kind"),
-                etag=gs.get("etag"),
-            )
+                defaults={
+                    "schema_name": gs.get("schemaName"),
+                    "display_name": gs.get("displayName"),
+                    "kind": gs.get("kind"),
+                    "etag": gs.get("etag"),
+                },
+            )[0]
 
             for f in gs.get("fields"):
-                GoogleCustomSchemaField.objects.create(
+                GoogleCustomSchemaField.objects.update_or_create(
                     schema=current_schema,
-                    field_name=f.get("fieldName"),
-                    field_id=f.get("fieldId"),
-                    field_type=f.get("fieldType"),
-                    multi_valued=f.get("multiValued", False),
-                    kind=f.get("kind"),
                     etag=f.get("etag"),
-                    indexed=f.get("indexed", False),
-                    display_name=f.get("displayName"),
-                    read_access_type=f.get("readAccessType"),
-                    numeric_indexing_spec_min_value=f.get(
-                        "numericIndexingSpec", {}
-                    ).get("minValue", None),
-                    numeric_indexing_spec_max_value=f.get(
-                        "numericIndexingSpec", {}
-                    ).get("maxValue", None),
+                    defaults={
+                        "field_id": f.get("fieldId"),
+                        "field_name": f.get("fieldName"),
+                        "field_type": f.get("fieldType"),
+                        "multi_valued": f.get("multiValued", False),
+                        "kind": f.get("kind"),
+                        "indexed": f.get("indexed", False),
+                        "display_name": f.get("displayName"),
+                        "read_access_type": f.get("readAccessType"),
+                        "numeric_indexing_spec_min_value": f.get(
+                            "numericIndexingSpec", {}
+                        ).get("minValue", None),
+                        "numeric_indexing_spec_max_value": f.get(
+                            "numericIndexingSpec", {}
+                        ).get("maxValue", None),
+                    },
                 )
-                GoogleDefaultSchemaProperty.objects.create(
+                GoogleDefaultSchemaProperty.objects.update_or_create(
                     schema=parent_schema,
                     etag=f.get("etag"),
                     parent=parent_property,
                 )
 
     def _delete_default_schemas(self, schema_id):
-        GoogleDefaultSchema.objects.filter(schema_id=schema_id).delete()
+        schema = GoogleDefaultSchema.objects.filter(schema_id=schema_id).first()
+        properties = GoogleDefaultSchemaProperty.objects.filter(schema=schema).all()
+        for property in properties:
+            try:
+                property.delete()
+            except ProtectedError as e:
+                protected_details = ", ".join([str(obj) for obj in e.protected_objects])
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"Unable to delete property {property.etag!r}. It is being used by: {protected_details}."
+                    )
+                )
+        # Remove any defualt schemas that no longer have properties
         GoogleDefaultSchema.objects.all().annotate(
             property_count=Count("properties")
         ).filter(property_count=0).delete()
+
+    def _delete_custom_schemas(self):
+        fields = GoogleCustomSchemaField.objects.all()
+        for field in fields:
+            try:
+                field.delete()
+            except ProtectedError as e:
+                protected_details = ", ".join([str(obj) for obj in e.protected_objects])
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"Unable to delete custom field {field.etag!r}. It is being used by: {protected_details}."
+                    )
+                )
+
+        # Remove any defualt schemas that no longer have properties
+        GoogleCustomSchema.objects.all().annotate(field_count=Count("fields")).filter(
+            field_count=0
+        ).delete()
 
     def _initialize_default_schema(
         self, schema_id, parent_property: GoogleDefaultSchemaProperty = None
@@ -206,21 +241,25 @@ class GoogleSyncCommandAbstract(BaseCommand):
 
         """Used to create default schema and handle recursion"""
         schema = self._get_schema_by_name(schema_id)
-        current_schema = GoogleDefaultSchema.objects.create(
+        current_schema = GoogleDefaultSchema.objects.update_or_create(
             service_account_config_id=self.google_config.get("id"),
             schema_id=schema.get("id"),
-            description=schema.get("description"),
-            type=schema.get("type"),
-        )
+            defaults={
+                "description": schema.get("description"),
+                "type": schema.get("type"),
+            },
+        )[0]
         for etag, property in schema.get("properties").items():
-            current_property = GoogleDefaultSchemaProperty.objects.create(
+            current_property = GoogleDefaultSchemaProperty.objects.update_or_create(
                 schema=current_schema,
                 etag=etag,
-                type=property.get("type"),
-                format=property.get("format"),
-                description=property.get("description"),
-                parent=parent_property,
-            )
+                defaults={
+                    "type": property.get("type"),
+                    "format": property.get("format"),
+                    "description": property.get("description"),
+                    "parent": parent_property,
+                },
+            )[0]
 
             recursive_reference = property.get("$ref")
             if recursive_reference is not None:

@@ -42,11 +42,18 @@ class Command(BaseCommand):
                     matching_priority=None
                 ).order_by("matching_priority")
             ]
-            link_mapping_ids = self.sync_profile.link_mappings.exclude(
+            link_mappings = self.sync_profile.link_mappings.exclude(
                 matching_priority=None
             ).order_by("matching_priority")
 
-            for link_mapping in link_mapping_ids:
+            if not link_mappings:
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"No link mappings defined! Please configure link mappings first."
+                    )
+                )
+                return 1
+            for link_mapping in link_mappings:
                 query.add(
                     Q(
                         **{

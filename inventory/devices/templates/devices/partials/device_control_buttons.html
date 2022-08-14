@@ -4,13 +4,13 @@
 
 
 {% if perms.devices.view_device %}
-  {% include 'partials/button.html' with value="Device List" href=index_url %}  
+  {% include 'partials/button.html' with value="List" href=index_url %}  
 {% endif %}
 
 {% if perms.devices.change_device %}
-  {% include 'partials/button.html' with value="Edit Device" href=edit_url %}
+  {% include 'partials/button.html' with value="Edit" href=edit_url %}
 {% endif %}
 
 {% if perms.devices.delete_device %}
-  {% include 'partials/button.html' with value="Delete Device" href=delete_url class='danger' %}
+  {% include 'partials/button.html' with value="Delete" href=delete_url btn_class="btn-danger" %}
 {% endif %}
