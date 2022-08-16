@@ -21,7 +21,8 @@ from inventory.utils import (
     get_table_context,
     get_history_table_context,
 )
-from inventory.aggregates import GroupConcat
+
+# from inventory.aggregates import GroupConcat
 from .models import Person
 from .forms import PersonForm
 

@@ -145,7 +145,7 @@ class PersonTest(TestCase):
         DeviceAssignmentWithReturnDatetimeFactory(person=person, return_datetime=None)
         person = Person.objects.get(id=1)
         self.assertTrue(person.is_currently_assigned)
-        person.deviceassignment_set.update(
+        person.deviceassignments.update(
             return_datetime=datetime.now(tz=ZoneInfo(key="America/Chicago"))
         )
         person = Person.objects.get(id=1)
