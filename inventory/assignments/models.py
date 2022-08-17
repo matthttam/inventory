@@ -44,10 +44,6 @@ class AssignmentAbstract(models.Model):
     class Meta:
         abstract = True
 
-    # @property
-    # def is_outstanding(self):
-    #    return self.return_datetime is None
-
 
 class DeviceAssignment(AssignmentAbstract):
     device = models.ForeignKey(
