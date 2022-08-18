@@ -55,8 +55,6 @@ class GoogleSyncCommandAbstract(BaseCommand):
         responses = list()
 
         while start < len(requests):
-            print(dir(service))
-            # batch = service.new_batch_http_request(callback=callback)
             batch = BatchHttpRequest(
                 callback=callback,
                 batch_uri="https://www.googleapis.com/batch/admin/v1",
