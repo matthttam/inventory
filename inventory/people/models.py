@@ -31,8 +31,8 @@ class PersonManager(models.Manager):
         # Add a count of outstanding assignments
         qs = qs.annotate(
             outstanding_assignment_count=Count(
-                F("deviceassignment"),
-                filter=Q(deviceassignment__return_datetime=None),
+                F("deviceassignments"),
+                filter=Q(deviceassignments__return_datetime=None),
             )
         )
 

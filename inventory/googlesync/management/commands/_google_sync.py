@@ -3,9 +3,10 @@ from typing import Type
 
 import googleapiclient.discovery
 from django.core.management.base import BaseCommand
-from django.db.models import Count
+from django.db.models import Count, ProtectedError
 from django.forms import model_to_dict
 from google.oauth2 import service_account
+from googleapiclient.http import BatchHttpRequest
 from googlesync.exceptions import ConfigNotFound
 from googlesync.models import (
     GoogleCustomSchema,
@@ -15,7 +16,6 @@ from googlesync.models import (
     GoogleServiceAccountConfig,
     GoogleSyncProfileAbstract,
 )
-from django.db.models import ProtectedError
 
 
 class GoogleSyncCommandAbstract(BaseCommand):
@@ -48,6 +48,25 @@ class GoogleSyncCommandAbstract(BaseCommand):
         )
         credentials_delegated = credentials.with_subject(self.DELEGATE)
         return credentials_delegated
+
+    def _process_batch_requests(
+        self, service, requests: list, callback=None, start=0, max=1000
+    ) -> list:
+        responses = list()
+
+        while start < len(requests):
+            print(dir(service))
+            # batch = service.new_batch_http_request(callback=callback)
+            batch = BatchHttpRequest(
+                callback=callback,
+                batch_uri="https://www.googleapis.com/batch/admin/v1",
+            )
+            for request in requests[start:max]:
+                batch.add(request)
+            responses.append(batch.execute())
+            start = max
+            max *= 2
+        return responses
 
     def _get_my_customer(self):
         customer_resource = self._get_customer_service()
