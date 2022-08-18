@@ -45,6 +45,8 @@ class PersonFactory(DjangoModelFactory):
     internal_id = factory.LazyFunction(lambda: fake.unique.numerify("%##!"))
     type = factory.SubFactory(PersonTypeFactory)
     status = factory.SubFactory(PersonStatusFactory)
+    primary_building = factory.SubFactory(BuildingFactory)
+    primary_room = factory.SubFactory(RoomFactory)
 
     @factory.post_generation
     def buildings(self, create, extracted, **kwargs):

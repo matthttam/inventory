@@ -1,12 +1,11 @@
-from ._google_sync import GoogleSyncCommandAbstract
-from devices.models import Device
-from django.db.models.functions import Concat
-from django.db.models import CharField, Value as V, Q, F, Case, When, Prefetch
-from django_mysql.models import GroupConcat
 from assignments.models import DeviceAssignment
-from googleapiclient.http import BatchHttpRequest
+from devices.models import Device
+from django.db.models import F, Q
+from django.db.models import Value as V
+from django.db.models.functions import Concat
+from django_mysql.models import GroupConcat
 
-import pdb
+from ._google_sync import GoogleSyncCommandAbstract
 
 
 class Command(GoogleSyncCommandAbstract):
@@ -16,37 +15,18 @@ class Command(GoogleSyncCommandAbstract):
         pass
 
     def handle(self, *args, **options):
-        chromeosdevices = self._get_chromeosdevices_service()
+        chromeosdevices_service = self._get_chromeosdevices_service()
 
         devices = self.get_devices_to_update()
         patch_requests = self.get_chromeosdevices_patch_requests(
-            chromeosdevices, devices
+            chromeosdevices_service, devices
         )
         responses = self._process_batch_requests(
-            service=chromeosdevices,
+            service=chromeosdevices_service,
             requests=patch_requests,
             callback=self._patch_location_request_callback,
         )
         self.stdout.write(self.style.SUCCESS("Done"))
-
-    def _process_batch_requests(
-        self, service, requests: list, callback=None, start=0, max=1000
-    ) -> list:
-        responses = list()
-
-        while start < len(requests):
-            print(dir(service))
-            # batch = service.new_batch_http_request(callback=callback)
-            batch = BatchHttpRequest(
-                callback=callback,
-                batch_uri="https://www.googleapis.com/batch/admin/v1",
-            )
-            for request in requests[start:max]:
-                batch.add(request)
-            responses.append(batch.execute())
-            start = max
-            max *= 2
-        return responses
 
     def _patch_location_request_callback(self, request_id, response, exception) -> None:
         if exception is not None:
@@ -79,6 +59,8 @@ class Command(GoogleSyncCommandAbstract):
             DeviceAssignment.objects.outstanding()
             .select_related("device", "person")
             .exclude(device__google_device=None)
+            .exclude(person__type__name="Staff")
+            .values("device__google_device__id")
             .annotate(
                 correct_google_location=Concat(
                     F("device__building__name"),
