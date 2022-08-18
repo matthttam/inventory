@@ -135,11 +135,12 @@ class UpdateGoogleDevicesTest(TestCase):
                 customerId="1234",
                 projection="FULL",
                 deviceId="40413525601230989103",
-                body={"annotatedLocation": "Building3,c@cd.com"},
+                body={"annotatedLocation": "Building3,c@c.com"},
             ),
         ]
         command.get_chromeosdevices_patch_requests(mock_service, devices)
-        self.assertEqual(mock_service.patch.call_args_list, expected_calls)
+        print(mock_service.patch.call_args_list)
+        self.assertCountEqual(mock_service.patch.call_args_list, expected_calls)
 
     def test_get_devices_to_update_uses_list_of_active_assigned_for_nonstaff(self):
         person_type_student = PersonTypeFactory(name="Student")
