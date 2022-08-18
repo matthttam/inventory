@@ -6,6 +6,7 @@ from django.test import LiveServerTestCase, TestCase
 from django.urls import reverse
 from inventory.tests.helpers import chrome_set_value, get_chrome_driver
 from people.tests.factories import PersonFactory
+from devices.tests.factories import DeviceFactory
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -43,35 +44,43 @@ class DeviceAssignmentQuickAssignLiveTest(StaticLiveServerTestCase):
         force_login(superuser, self.browser, f"{self.live_server_url}/")
         self.browser.get(f"{self.live_server_url}/assignments/quickassign/")
 
-        self.device_search_xpath = (
-            '//*[@id="check_form"]/div[1]/div/span/span/span[1]/input'
-        )
-
-        self.person_search_xpath = (
-            '//*[@id="check_form"]/div[2]/div/span/span/span[1]/input'
-        )
-
-        self.device_search_box = self.browser.find_element(
+    def get_device_search_box(self):
+        return self.browser.find_element(
             by=By.XPATH,
-            value=self.device_search_xpath,
+            value='//*[@id="check_form"]/div[1]/div/span/span/span[1]/input',
         )
 
-        self.person_search_box = self.browser.find_element(
+    def get_person_search_box(self):
+        return self.browser.find_element(
             by=By.XPATH,
-            value=self.person_search_xpath,
+            value='//*[@id="check_form"]/div[2]/div/span/span/span[1]/input',
         )
 
     def test_device_search_is_focused_load(self):
-
-        # person_searchbox = locate_with
+        device_search_box = self.get_device_search_box()
         self.assertEqual(
-            self.device_search_box,
+            device_search_box,
             self.browser.switch_to.active_element,
             msg="Device search box is not focused automatically!",
         )
 
     def test_device_search_uses_asset(self):
-        pass
+        DeviceFactory(asset_id="L001234")
+        DeviceFactory(asset_id="L001235")
+        device_search_box = self.get_device_search_box()
+        chrome_set_value(self.browser, device_search_box, "L00")
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located(
+                (By.XPATH, '//*[@id="select2-device-results"]')
+            )
+        )
+        results_box = device_search_box.find_element(
+            by=By.XPATH,
+            value='//*[@id="select2-device-results"]',
+        )
+        print(str(results_box))
+
+        # self.assertIn("L001234", )
 
     def test_device_search_uses_serial(self):
         pass
