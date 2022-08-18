@@ -6,11 +6,26 @@ from auditlog.models import AuditlogHistoryField
 
 from devices.models import Device, DeviceAccessory
 from people.models import Person
+from django.db.models import CharField, Value as V, Q, F, Case, When, Prefetch
 
 
 class AssignmentManager(models.Manager):
     def outstanding(self):
+        """Assignments that have not been returned"""
         return self.filter(return_datetime=None)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        # Add is_outstanding
+        qs = qs.annotate(
+            is_outstanding=Case(
+                When(return_datetime=None, then=True),
+                default=False,
+            )
+        )
+
+        return qs
 
 
 class AssignmentAbstract(models.Model):
@@ -23,24 +38,22 @@ class AssignmentAbstract(models.Model):
         default=None,
         verbose_name="return date",
     )
-    person = models.ForeignKey(
-        Person,
-        on_delete=models.PROTECT,
-        related_query_name="%(class)s",
-    )
 
     objects = AssignmentManager()
 
     class Meta:
         abstract = True
 
-    @property
-    def is_outstanding(self):
-        return self.return_datetime is None
-
 
 class DeviceAssignment(AssignmentAbstract):
-    device = models.ForeignKey(Device, on_delete=models.PROTECT)
+    device = models.ForeignKey(
+        Device, on_delete=models.PROTECT, related_name="deviceassignments"
+    )
+    person = models.ForeignKey(
+        Person,
+        on_delete=models.PROTECT,
+        related_name="deviceassignments",
+    )
     history = AuditlogHistoryField()
 
     class Meta:
@@ -55,6 +68,11 @@ class DeviceAssignment(AssignmentAbstract):
 
 class DeviceAccessoryAssignment(AssignmentAbstract):
     device_accessory = models.ForeignKey(DeviceAccessory, on_delete=models.PROTECT)
+    person = models.ForeignKey(
+        Person,
+        on_delete=models.PROTECT,
+        related_name="deviceaccessoryassignments",
+    )
 
 
 # Audit Log Registrations
