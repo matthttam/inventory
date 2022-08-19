@@ -11,7 +11,7 @@ params:
   {% for row in infobox%}
 
     {% if row.date %}
-      {% include 'partials/card_body_row.html' with label=row.label value=row.date|localtime %}
+      {% include 'partials/card_body_row.html' with label=row.label value=row.date|date:'SHORT_DATETIME_FORMAT' %}
     {% else %}
       {% include 'partials/card_body_row.html' with label=row.label value=row.value %}
     {% endif %}

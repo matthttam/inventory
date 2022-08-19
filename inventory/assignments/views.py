@@ -216,27 +216,18 @@ class QuickAssignSubmitView(PermissionRequiredMixin, JSONFormView):
 
 def get_deviceassignment_infobox_data(deviceassignment) -> list:
 
-    assignment_date = deviceassignment.assignment_datetime
-    return_date = deviceassignment.return_datetime
-
-    # if deviceassignment.assignment_datetime:
-    #    assignment_date = deviceassignment.assignment_datetime.strftime(
-    #        "%-m/%-d/%Y %-I:%-M %p"
-    #    )
-    # if deviceassignment.return_datetime:
-    #    return_date = deviceassignment.return_datetime.strftime("%-m/%-d/%Y %-I:%-M %p")
     return [
         {"label": "Assignment ID :", "value": deviceassignment.id},
         {"label": "Person :", "value": deviceassignment.person},
         {"label": "Device :", "value": deviceassignment.device},
         {
             "label": "Assignment Date :",
-            "date": assignment_date,
+            "date": deviceassignment.assignment_datetime,
             "value": "None",
         },
         {
             "label": "Return Date :",
-            "date": return_date,
+            "date": deviceassignment.return_datetime,
             "value": "None",
         },
     ]
