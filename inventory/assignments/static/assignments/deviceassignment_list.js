@@ -11,8 +11,15 @@ $(document).ready(function () {
         fixedHeader: true,
         searchDelay: 350,
         columns: [
+            {
+                className: 'dt-control',
+                orderable: false,
+                data: null,
+                defaultContent: '',
+            },
             { name: 'id', data: 'id', visible: false},
             { name: 'person_name', data: 'person_name' },
+            { name: 'person_type', data: 'person_type' },
             { name: 'device__asset_id', data: 'device__asset_id' },
             { 
                 name: 'assignment_datetime', 

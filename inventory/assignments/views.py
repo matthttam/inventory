@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse, reverse_lazy
 from django.db.models.functions import Concat
-from django.db.models import CharField, Value as V, Q
+from django.db.models import CharField, Value as V, Q, F
 from django.shortcuts import redirect
 
 from auditlog.models import LogEntry
@@ -38,14 +38,22 @@ class DeviceAssignmentDatatableServerSideProcessingView(
     PermissionRequiredMixin, ServerSideDatatableMixin
 ):
     permission_required = "assignments.view_deviceassignment"
-    queryset = DeviceAssignment.objects.all().annotate(
-        person_name=Concat(
-            "person__first_name", V(" "), "person__last_name", output_field=CharField()
+    queryset = (
+        DeviceAssignment.objects.all()
+        .annotate(
+            person_name=Concat(
+                "person__first_name",
+                V(" "),
+                "person__last_name",
+                output_field=CharField(),
+            )
         )
+        .annotate(person_type=F("person__type__name"))
     )
     columns = [
         "id",
         "person_name",
+        "person_type",
         "device__asset_id",
         "assignment_datetime",
         "return_datetime",
@@ -60,8 +68,10 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
             "assignment_list": {
                 "id": "assignment_list",
                 "headers": [
+                    "",
                     "ID",
                     "Person",
+                    "Person Type",
                     "Device",
                     "Assignment Date",
                     "Return Date",
