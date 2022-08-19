@@ -1,5 +1,5 @@
-import re
-
+import re, operator
+from functools import reduce
 from django.views.generic import (
     DetailView,
     UpdateView,
@@ -161,16 +161,24 @@ class QuickAssignPersonListJSONView(PermissionRequiredMixin, JSONListView):
     def get_queryset(self):
         q = self.request.GET.get("q")
         # Remove symbols and repeated spaces
-        q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
+        # q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
         people = Person.objects.all()
         if q != "":
-            people = people.filter(
-                Q(internal_id__exact=q)
+            filter = (
+                Q(internal_id__istartswith=q)
                 | Q(first_name__icontains=q)
-                | Q(last_name__icontains=q)
                 | Q(last_name__icontains=q)
                 | Q(email__istartswith=q)
             )
+
+            search_word_list = q.replace(",", "").split(" ")
+            if len(search_word_list) > 1:
+                # filter |= Q(full_name__in=search_word_list)
+                filter |= reduce(
+                    operator.and_, (Q(full_name__icontains=x) for x in search_word_list)
+                )
+            people = people.filter(filter)
+
         people = people.values(
             "id",
             "first_name",
@@ -189,13 +197,11 @@ class QuickAssignDeviceListJSONView(PermissionRequiredMixin, JSONListView):
     def get_queryset(self):
         q = self.request.GET.get("q")
         # Remove symbols and repeated spaces
-        q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
+        # q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
         devices = Device.objects.all()
         if q != "":
             devices = devices.filter(
-                Q(asset_id__exact=q)
-                | Q(serial_number__exact=q)
-                | Q(asset_id__icontains=q)
+                Q(serial_number__icontains=q) | Q(asset_id__icontains=q)
             )
         devices = devices.values(
             "id", "asset_id", "serial_number", "is_active", "is_currently_assigned"

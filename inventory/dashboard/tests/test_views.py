@@ -17,6 +17,8 @@ class DashboardViewTest(TestCase):
     def test_dashboard(self):
         response = self.client.get(reverse("dashboard:dashboard"))
         self.assertEqual(response.status_code, 200)
+        self.assertInHTML("Inventory - Dashboard", response.content.decode())
+        self.assertTemplateUsed(response, "dashboard/dashboard.html")
 
 
 class UnauthenticatedDeviceAssignmentViewTest(TestCase):

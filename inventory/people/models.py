@@ -1,5 +1,6 @@
 from django.db import models
-from django.db.models import F, Count, Q, When, Value, Case
+from django.db.models import F, Count, Q, When, Case, Value as V
+from django.db.models.functions import Concat
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.urls import reverse
@@ -28,6 +29,8 @@ class PersonManager(models.Manager):
     def get_queryset(self):
         qs = super().get_queryset()
 
+        # Add their full name
+        qs = qs.annotate(full_name=Concat(F("first_name"), V(" "), F("last_name")))
         # Add a count of outstanding assignments
         qs = qs.annotate(
             outstanding_assignment_count=Count(
