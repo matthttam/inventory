@@ -4,11 +4,17 @@ params:
   infobox_footer: Url of parial to load at the bottom of the infobox
 {% endcomment %}
 
+{% load tz %}
+
 {% if infobox %}
 
   {% for row in infobox%}
 
-    {% include 'partials/card_body_row.html' with label=row.label value=row.value %}
+    {% if row.date %}
+      {% include 'partials/card_body_row.html' with label=row.label value=row.date|localtime %}
+    {% else %}
+      {% include 'partials/card_body_row.html' with label=row.label value=row.value %}
+    {% endif %}
   
   {% endfor %}
 
