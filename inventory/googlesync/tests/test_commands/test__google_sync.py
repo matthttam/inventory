@@ -83,6 +83,35 @@ class GoogleSyncTest(TestCase):
         # Verify with_subject was called with the object delegate we expect
         mock_credentials.with_subject.assert_called_with("test@example.com")
 
+    # @patch("googleapiclient.http.BatchHttpRequest")
+    @patch(
+        "googlesync.management.commands._google_sync.BatchHttpRequest",
+        new_callable=Mock(),
+    )
+    @patch.object(GoogleSyncCommandAbstract, "_get_my_customer")
+    def test__process_batch_requests_batches_by_1000(
+        self, mock__get_my_customer, mock_BatchHttpRequest
+    ):
+        def batch_side_effect():
+            return Mock()
+
+        requests = list(range(0, 2001))
+        mock_batch = Mock(**{"execute.side_effect": batch_side_effect()})
+        mock_BatchHttpRequest.return_value = mock_batch
+        mock_service = Mock()
+
+        command = GoogleSyncCommandAbstract()
+        responses = command._process_batch_requests(
+            service=mock_service, requests=requests, callback=None
+        )
+        mock_BatchHttpRequest.assert_any_call(
+            callback=None, batch_uri="https://www.googleapis.com/batch/admin/v1"
+        )
+        self.assertEqual(mock_BatchHttpRequest.call_count, 3)
+        self.assertEqual(mock_batch.add.call_count, 2001)
+        self.assertEqual(mock_batch.execute.call_count, 3)
+        self.assertEqual(len(responses), 3)
+
     @patch.object(GoogleSyncCommandAbstract, "_get_customer_service")
     def test__get_my_customer(self, mock__get_customer_service):
         mock_customer_resource = Mock()

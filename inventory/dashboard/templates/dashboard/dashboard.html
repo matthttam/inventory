@@ -8,12 +8,13 @@
 
 {% url 'assignments:quickassign' as quickassign_url%}
 
-
+{% if perms.assignments.add_deviceassignment %}
     <h1 class="display-1 my-5">
         Click below to begin assigning devices:
     </h1>
+
     {% include "partials/button.html" with href=quickassign_url class="btn btn-block mx-3 p-3 btn-lg btn-success w-100" value="Quick Assign"%}
-    
+{% endif %}
 
 
 {% endblock %}

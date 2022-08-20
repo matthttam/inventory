@@ -1,8 +1,9 @@
 // Configure the defaults for all datatables
 $.extend(true, $.fn.dataTable.defaults, {
-    dom: `<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>
+    dom: `<'row'<'col-sm-6 col-md-6'l><'col-sm-6 col-md-6'f>>
     <'row'<'col-sm-12'tr>>
     <'row'<'col-sm-12 col-md-3'i><'col-sm-12 col-md-3'B><'col-sm-12 col-md-6'p>>`,
+    stateSave: true,
     buttons:{
         dom: {
             button: {
@@ -10,7 +11,9 @@ $.extend(true, $.fn.dataTable.defaults, {
             }
         },
         buttons: [
-                
+            {
+                extend: 'colvis'
+            },
             {
                 extend: 'collection',
                 text: '<i class="bi bi-save pe-1"></i>',
