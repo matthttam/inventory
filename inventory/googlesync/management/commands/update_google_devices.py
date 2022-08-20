@@ -72,15 +72,6 @@ class Command(GoogleSyncCommandAbstract):
                 )
             )
             .annotate(current_google_location=F("device__google_device__location"))
-            .filter(
-                Q(current_google_location=None)
-                | ~Q(correct_google_location=F("current_google_location"))
-            )
-            .values(
-                google_id=F("device__google_device__id"),
-                correct_google_location=F("correct_google_location"),
-                current_google_location=F("current_google_location"),
-            )
         )
         # Get a list of all other devices and set them to Building,*
         unassigned_devices = (
@@ -101,6 +92,14 @@ class Command(GoogleSyncCommandAbstract):
                 correct_google_location=F("correct_google_location"),
                 current_google_location=F("current_google_location"),
             )
+        )
+        outstanding_devices_needing_updates = outstanding_devices.filter(
+            Q(current_google_location=None)
+            | ~Q(correct_google_location=F("current_google_location"))
+        ).values(
+            google_id=F("device__google_device__id"),
+            correct_google_location=F("correct_google_location"),
+            current_google_location=F("current_google_location"),
         )
         return list(outstanding_devices.union(unassigned_devices))
 
