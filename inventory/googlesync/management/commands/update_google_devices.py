@@ -21,11 +21,14 @@ class Command(GoogleSyncCommandAbstract):
         patch_requests = self.get_chromeosdevices_patch_requests(
             chromeosdevices_service, devices
         )
-        responses = self._process_batch_requests(
-            service=chromeosdevices_service,
-            requests=patch_requests,
-            callback=self._patch_location_request_callback,
-        )
+        responses = list()
+        for request in patch_requests:
+            responses += request.execute()
+        # responses = self._process_batch_requests(
+        #    service=chromeosdevices_service,
+        #    requests=patch_requests,
+        #    callback=self._patch_location_request_callback,
+        # )
         self.stdout.write(self.style.SUCCESS("Done"))
 
     def _patch_location_request_callback(self, request_id, response, exception) -> None:
