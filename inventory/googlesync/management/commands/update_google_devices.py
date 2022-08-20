@@ -79,7 +79,7 @@ class Command(GoogleSyncCommandAbstract):
             )
         )
         # Get a list of all other devices and set them to Building,*
-        unassigned_devices = (
+        unassigned_devices_needing_updates = (
             Device.objects.exclude(google_device=None)
             .exclude(
                 google_device__id__in=outstanding_devices.values_list(
@@ -102,7 +102,11 @@ class Command(GoogleSyncCommandAbstract):
             Q(current_google_location=None)
             | ~Q(correct_google_location=F("current_google_location"))
         )
-        return list(outstanding_devices.union(unassigned_devices))
+        return list(
+            outstanding_devices_needing_updates.union(
+                unassigned_devices_needing_updates
+            )
+        )
 
     def move_google_device(self, organization_unit, google_ids: list[str]):
         devices = self._get_chromeosdevices_service()
