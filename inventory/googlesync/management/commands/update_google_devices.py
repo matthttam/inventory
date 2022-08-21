@@ -21,11 +21,14 @@ class Command(GoogleSyncCommandAbstract):
         patch_requests = self.get_chromeosdevices_patch_requests(
             chromeosdevices_service, devices
         )
-        responses = self._process_batch_requests(
-            service=chromeosdevices_service,
-            requests=patch_requests,
-            callback=self._patch_location_request_callback,
-        )
+        responses = list()
+        for request in patch_requests:
+            responses += request.execute()
+        # responses = self._process_batch_requests(
+        #    service=chromeosdevices_service,
+        #    requests=patch_requests,
+        #    callback=self._patch_location_request_callback,
+        # )
         self.stdout.write(self.style.SUCCESS("Done"))
 
     def _patch_location_request_callback(self, request_id, response, exception) -> None:
@@ -69,10 +72,6 @@ class Command(GoogleSyncCommandAbstract):
                 )
             )
             .annotate(current_google_location=F("device__google_device__location"))
-            .filter(
-                Q(current_google_location=None)
-                | ~Q(correct_google_location=F("current_google_location"))
-            )
             .values(
                 google_id=F("device__google_device__id"),
                 correct_google_location=F("correct_google_location"),
@@ -80,7 +79,7 @@ class Command(GoogleSyncCommandAbstract):
             )
         )
         # Get a list of all other devices and set them to Building,*
-        unassigned_devices = (
+        unassigned_devices_needing_updates = (
             Device.objects.exclude(google_device=None)
             .exclude(
                 google_device__id__in=outstanding_devices.values_list(
@@ -99,7 +98,15 @@ class Command(GoogleSyncCommandAbstract):
                 current_google_location=F("current_google_location"),
             )
         )
-        return list(outstanding_devices.union(unassigned_devices))
+        outstanding_devices_needing_updates = outstanding_devices.filter(
+            Q(current_google_location=None)
+            | ~Q(correct_google_location=F("current_google_location"))
+        )
+        return list(
+            outstanding_devices_needing_updates.union(
+                unassigned_devices_needing_updates
+            )
+        )
 
     def move_google_device(self, organization_unit, google_ids: list[str]):
         devices = self._get_chromeosdevices_service()
