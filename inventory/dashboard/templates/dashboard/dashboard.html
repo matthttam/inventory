@@ -23,6 +23,7 @@
                 <div class="container-fluid p-4">
                     {% block content %}
                     {% if perms.assignments.add_deviceassignment %}
+                        {% url 'assignments:quickassign' as quickassign_url%}
                         <h1 class="display-1 my-5">
                             Click below to begin assigning devices:
                         </h1>
