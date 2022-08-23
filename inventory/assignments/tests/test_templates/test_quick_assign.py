@@ -32,7 +32,9 @@ class DeviceAssignmentQuickAssignTemplateTest(TestCase):
 
     def test_buttons(self):
         soup = BeautifulSoup(self.response.content.decode(), "html.parser")
-        submit_buttons = soup.find("form").select('button[type="submit"]')
+        submit_buttons = soup.find(
+            "form", {"id": "deviceassignment_quickassign_form"}
+        ).select('button[type="submit"]')
         self.assertEqual(len(submit_buttons), 1)
         self.assertInHTML(submit_buttons[0].contents[0], "Submit")
 

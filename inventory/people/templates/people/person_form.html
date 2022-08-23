@@ -4,7 +4,7 @@
 
 {% block content %}
 
-    <form method="post">
+    <form method="post" id="person_form">
         {% csrf_token %}
         {{ form.as_p }}
         <input class="btn btn-primary m-2" role="button" type="submit" value="Save">

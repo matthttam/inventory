@@ -24,7 +24,8 @@ class DashboardTestSuperuser(TestCase):
 
     def test_templates(self):
         self.assertTemplateUsed(self.response, "base.html")
-        self.assertTemplateUsed(self.response, "dashboard/partials/dashboard_nav.html")
+        self.assertTemplateUsed(self.response, "dashboard/partials/_side_nav.html")
+        self.assertTemplateUsed(self.response, "dashboard/partials/_top_nav.html")
 
 
 class DashboardTest(TestCase):

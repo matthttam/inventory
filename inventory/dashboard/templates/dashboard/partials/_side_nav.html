@@ -43,7 +43,7 @@
 
                 {% if perms.assignments.view_deviceassignment %}
                 <a class="nav-link{% if namespace != "assignments" %} collapsed{% endif %}" href="#" data-bs-toggle="collapse" data-bs-target="#AssignmentCollapse" aria-expanded="{% if namespace == "assignments" %}true{% else %}false{% endif %}" aria-controls="AssignmentCollapse">
-                    <div class="sb-nav-link-icon"><i class="bi bi-laptop-fill"></i></div>
+                    <div class="sb-nav-link-icon"><i class="bi bi-journal"></i></div>
                     Assignments
                     <div class="sb-sidenav-collapse-arrow"><i class="bi bi-chevron-down"></i></div>
                 </a>
@@ -52,7 +52,7 @@
                         <a class="nav-link {% if namespace == "assignments" and url_name == "index" %}active{% endif %}" aria-current="page" href="{% url "assignments:index" %}"><div class="sb-nav-link-icon"><i class="bi bi-table"></i></div>List</a>
                         {% if perms.assignments.add_device %}
                         <a class="nav-link {% if namespace == "assignments" and url_name == "new" %}active{% endif %}" aria-current="page" href="{% url "assignments:quickassign" %}"><div class="sb-nav-link-icon"><i class="bi bi-plus-lg"></i></div>Quick Assign</a>
-                        <a class="nav-link {% if namespace == "assignments" and url_name == "new" %}active{% endif %}" aria-current="page" href="{% url "assignments:new" %}"><div class="sb-nav-link-icon"><i class="bi bi-plus-square"></i></div>Create</a>
+                        <a class="nav-link {% if namespace == "assignments" and url_name == "new" %}active{% endif %}" aria-current="page" href="{% url "assignments:new" %}"><div class="sb-nav-link-icon"><i class="bi bi-journal-plus"></i></div>Create</a>
                         {% endif %}
                     </nav>
                 </div>
