@@ -1,0 +1,68 @@
+{% with namespace=request.resolver_match.namespace url_name=request.resolver_match.url_name     %}
+<div id="layoutSidenav_nav">
+    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <div class="sb-sidenav-menu-heading">Core</div>
+                <a class="nav-link" href="{% url 'dashboard:dashboard' %}">
+                    <div class="sb-nav-link-icon"><i class="bi bi-speedometer"></i></div>
+                    Dashboard
+                </a>
+
+                {% if perms.people.view_person %}
+                <a class="nav-link{% if namespace != "people" %} collapsed{% endif %}" href="#" data-bs-toggle="collapse" data-bs-target="#PeopleCollapse" aria-expanded="{% if namespace == "people" %}true{% else %}false{% endif %}" aria-controls="PeopleCollapse">
+                    <div class="sb-nav-link-icon"><i class="bi bi-people-fill"></i></div>
+                    People
+                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-chevron-down"></i></div>
+                </a>
+                <div class="collapse{% if namespace == "people" %} show{% endif %}" id="PeopleCollapse" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link {% if namespace == "people" and url_name == "index" %}active{% endif %}" aria-current="page" href="{% url "people:index" %}"><div class="sb-nav-link-icon"><i class="bi bi-table"></i></div>List</a>
+                        {% if perms.people.add_person %}
+                        <a class="nav-link {% if namespace == "people" and url_name == "new" %}active{% endif %}" aria-current="page" href="{% url "people:new" %}"><div class="sb-nav-link-icon"><i class="bi bi-person-plus-fill"></i></div>Create</a>
+                        {% endif %}
+                    </nav>
+                </div>
+                {% endif %}
+
+                {% if perms.devices.view_device %}
+                <a class="nav-link{% if namespace != "devices" %} collapsed{% endif %}" href="#" data-bs-toggle="collapse" data-bs-target="#DeviceCollapse" aria-expanded="{% if namespace == "devices" %}true{% else %}false{% endif %}" aria-controls="DeviceCollapse">
+                    <div class="sb-nav-link-icon"><i class="bi bi-laptop-fill"></i></div>
+                    Devices
+                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-chevron-down"></i></div>
+                </a>
+                <div class="collapse{% if namespace == "devices" %} show{% endif %}" id="DeviceCollapse" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link {% if namespace == "devices" and url_name == "index" %}active{% endif %}" aria-current="page" href="{% url "devices:index" %}"><div class="sb-nav-link-icon"><i class="bi bi-table"></i></div>List</a>
+                        {% if perms.devices.add_device %}
+                        <a class="nav-link {% if namespace == "devices" and url_name == "new" %}active{% endif %}" aria-current="page" href="{% url "devices:new" %}"><div class="sb-nav-link-icon"><i class="bi bi-plus-square"></i></div>Create</a>
+                        {% endif %}
+                    </nav>
+                </div>
+                {% endif %}
+
+                {% if perms.assignments.view_deviceassignment %}
+                <a class="nav-link{% if namespace != "assignments" %} collapsed{% endif %}" href="#" data-bs-toggle="collapse" data-bs-target="#AssignmentCollapse" aria-expanded="{% if namespace == "assignments" %}true{% else %}false{% endif %}" aria-controls="AssignmentCollapse">
+                    <div class="sb-nav-link-icon"><i class="bi bi-laptop-fill"></i></div>
+                    Assignments
+                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-chevron-down"></i></div>
+                </a>
+                <div class="collapse{% if namespace == "assignments" %} show{% endif %}" id="AssignmentCollapse" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link {% if namespace == "assignments" and url_name == "index" %}active{% endif %}" aria-current="page" href="{% url "assignments:index" %}"><div class="sb-nav-link-icon"><i class="bi bi-table"></i></div>List</a>
+                        {% if perms.assignments.add_device %}
+                        <a class="nav-link {% if namespace == "assignments" and url_name == "new" %}active{% endif %}" aria-current="page" href="{% url "assignments:quickassign" %}"><div class="sb-nav-link-icon"><i class="bi bi-plus-lg"></i></div>Quick Assign</a>
+                        <a class="nav-link {% if namespace == "assignments" and url_name == "new" %}active{% endif %}" aria-current="page" href="{% url "assignments:new" %}"><div class="sb-nav-link-icon"><i class="bi bi-plus-square"></i></div>Create</a>
+                        {% endif %}
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="sb-sidenav-footer">
+            <div class="small">Logged in as:</div>
+            {{ user.profile.display_name }}
+        </div>
+    </nav>
+</div>
+{% endwith %}
