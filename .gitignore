@@ -193,7 +193,7 @@ passenger_wsgi.py
 
 # Ignore static files
 public/static/
-static/
+
 
 # Ignore config
 config/
