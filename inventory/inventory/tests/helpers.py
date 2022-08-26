@@ -29,3 +29,10 @@ def chrome_set_value(driver, element, value, timeout=10):
         f"arguments[0].value = '{value}';",
         WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(element)),
     )
+
+
+def chrome_click_element(driver, element, timeout=10):
+    driver.execute_script(
+        f"arguments[0].click();",
+        WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(element)),
+    )

@@ -1,12 +1,12 @@
 from assignments.tests.factories import DeviceAssignmentFactory
 from authentication.tests.factories import SuperuserUserFactory, User
 from bs4 import BeautifulSoup
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import LiveServerTestCase, TestCase
-from django.urls import reverse
-from inventory.tests.helpers import chrome_set_value, get_chrome_driver
-from people.tests.factories import PersonFactory
 from devices.tests.factories import DeviceFactory
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import TestCase
+from django.urls import reverse
+from inventory.tests.helpers import get_chrome_driver
+from people.tests.factories import PersonFactory
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait

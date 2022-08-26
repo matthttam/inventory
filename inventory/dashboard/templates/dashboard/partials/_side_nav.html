@@ -4,9 +4,9 @@
         <div class="sb-sidenav-menu">
             <div class="nav">
                 <div class="sb-sidenav-menu-heading">Core</div>
-                <a class="nav-link" href="{% url 'dashboard:dashboard' %}">
-                    <div class="sb-nav-link-icon"><i class="bi bi-speedometer"></i></div>
-                    Dashboard
+                
+                <a id="DashboardLink" class="nav-link{% if namespace == "dashboard" and url_name == "dashboard" %} active{% endif %}" href="{% url 'dashboard:dashboard' %}">
+                    <div class="sb-nav-link-icon"><i class="bi bi-speedometer"></i></div>Dashboard
                 </a>
 
                 {% if perms.people.view_person %}
@@ -26,12 +26,12 @@
                 {% endif %}
 
                 {% if perms.devices.view_device %}
-                <a class="nav-link{% if namespace != "devices" %} collapsed{% endif %}" href="#" data-bs-toggle="collapse" data-bs-target="#DeviceCollapse" aria-expanded="{% if namespace == "devices" %}true{% else %}false{% endif %}" aria-controls="DeviceCollapse">
+                <a class="nav-link{% if namespace != "devices" %} collapsed{% endif %}" href="#" data-bs-toggle="collapse" data-bs-target="#DevicesCollapse" aria-expanded="{% if namespace == "devices" %}true{% else %}false{% endif %}" aria-controls="DevicesCollapse">
                     <div class="sb-nav-link-icon"><i class="bi bi-laptop-fill"></i></div>
                     Devices
                     <div class="sb-sidenav-collapse-arrow"><i class="bi bi-chevron-down"></i></div>
                 </a>
-                <div class="collapse{% if namespace == "devices" %} show{% endif %}" id="DeviceCollapse" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                <div class="collapse{% if namespace == "devices" %} show{% endif %}" id="DevicesCollapse" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {% if namespace == "devices" and url_name == "index" %}active{% endif %}" aria-current="page" href="{% url "devices:index" %}"><div class="sb-nav-link-icon"><i class="bi bi-table"></i></div>List</a>
                         {% if perms.devices.add_device %}
@@ -42,27 +42,38 @@
                 {% endif %}
 
                 {% if perms.assignments.view_deviceassignment %}
-                <a class="nav-link{% if namespace != "assignments" %} collapsed{% endif %}" href="#" data-bs-toggle="collapse" data-bs-target="#AssignmentCollapse" aria-expanded="{% if namespace == "assignments" %}true{% else %}false{% endif %}" aria-controls="AssignmentCollapse">
+                <a class="nav-link{% if namespace != "assignments" %} collapsed{% endif %}" href="#" data-bs-toggle="collapse" data-bs-target="#AssignmentsCollapse" aria-expanded="{% if namespace == "assignments" %}true{% else %}false{% endif %}" aria-controls="AssignmentsCollapse">
                     <div class="sb-nav-link-icon"><i class="bi bi-journal"></i></div>
                     Assignments
                     <div class="sb-sidenav-collapse-arrow"><i class="bi bi-chevron-down"></i></div>
                 </a>
-                <div class="collapse{% if namespace == "assignments" %} show{% endif %}" id="AssignmentCollapse" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                <div class="collapse{% if namespace == "assignments" %} show{% endif %}" id="AssignmentsCollapse" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {% if namespace == "assignments" and url_name == "index" %}active{% endif %}" aria-current="page" href="{% url "assignments:index" %}"><div class="sb-nav-link-icon"><i class="bi bi-table"></i></div>List</a>
-                        {% if perms.assignments.add_device %}
-                        <a class="nav-link {% if namespace == "assignments" and url_name == "new" %}active{% endif %}" aria-current="page" href="{% url "assignments:quickassign" %}"><div class="sb-nav-link-icon"><i class="bi bi-plus-lg"></i></div>Quick Assign</a>
+                        {% if perms.assignments.add_deviceassignment %}
+                        <a class="nav-link {% if namespace == "assignments" and url_name == "quickassign" %}active{% endif %}" aria-current="page" href="{% url "assignments:quickassign" %}"><div class="sb-nav-link-icon"><i class="bi bi-plus-lg"></i></div>Quick Assign</a>
                         <a class="nav-link {% if namespace == "assignments" and url_name == "new" %}active{% endif %}" aria-current="page" href="{% url "assignments:new" %}"><div class="sb-nav-link-icon"><i class="bi bi-journal-plus"></i></div>Create</a>
                         {% endif %}
                     </nav>
                 </div>
                 {% endif %}
+
+                {% if request.user.is_staff %}
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#AdminCollapse" aria-expanded="false" aria-controls="AdminCollapse">
+                        <div class="sb-nav-link-icon"><i class="bi bi-gear"></i></div>
+                        Administration
+                        <div class="sb-sidenav-collapse-arrow"><i class="bi bi-chevron-down"></i></div>
+                    </a>
+                    <div class="collapse{% if namespace == "googlesync" or namespace == "config" %} show{% endif %}" id="AdminCollapse" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" aria-current="page" href="{% url "admin:index" %}"><div class="sb-nav-link-icon"><i class="bi bi-tools"></i></div>Management Portal</a>
+                        </nav>
+                    </div>
+                {% endif %}
             </div>
         </div>
         <div class="sb-sidenav-footer">
-            <div class="small">Logged in as:</div>
-            {{ user.profile.display_name }}
-        </div>
+            <div class="small">Logged in as:</div><div name="logged_in_as">{{ user.profile.display_name }}</div></div>
     </nav>
 </div>
 {% endwith %}
