@@ -23,6 +23,7 @@ class Command(GoogleSyncCommandAbstract):
         )
         responses = list()
         for request in patch_requests:
+            # print(request)
             responses += request.execute()
         # responses = self._process_batch_requests(
         #    service=chromeosdevices_service,

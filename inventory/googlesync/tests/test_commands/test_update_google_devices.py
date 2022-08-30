@@ -69,7 +69,8 @@ class UpdateGoogleDevicesTest(TestCase):
 
         mock_devices = Mock()
         mock_get_devices_to_update.return_value = mock_devices
-        mock_patch_requests = Mock
+        mock_patch_request = Mock()
+        mock_patch_requests = [mock_patch_request]
         mock_get_chromeosdevices_patch_requests.return_value = mock_patch_requests
         mock_chromeosdevices_service = Mock()
         mock__get_chromeosdevices_service.return_value = mock_chromeosdevices_service
@@ -77,18 +78,17 @@ class UpdateGoogleDevicesTest(TestCase):
         command = GoogleDevicesUpdateCommand()
         command.handle()
 
-        # mock__get_chromeosdevices_service.assert_called_once()
-        # mock_get_devices_to_update.assert_called_once()
         mock__get_chromeosdevices_service.assert_called_once()
         mock_get_devices_to_update.assert_called_once()
         mock_get_chromeosdevices_patch_requests.assert_called_once_with(
             mock_chromeosdevices_service, mock_devices
         )
-        mock__process_batch_requests.assert_called_once_with(
-            service=mock_chromeosdevices_service,
-            requests=mock_patch_requests,
-            callback=mock__patch_location_request_callback,
-        )
+        mock_patch_request.execute.assert_called_once()
+        # mock__process_batch_requests.assert_called_once_with(
+        #    service=mock_chromeosdevices_service,
+        #    requests=mock_patch_requests,
+        #    callback=mock__patch_location_request_callback,
+        # )
         self.assertEqual(mock_stdout.getvalue(), "Done\n")
 
     def test__patch_location_request_callback(self):

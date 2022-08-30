@@ -31,45 +31,44 @@ class DashboardTestSuperuser(TestCase):
 
 
 class DashboardTemplateTest(TestCase):
-    def setUp(self):
-
-        self.template = Template("{% include  'dashboard/dashboard.html'%}")
-        self.context = Context(
+    def test_quickassign_button_without_permission(self):
+        template = Template("{% include  'dashboard/dashboard.html'%}")
+        context = Context(
             {
                 "perms": {
                     "assignments": {
-                        "view_deviceassignment": True,
-                        "delete_deviceassignment": True,
-                        "change_deviceassignment": True,
+                        "add_deviceassignment": False,
                     }
                 },
             }
         )
-
-    def test_quickassign_button_without_permission(self):
-        context = copy.deepcopy(self.context)
-        template = copy.deepcopy(self.template)
-        context["perms"]["assignments"]["add_deviceassignment"] = False
         rendered = template.render(context)
         soup = BeautifulSoup(rendered, "html.parser")
         quickassign_link = soup.select('a[href="/assignments/quickassign/"]')
         self.assertEqual(
             len(quickassign_link),
             0,
-            msg="Quick assign button exists when it should not!",
+            msg="Quick assign button exists without permissions!",
         )
 
     def test_quickassign_button_with_permissions(self):
-        context = copy.deepcopy(self.context)
-        template = copy.deepcopy(self.template)
-        context["perms"]["assignments"]["add_deviceassignment"] = True
+        template = Template("{% include  'dashboard/dashboard.html'%}")
+        context = Context(
+            {
+                "perms": {
+                    "assignments": {
+                        "add_deviceassignment": True,
+                    }
+                },
+            }
+        )
         rendered = template.render(context)
         soup = BeautifulSoup(rendered, "html.parser")
         quickassign_link = soup.select('a[href="/assignments/quickassign/"]')
         self.assertEqual(
             len(quickassign_link),
             1,
-            msg="Quick assign button does not exist when it should!",
+            msg="Quick assign button does not existwith permissions!",
         )
 
 
@@ -78,11 +77,6 @@ class DashboardLiveTest(StaticLiveServerTestCase):
         return WebDriverWait(self.browser, 10).until(
             EC.visibility_of_element_located(locator)
         )
-
-        # (
-        #            By.XPATH,
-        #            '//*[@id="check_form"]/div[2]/div/span/span/span[1]/input',
-        #        )
 
     def setUp(self):
         self.browser = get_chrome_driver()
@@ -119,12 +113,14 @@ class DashboardLiveTest(StaticLiveServerTestCase):
         # Click List
         chrome_click_element(self.browser, people_list_link)
 
-        # Verify People Link is expanded and List is active
+        # Verify People Link is expanded
         people_link = self.get_element(
             (By.XPATH, '//a[@data-bs-target="#PeopleCollapse"]')
         )
+        self.assertNotIn("collapsed", people_link.get_attribute("class"))
+
+        # Verify
         people_list_link = self.get_element(
             (By.XPATH, '//div[@id="PeopleCollapse"]/nav/a[@href="/people/"]')
         )
-        self.assertNotIn("collapsed", people_link.get_attribute("class"))
         self.assertIn("active", people_list_link.get_attribute("class"))
