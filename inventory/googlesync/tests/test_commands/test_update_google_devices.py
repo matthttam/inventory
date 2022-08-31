@@ -91,8 +91,19 @@ class UpdateGoogleDevicesTest(TestCase):
         # )
         self.assertEqual(mock_stdout.getvalue(), "Done\n")
 
-    def test__patch_location_request_callback(self):
-        self.skipTest("Need to test")
+    @patch("sys.stdout", new_callable=StringIO)
+    def test__patch_location_request_callback(self, mock_stdout):
+        command = GoogleDevicesUpdateCommand()
+        response = command._patch_location_request_callback("", "", None)
+        assert response is None
+        assert mock_stdout.getvalue() == ""
+
+        response = command._patch_location_request_callback("", "", Exception("test"))
+        assert response is None
+        assert (
+            mock_stdout.getvalue()
+            == "Failed to update google chromeos device data: test\n"
+        )
 
     def test_get_chromeosdevices_patch_requests(self):
         mock_patch1 = Mock()
