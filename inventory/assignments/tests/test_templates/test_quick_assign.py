@@ -1,12 +1,12 @@
 from assignments.tests.factories import DeviceAssignmentFactory
 from authentication.tests.factories import SuperuserUserFactory, User
 from bs4 import BeautifulSoup
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import LiveServerTestCase, TestCase
-from django.urls import reverse
-from inventory.tests.helpers import chrome_set_value, get_chrome_driver
-from people.tests.factories import PersonFactory
 from devices.tests.factories import DeviceFactory
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import TestCase
+from django.urls import reverse
+from inventory.tests.helpers import get_chrome_driver
+from people.tests.factories import PersonFactory
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -32,7 +32,9 @@ class DeviceAssignmentQuickAssignTemplateTest(TestCase):
 
     def test_buttons(self):
         soup = BeautifulSoup(self.response.content.decode(), "html.parser")
-        submit_buttons = soup.find("form").select('button[type="submit"]')
+        submit_buttons = soup.find(
+            "form", {"id": "deviceassignment_quickassign_form"}
+        ).select('button[type="submit"]')
         self.assertEqual(len(submit_buttons), 1)
         self.assertInHTML(submit_buttons[0].contents[0], "Submit")
 

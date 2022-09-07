@@ -1,20 +1,56 @@
 {% extends "base.html" %}
+
+{% load static %}
+
 {% block title %}Inventory - Dashboard{% endblock %}
-{% block dashboard %}
-{% include "dashboard/partials/dashboard_nav.html"%}
-{% endblock dashboard %}
 
-{% block content %}
+{% block head %}
+{{ block.super }}
+<script src="{% static 'dashboard/js/dashboard.js'%}"></script>
+<link href="{% static 'dashboard/css/dashboard.css'%}" rel="stylesheet" />
 
-{% url 'assignments:quickassign' as quickassign_url%}
+{% endblock %}
 
-{% if perms.assignments.add_deviceassignment %}
-    <h1 class="display-1 my-5">
-        Click below to begin assigning devices:
-    </h1>
 
-    {% include "partials/button.html" with href=quickassign_url class="btn btn-block mx-3 p-3 btn-lg btn-success w-100" value="Quick Assign"%}
-{% endif %}
+{% block base_content %}
+<body class="sb-nav-fixed {% if request.COOKIES.sb_sidebar_toggle == "true" %}sb-sidenav-toggled{% endif %}">
+        
+    {% include './partials/_top_nav.html' %}
+    <div id="layoutSidenav">
+        {% include './partials/_side_nav.html' %}
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid p-4">
+                    {% block content %}
+                    
+                    {% if perms.assignments.add_deviceassignment %}
+                    
+                        {% url 'assignments:quickassign' as quickassign_url%}
+                        <h1 class="display-1 my-5">
+                            Click below to begin assigning devices:
+                        </h1>
 
+                        {% include "partials/button.html" with href=quickassign_url class="btn btn-block p-3 btn-lg btn-success w-100" value="Quick Assign"%}
+                    {% endif %}
+                    
+                    {% endblock %}
+                    
+                </div>
+            </main>
+            <!--<footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; Your Website 2022</div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms &amp; Conditions</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>-->
+        </div>
+    </div>
+</body>
 
 {% endblock %}

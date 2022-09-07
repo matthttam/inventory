@@ -69,7 +69,8 @@ class UpdateGoogleDevicesTest(TestCase):
 
         mock_devices = Mock()
         mock_get_devices_to_update.return_value = mock_devices
-        mock_patch_requests = Mock
+        mock_patch_request = Mock()
+        mock_patch_requests = [mock_patch_request]
         mock_get_chromeosdevices_patch_requests.return_value = mock_patch_requests
         mock_chromeosdevices_service = Mock()
         mock__get_chromeosdevices_service.return_value = mock_chromeosdevices_service
@@ -77,22 +78,32 @@ class UpdateGoogleDevicesTest(TestCase):
         command = GoogleDevicesUpdateCommand()
         command.handle()
 
-        # mock__get_chromeosdevices_service.assert_called_once()
-        # mock_get_devices_to_update.assert_called_once()
         mock__get_chromeosdevices_service.assert_called_once()
         mock_get_devices_to_update.assert_called_once()
         mock_get_chromeosdevices_patch_requests.assert_called_once_with(
             mock_chromeosdevices_service, mock_devices
         )
-        mock__process_batch_requests.assert_called_once_with(
-            service=mock_chromeosdevices_service,
-            requests=mock_patch_requests,
-            callback=mock__patch_location_request_callback,
-        )
+        mock_patch_request.execute.assert_called_once()
+        # mock__process_batch_requests.assert_called_once_with(
+        #    service=mock_chromeosdevices_service,
+        #    requests=mock_patch_requests,
+        #    callback=mock__patch_location_request_callback,
+        # )
         self.assertEqual(mock_stdout.getvalue(), "Done\n")
 
-    def test__patch_location_request_callback(self):
-        self.skipTest("Need to test")
+    @patch("sys.stdout", new_callable=StringIO)
+    def test__patch_location_request_callback(self, mock_stdout):
+        command = GoogleDevicesUpdateCommand()
+        response = command._patch_location_request_callback("", "", None)
+        assert response is None
+        assert mock_stdout.getvalue() == ""
+
+        response = command._patch_location_request_callback("", "", Exception("test"))
+        assert response is None
+        assert (
+            mock_stdout.getvalue()
+            == "Failed to update google chromeos device data: test\n"
+        )
 
     def test_get_chromeosdevices_patch_requests(self):
         mock_patch1 = Mock()
