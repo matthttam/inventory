@@ -10,6 +10,9 @@ $(document).ready(function () {
         },
         fixedHeader: true,
         searchDelay: 350,
+        rowId: function(a) {
+            return 'deviceassignment_' + a.id;
+        },
         columns: [
             { name: 'id', data: 'id', visible: false},
             { name: 'person_name', data: 'person_name' },
