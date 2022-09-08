@@ -31,6 +31,7 @@ from people.models import Person
 from devices.models import Device
 from .models import DeviceAssignment
 from .forms import DeviceAssignmentForm, DeviceAssignmentTurninForm
+from django.db.models import F
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -38,15 +39,38 @@ class DeviceAssignmentDatatableServerSideProcessingView(
     PermissionRequiredMixin, ServerSideDatatableMixin
 ):
     permission_required = "assignments.view_deviceassignment"
-    queryset = DeviceAssignment.objects.all().annotate(
-        person_name=Concat(
-            "person__first_name", V(" "), "person__last_name", output_field=CharField()
+    queryset = (
+        DeviceAssignment.objects.all()
+        .select_related("person", "device")
+        .annotate(
+            device_str=Concat(
+                "device__asset_id",
+                V(" ("),
+                "device__serial_number",
+                V(")"),
+                output_field=CharField(),
+            )
+        )
+        .annotate(
+            person_name=Concat(
+                "person__first_name",
+                V(" "),
+                "person__last_name",
+                output_field=CharField(),
+            )
         )
     )
     columns = [
         "id",
+        "person__internal_id",
+        "person__type__name",
         "person_name",
+        "person__first_name",
+        "person__last_name",
+        "device_str",
         "device__asset_id",
+        "device__serial_number",
+        "device__device_model__name",
         "assignment_datetime",
         "return_datetime",
     ]
@@ -61,8 +85,15 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
                 "id": "assignment_list",
                 "headers": [
                     "ID",
+                    "Person Internal ID",
                     "Person",
+                    "Person First Name",
+                    "Person Last Name",
+                    "Person Type",
                     "Device",
+                    "Device Asset",
+                    "Device Serial",
+                    "Device Model",
                     "Assignment Date",
                     "Return Date",
                     "Actions",
