@@ -16,9 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from dashboard import views
+from .views import InventoryAboutView
 
 urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
+    path("about/", InventoryAboutView.as_view(), name="about"),
     path("admin/", admin.site.urls),
     path("", include("dashboard.urls")),
     path("devices/", include("devices.urls")),
