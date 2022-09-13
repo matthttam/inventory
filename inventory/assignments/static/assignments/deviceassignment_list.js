@@ -1,5 +1,10 @@
 $(document).ready(function () {
-    $('#assignment_list').DataTable({
+    // $('#assignment_list tfoot th').each( function (i) {
+    //     var title = $('#assignment_list thead th').eq( $(this).index() ).text();
+    //     $(this).html( '<input type="text" placeholder="'+title+'" data-index="'+i+'" />' );
+    // } );
+
+    table = $('#assignment_list').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
@@ -14,26 +19,24 @@ $(document).ready(function () {
             return 'deviceassignment_' + a.id;
         },
         columns: [
-            { name: 'id', data: 'id', visible: false},
-            { name: 'person__internal_id', data: 'person__internal_id', visible: false},
-            { name: 'person_name', data: 'person_name' },
-            { name: 'person__first_name', data: 'person__first_name', visible: false },
-            { name: 'person__last_name', data: 'person__last_name', visible: false },
-            { name: 'person__type__name', data: 'person__type__name'},
-            { name: 'device_str', data: 'device_str' },
-            { name: 'device__asset_id', data: 'device__asset_id', visible: false },
-            { name: 'device__serial_number', data: 'device__serial_number', visible: false },
-            { name: 'device__device_model__name', data: 'device__device_model__name'},
-            { 
-                name: 'assignment_datetime', 
+            { data: 'id', visible: false},
+            { data: 'person__internal_id', visible: false},
+            { data: 'person_name' },
+            { data: 'person__first_name', visible: false },
+            { data: 'person__last_name', visible: false },
+            { data: 'person__type__name'},
+            { data: 'device_str' },
+            { data: 'device__asset_id', visible: false },
+            { data: 'device__serial_number', visible: false },
+            { data: 'device__device_model__name'},
+            {
                 data: 'assignment_datetime',
                 render: function(data, type, row, meta){
                     if(!data) return ''
                     return new Date(data).toLocaleDateString()
                 }
             },
-            { 
-                name: 'return_datetime', 
+            {
                 data: 'return_datetime',
                 render: function(data, type, row, meta){
                     if(!data) return ''
@@ -43,4 +46,11 @@ $(document).ready(function () {
             getActionColumnDef(),
         ]
     });
+
+    // Filter event handler
+    // $( '#assignment_list' ).on( 'keyup change', 'tfoot input', function () {
+    //     table.column( $(this).parent().index()+':visible' )
+    //     .search( this.value )
+    //     .draw();
+    // } );
 });

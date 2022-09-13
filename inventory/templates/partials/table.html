@@ -17,3 +17,12 @@
         {% include tbody_template %}
     {% endif %}
 {% endblock tbody %}
+
+{% block tfoot %}
+    <tr>
+    {{ block.super }}
+    {% if tfoot_template %}
+        {% include tfoot_template %}
+    {% endif %}
+    </tr>
+{% endblock tfoot %}
