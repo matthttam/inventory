@@ -28,7 +28,6 @@ $(document).ready(function() {
 
             processResults: function (data) {                    
                 var searchTerm = deviceSelect.data("select2").$dropdown.find("input").val();
-                console.log(data.results[0])
                 if (
                         data.results.length == 1 && 
                         data.results[0].is_active && 

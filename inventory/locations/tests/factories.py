@@ -24,7 +24,7 @@ class BuildingFactory(DjangoModelFactory):
         lambda: f"{fake.unique.school_name()}"
     )  # factory.faker("")
     internal_id = factory.LazyFunction(
-        lambda: fake.unique.numerify(f"%#!")
+        lambda: fake.unique.numerify(f"%#######!")
     )  # fake.unique.school_nces_id()
     acronym = factory.LazyAttribute(
         lambda o: "".join(re.findall("(?<![a-z])[A-Z]", o.name))

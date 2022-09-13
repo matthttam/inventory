@@ -6,7 +6,6 @@ function getActionButtons(row){
      * @param {object} - row - Datatable row object
      */
     const actions = JSON.parse(document.getElementById('permitted_actions').textContent);
-    console.log(actions)
     if(!actions) return ""
 
     ActionButtons = 
@@ -39,7 +38,7 @@ function getActionButtons(row){
 function getActionColumnDef(){
     return { 
         name: 'actions', 
-        data: 'id', 
+        data: 'actions', 
         render:function(data, type, row, meta){
             return getActionButtons(row)
         },
