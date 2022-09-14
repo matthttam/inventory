@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "markdownify.apps.MarkdownifyConfig",
     "inventory",
     "debug_toolbar",
     "auditlog",
@@ -180,6 +181,8 @@ SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT")
 SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE")
 
 CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE")
+
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
 
 SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS")
 

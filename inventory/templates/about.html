@@ -1,0 +1,13 @@
+{% extends "dashboard/dashboard.html" %}
+
+{% load static %}
+{% load markdownify %}
+
+
+{% block title %}Inventory - About{% endblock %}
+
+{% block content %}
+
+{{ changelog|markdownify }}
+
+{% endblock content %}

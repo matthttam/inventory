@@ -192,7 +192,8 @@ cython_debug/
 passenger_wsgi.py
 
 # Ignore static files
-static/
+public/static/
+
 
 # Ignore config
 config/

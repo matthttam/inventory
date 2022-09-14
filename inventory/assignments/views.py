@@ -1,5 +1,5 @@
-import re
-
+import re, operator
+from functools import reduce
 from django.views.generic import (
     DetailView,
     UpdateView,
@@ -31,6 +31,7 @@ from people.models import Person
 from devices.models import Device
 from .models import DeviceAssignment
 from .forms import DeviceAssignmentForm, DeviceAssignmentTurninForm
+from django.db.models import F
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -38,15 +39,38 @@ class DeviceAssignmentDatatableServerSideProcessingView(
     PermissionRequiredMixin, ServerSideDatatableMixin
 ):
     permission_required = "assignments.view_deviceassignment"
-    queryset = DeviceAssignment.objects.all().annotate(
-        person_name=Concat(
-            "person__first_name", V(" "), "person__last_name", output_field=CharField()
+    queryset = (
+        DeviceAssignment.objects.all()
+        .select_related("person", "device")
+        .annotate(
+            device_str=Concat(
+                "device__asset_id",
+                V(" ("),
+                "device__serial_number",
+                V(")"),
+                output_field=CharField(),
+            )
+        )
+        .annotate(
+            person_name=Concat(
+                "person__first_name",
+                V(" "),
+                "person__last_name",
+                output_field=CharField(),
+            )
         )
     )
     columns = [
         "id",
+        "person__internal_id",
+        "person__type__name",
         "person_name",
+        "person__first_name",
+        "person__last_name",
+        "device_str",
         "device__asset_id",
+        "device__serial_number",
+        "device__device_model__name",
         "assignment_datetime",
         "return_datetime",
     ]
@@ -61,8 +85,15 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
                 "id": "assignment_list",
                 "headers": [
                     "ID",
+                    "Person Internal ID",
                     "Person",
+                    "Person First Name",
+                    "Person Last Name",
+                    "Person Type",
                     "Device",
+                    "Device Asset",
+                    "Device Serial",
+                    "Device Model",
                     "Assignment Date",
                     "Return Date",
                     "Actions",
@@ -161,16 +192,24 @@ class QuickAssignPersonListJSONView(PermissionRequiredMixin, JSONListView):
     def get_queryset(self):
         q = self.request.GET.get("q")
         # Remove symbols and repeated spaces
-        q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
+        # q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
         people = Person.objects.all()
         if q != "":
-            people = people.filter(
-                Q(internal_id__exact=q)
+            filter = (
+                Q(internal_id__istartswith=q)
                 | Q(first_name__icontains=q)
-                | Q(last_name__icontains=q)
                 | Q(last_name__icontains=q)
                 | Q(email__istartswith=q)
             )
+
+            search_word_list = q.replace(",", "").split(" ")
+            if len(search_word_list) > 1:
+                # filter |= Q(full_name__in=search_word_list)
+                filter |= reduce(
+                    operator.and_, (Q(full_name__icontains=x) for x in search_word_list)
+                )
+            people = people.filter(filter)
+
         people = people.values(
             "id",
             "first_name",
@@ -189,13 +228,11 @@ class QuickAssignDeviceListJSONView(PermissionRequiredMixin, JSONListView):
     def get_queryset(self):
         q = self.request.GET.get("q")
         # Remove symbols and repeated spaces
-        q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
+        # q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
         devices = Device.objects.all()
         if q != "":
             devices = devices.filter(
-                Q(asset_id__exact=q)
-                | Q(serial_number__exact=q)
-                | Q(asset_id__icontains=q)
+                Q(serial_number__icontains=q) | Q(asset_id__icontains=q)
             )
         devices = devices.values(
             "id", "asset_id", "serial_number", "is_active", "is_currently_assigned"
@@ -214,6 +251,14 @@ def get_deviceassignment_infobox_data(deviceassignment) -> list:
         {"label": "Assignment ID :", "value": deviceassignment.id},
         {"label": "Person :", "value": deviceassignment.person},
         {"label": "Device :", "value": deviceassignment.device},
-        {"label": "Assignment Date :", "value": deviceassignment.assignment_datetime},
-        {"label": "Return Date :", "value": deviceassignment.return_datetime},
+        {
+            "label": "Assignment Date :",
+            "date": deviceassignment.assignment_datetime,
+            "value": "None",
+        },
+        {
+            "label": "Return Date :",
+            "date": deviceassignment.return_datetime,
+            "value": "None",
+        },
     ]

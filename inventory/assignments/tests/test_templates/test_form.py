@@ -27,8 +27,12 @@ class DeviceAssignmentFormTest(TestCase):
 
     def test_buttons(self):
         soup = BeautifulSoup(self.response.content.decode(), "html.parser")
-        submit_buttons = soup.find("form").select('button[type="submit"]')
-        cancel_buttons = soup.find("form").select('a[href="/assignments/"]')
+        submit_buttons = soup.find("form", {"id": "deviceassignment_form"}).select(
+            'button[type="submit"]'
+        )
+        cancel_buttons = soup.find("form", {"id": "deviceassignment_form"}).select(
+            'a[href="/assignments/"]'
+        )
         self.assertEqual(len(submit_buttons), 1)
         self.assertEqual(len(cancel_buttons), 1)
         self.assertInHTML(submit_buttons[0].contents[0], "Save")

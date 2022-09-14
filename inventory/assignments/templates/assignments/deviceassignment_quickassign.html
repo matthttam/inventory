@@ -8,7 +8,7 @@
 {% include 'partials/select2.html'%}
 
 {% load static %}
-<script src="{% static 'inventory/csrftoken.js' %}" rel="stylesheet"></script>
+<script src="{% static 'inventory/js/csrftoken.js' %}" rel="stylesheet"></script>
 <link href="{% static 'assignments/deviceassignment_quick_assign.css'%}" rel="stylesheet" />
 <script src="{% static 'assignments/deviceassignment_quick_assign.js'%}"></script>
 {% endblock %}
@@ -19,7 +19,7 @@
 
     <div id="splash_area">
     </div>
-    <form id='check_form' class="needs-validation">
+    <form id='check_form' class="needs-validation" id="deviceassignment_quickassign_form">
         <div class="form-group pb-5">
             <label for="device">Device:</label>
             <select name="device" class="form-control" id="device" required>

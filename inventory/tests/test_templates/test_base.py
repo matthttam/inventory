@@ -41,21 +41,10 @@ class BaseTest(SimpleTestCase):
         title = self.soup.select_one("title").contents[0]
         self.assertEqual("Inventory", title)
 
-    def test_missing_content(self):
-        no_content_context = Context({})
-        no_content_template = Template("{% include 'partials/no_content.html' %}")
-        no_content_rendered = no_content_template.render(no_content_context)
-        self.assertInHTML(no_content_rendered, self.rendered)
-
     def test_with_content(self):
         parent_template_context = Context()
         parent_template_template = Template(
-            "{% extends 'base.html' %}{% block content %}<h1>test</h1>{% endblock %}"
+            "{% extends 'base.html' %}{% block base_content %}<h1>test</h1>{% endblock %}"
         )
         rendered = parent_template_template.render(parent_template_context)
-        no_content_context = Context({})
-        no_content_template = Template("{% include 'partials/no_content.html' %}")
-        no_content_rendered = no_content_template.render(no_content_context)
-
         self.assertInHTML("<h1>test</h1>", rendered)
-        self.assertNotIn(no_content_rendered, rendered)

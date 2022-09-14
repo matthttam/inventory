@@ -1,55 +1,63 @@
-from os import environ
-
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import tag
-from django.urls import reverse
-
 from authentication.tests.factories import UserFactory
-from inventory.tests.web_browser import WebBrowser
+from django.test import LiveServerTestCase
+from django.urls import reverse
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+from inventory.tests.helpers import get_chrome_driver, chrome_set_value
 
 
-class LoginFormTest(StaticLiveServerTestCase):
+class LoginTest(LiveServerTestCase):
     def setUp(self):
-        environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
-        self.web_browser = WebBrowser()
-        self.addCleanup(self.web_browser.close)
+        self.browser = get_chrome_driver()
+        # options = Options()
+        # options.add_argument("--headless")
+        # options.add_argument("--disable-gpu")
+        # self.browser = webdriver.Chrome(options=options)
 
-    def test_login_invalid_credentials(self):
-        page = self.web_browser.browser.new_page()
-        page.goto(f"{self.live_server_url}/")
-        page.fill("[name=username]", "myuser")
-        page.fill("[name=password]", "secret")
-        page.click("id=submit_button")
-        self.assertInHTML(
-            "Your username and password didn't match. Please try again.", page.content()
-        )
-        storage_state = page.context.storage_state()
-
-        cookie_names = [c.get("name") for c in storage_state.get("cookies")]
-        self.assertNotIn("sessionid", cookie_names)
+    def test_login_page_load(self):
+        self.browser.get(f"{self.live_server_url}/")
         self.assertEqual(
-            page.url, f"{self.live_server_url}{reverse('authentication:login')}"
+            self.browser.current_url,
+            f"{self.live_server_url}{reverse('authentication:login')}?next=/",
         )
-        page.close()
+        self.assertIsNone(
+            self.browser.get_cookie("sessionid"),
+            msg="sessionid exists in cookies before authenticating!",
+        )
 
     def test_login_valid_credentials(self):
         password = "PA$$w0rd"
         user = UserFactory(password=password)
-        page = self.web_browser.browser.new_page()
-        page.goto(f"{self.live_server_url}/")
-        self.assertEqual(
-            page.url, f"{self.live_server_url}{reverse('authentication:login')}?next=/"
-        )
-        page.fill("[name=username]", user.username)
-        page.fill("[name=password]", password)
-        page.click("id=submit_button")
+        self.browser.get(f"{self.live_server_url}/")
 
-        self.assertNotIn(
-            "Your username and password didn't match. Please try again.", page.content()
+        chrome_set_value(self.browser, (By.NAME, "username"), user.username)
+        chrome_set_value(self.browser, (By.NAME, "password"), password)
+
+        submit_button = self.browser.find_element(by=By.ID, value="submit_button")
+        submit_button.click()
+
+        self.assertIsNotNone(
+            self.browser.get_cookie("sessionid"),
+            msg="Session failed to be created during login with valid credentials!",
         )
-        storage_state = page.context.storage_state()
-        self.assertIn("cookies", storage_state.keys())
-        cookie_names = [c["name"] for c in storage_state["cookies"]]
-        self.assertIn("sessionid", cookie_names)
-        self.assertEqual(page.url, f"{self.live_server_url}/")
-        page.close()
+        self.assertEqual(self.browser.current_url, f"{self.live_server_url}/")
+        self.browser.close()
+
+    def test_login_invalid_credentials(self):
+        user = UserFactory(password="correct_password!")
+        self.browser.get(f"{self.live_server_url}/")
+
+        chrome_set_value(self.browser, (By.NAME, "username"), user.username)
+        chrome_set_value(self.browser, (By.NAME, "password"), "wrong_password!")
+
+        submit_button = self.browser.find_element(by=By.ID, value="submit_button")
+        submit_button.click()
+        self.assertIsNone(
+            self.browser.get_cookie("sessionid"),
+            msg="Session was created during login with invalid credentials!",
+        )
+        self.assertEqual(
+            self.browser.current_url, f"{self.live_server_url}/accounts/login/"
+        )
+        self.browser.close()

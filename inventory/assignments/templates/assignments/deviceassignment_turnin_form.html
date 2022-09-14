@@ -6,7 +6,7 @@
 
 {% if deviceassignment %}
 
-    <form method="post">
+    <form method="post" id="deviceassignment_turnin_form">
         {% csrf_token %}
 
             {% if form.errors %}

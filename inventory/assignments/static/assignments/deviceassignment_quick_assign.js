@@ -28,12 +28,11 @@ $(document).ready(function() {
 
             processResults: function (data) {                    
                 var searchTerm = deviceSelect.data("select2").$dropdown.find("input").val();
-                console.log(data.results[0])
                 if (
                         data.results.length == 1 && 
                         data.results[0].is_active && 
                         ! data.results[0].is_currently_assigned && 
-                        (data.results[0].asset_id == searchTerm || data.results[0].serial_number == searchTerm)
+                        (data.results[0].asset_id.toUpperCase() == searchTerm.toUpperCase() || data.results[0].serial_number.toUpperCase() == searchTerm.toUpperCase())
                     )  {
                     deviceSelect.append($("<option />")
                         .attr("value", data.results[0].id)
@@ -70,7 +69,7 @@ $(document).ready(function() {
 
                 if (
                         data.results.length == 1 && 
-                        data.results[0].internal_id == searchTerm && 
+                        (data.results[0].internal_id.toUpperCase() == searchTerm.toUpperCase() || data.results[0].email.toUpperCase() == searchTerm.toUpperCase()) &&
                         data.results[0].is_active &&
                         !data.results[0].is_currently_assigned
                     ) {

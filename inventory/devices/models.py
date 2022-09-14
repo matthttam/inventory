@@ -44,14 +44,25 @@ class DeviceManager(models.Manager):
     def active(self):
         return self.filter(status__is_inactive=False)
 
+    def unassigned(self):
+        return self.filter(is_currently_assigned=False)
+
+    def assigned(self):
+        return self.filter(is_currently_assigned=True)
+
+    def ready_to_assign(self):
+        return self.filter(is_currently_assigned=False).filter(
+            status__is_inactive=False
+        )
+
     def get_queryset(self):
         qs = super().get_queryset()
 
         # Add a count of current assignments
         qs = qs.annotate(
             current_assignment_count=Count(
-                F("deviceassignment"),
-                filter=Q(deviceassignment__return_datetime=None),
+                F("deviceassignments"),
+                filter=Q(deviceassignments__return_datetime=None),
             )
         )
 

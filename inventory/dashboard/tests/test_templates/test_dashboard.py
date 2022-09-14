@@ -1,15 +1,20 @@
+import copy
+
+from authentication.tests.factories import SuperuserUserFactory
+from bs4 import BeautifulSoup
+from django.contrib.auth.models import User
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.template import Context, Template
 from django.test import TestCase
 from django.urls import reverse
-from authentication.tests.factories import UserFactory, SuperuserUserFactory
-from django.contrib.auth.models import User, Permission
-from django.contrib.contenttypes.models import ContentType
-from devices.models import Device
-from people.models import Person
-from assignments.models import DeviceAssignment
-from inventory.tests.helpers import get_permission
+from inventory.tests.helpers import get_chrome_driver, chrome_click_element
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+from seleniumlogin import force_login
 
 
-class DashboardTest(TestCase):
+class DashboardTestSuperuser(TestCase):
     @classmethod
     def setUpTestData(cls):
         SuperuserUserFactory(username="my_superuser@example.com")
@@ -21,8 +26,101 @@ class DashboardTest(TestCase):
 
     def test_templates(self):
         self.assertTemplateUsed(self.response, "base.html")
-        self.assertTemplateUsed(self.response, "dashboard/dashboard.html")
-        self.assertTemplateUsed(self.response, "dashboard/partials/dashboard_nav.html")
+        self.assertTemplateUsed(self.response, "dashboard/partials/_side_nav.html")
+        self.assertTemplateUsed(self.response, "dashboard/partials/_top_nav.html")
 
-    def test_title(self):
-        self.assertInHTML("Inventory - Dashboard", self.response.content.decode())
+
+class DashboardTemplateTest(TestCase):
+    def test_quickassign_button_without_permission(self):
+        template = Template("{% include  'dashboard/dashboard.html'%}")
+        context = Context(
+            {
+                "perms": {
+                    "assignments": {
+                        "add_deviceassignment": False,
+                    }
+                },
+            }
+        )
+        rendered = template.render(context)
+        soup = BeautifulSoup(rendered, "html.parser")
+        quickassign_link = soup.select('a[href="/assignments/quickassign/"]')
+        self.assertEqual(
+            len(quickassign_link),
+            0,
+            msg="Quick assign button exists without permissions!",
+        )
+
+    def test_quickassign_button_with_permissions(self):
+        template = Template("{% include  'dashboard/dashboard.html'%}")
+        context = Context(
+            {
+                "perms": {
+                    "assignments": {
+                        "add_deviceassignment": True,
+                    }
+                },
+            }
+        )
+        rendered = template.render(context)
+        soup = BeautifulSoup(rendered, "html.parser")
+        quickassign_link = soup.select('a[href="/assignments/quickassign/"]')
+        self.assertEqual(
+            len(quickassign_link),
+            1,
+            msg="Quick assign button does not existwith permissions!",
+        )
+
+
+class DashboardLiveTest(StaticLiveServerTestCase):
+    def get_element(self, locator):
+        return WebDriverWait(self.browser, 10).until(
+            EC.visibility_of_element_located(locator)
+        )
+
+    def setUp(self):
+        self.browser = get_chrome_driver()
+        superuser = SuperuserUserFactory()
+        force_login(superuser, self.browser, f"{self.live_server_url}/")
+        self.browser.get(f"{self.live_server_url}/")
+
+    def test_dashboard_becomes_active(self):
+        # On page load dashboard should be active.
+        dashboard_link = self.get_element((By.ID, "DashboardLink"))
+        self.assertIn("active", dashboard_link.get_attribute("class"))
+
+    def test_people_list_becomes_active(self):
+        # Get People link
+        people_link = self.get_element(
+            (By.XPATH, '//a[@data-bs-target="#PeopleCollapse"]')
+        )
+        # Verify People is collapsed
+        self.assertIn("collapsed", people_link.get_attribute("class"))
+
+        # Click People
+        chrome_click_element(self.browser, people_link)
+
+        # Verify People is not collapsed
+        self.assertNotIn("collapsed", people_link.get_attribute("class"))
+
+        # Get People List link
+        people_list_link = self.get_element(
+            (By.XPATH, '//div[@id="PeopleCollapse"]/nav/a[@href="/people/"]')
+        )
+        # Verify People List link is not active
+        self.assertNotIn("active", people_list_link.get_attribute("class"))
+
+        # Click List
+        chrome_click_element(self.browser, people_list_link)
+
+        # Verify People Link is expanded
+        people_link = self.get_element(
+            (By.XPATH, '//a[@data-bs-target="#PeopleCollapse"]')
+        )
+        self.assertNotIn("collapsed", people_link.get_attribute("class"))
+
+        # Verify
+        people_list_link = self.get_element(
+            (By.XPATH, '//div[@id="PeopleCollapse"]/nav/a[@href="/people/"]')
+        )
+        self.assertIn("active", people_list_link.get_attribute("class"))

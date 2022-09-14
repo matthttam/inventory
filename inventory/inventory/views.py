@@ -1,13 +1,16 @@
+import os
 from django.http import HttpResponseNotAllowed, JsonResponse
 from django.views.generic import ListView, FormView
 from django.views.generic.edit import BaseFormView
 from django.views.generic.list import BaseListView
 from django.core.exceptions import ImproperlyConfigured
+from django.views.generic.base import TemplateView
+from django.contrib.staticfiles import finders
 
 
 class JSONResponseMixin:
     """
-    A mixin that can be used to render a JSOn response
+    A mixin that can be used to render a JSON response
     """
 
     # def render_to_json_response(self, context, **response_kwargs):
@@ -59,3 +62,17 @@ class JSONFormView(JSONResponseMixin, BaseFormView):
             data = {"success": context["success"], "errors": context.form.errors}
 
         return data
+
+
+class InventoryAboutView(TemplateView):
+    template_name = "about.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        changelog_path = finders.find("inventory/CHANGELOG.md")
+        print(finders.searched_locations)
+        print(changelog_path)
+        changelog = open(changelog_path).read()
+        context["changelog"] = changelog
+
+        return context

@@ -12,4 +12,13 @@
         {% block tbody %}
         {% endblock tbody %}
     </tbody>
+    <tfoot>
+        {% block tfoot %}
+            {% if footers %}
+                {% for value in headers %}
+                    <th></th>
+                {% endfor %}
+            {% endif %}
+        {% endblock tfoot %}
+    </tfoot>
 </table>
