@@ -44,6 +44,7 @@ class PersonDatatableServerSideProcessingView(
         "type__name",
         "status__name",
         "primary_building__name",
+        "outstanding_assignment_count",
     ]
 
 
@@ -63,6 +64,7 @@ class PersonListView(PermissionRequiredMixin, TemplateView):
                     "Type",
                     "Status",
                     "Building",
+                    "Assignment Count",
                     "Actions",
                 ],
             }
