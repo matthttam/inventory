@@ -30,9 +30,20 @@ class DeviceDatatableServerSideProcessingView(
     PermissionRequiredMixin, ServerSideDatatableMixin
 ):
     permission_required = "devices.view_device"
-    queryset = Device.objects.all().annotate(
-        is_google_linked=Case(
-            When(google_device__isnull=True, then=False), default=True
+    queryset = (
+        Device.objects.all()
+        .select_related(
+            "status",
+            "device_model",
+            "device_model__manufacturer",
+            "building",
+            "google_device",
+            "room",
+        )
+        .annotate(
+            is_google_linked=Case(
+                When(google_device__isnull=True, then=False), default=True
+            )
         )
     )
     columns = [

@@ -5,6 +5,7 @@ from .models import (
     DeviceManufacturer,
     DeviceModel,
     DeviceStatus,
+    DeviceTag,
 )
 
 
@@ -33,3 +34,8 @@ class DeviceStatusAdmin(admin.ModelAdmin):
 @admin.register(DeviceAccessory)
 class DeviceAccessoryAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(DeviceTag)
+class DeviceTagAdmin(admin.ModelAdmin):
+    list_display = ("name", "active", "icon")

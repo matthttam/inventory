@@ -10,7 +10,9 @@ from devices.models import (
     DeviceModel,
     Device,
     DeviceAccessory,
+    DeviceTag,
 )
+from django.core.files.base import ContentFile
 
 # Faker Setup
 fake = Faker()
@@ -18,11 +20,21 @@ Faker.seed(0)
 fake.add_provider(CompanyProvider)
 
 
-class DeviceManufacturerFactory(DjangoModelFactory):
+def get_device_tag_generator(filename="example.jpg", width=300, height=300):
+    return lambda _: ContentFile(
+        factory.django.ImageField()._make_data({"width": width, "height": height}),
+        filename,
+    )
+
+
+class DeviceTagFactory(DjangoModelFactory):
     class Meta:
-        model = DeviceManufacturer
+        model = DeviceTag
+        django_get_or_create = ("name",)
 
     name = factory.LazyFunction(lambda: fake.unique.company())
+    active = True
+    factory.LazyFunction(get_device_tag_generator())
 
 
 class DeviceStatusFactory(DjangoModelFactory):
@@ -32,6 +44,13 @@ class DeviceStatusFactory(DjangoModelFactory):
 
     name = fake.random_choices(elements=("Active", "Inactive"))
     is_inactive = False
+
+
+class DeviceManufacturerFactory(DjangoModelFactory):
+    class Meta:
+        model = DeviceManufacturer
+
+    name = factory.LazyFunction(lambda: fake.unique.company())
 
 
 class DeviceModelFactory(DjangoModelFactory):
@@ -55,6 +74,14 @@ class DeviceFactory(DjangoModelFactory):
     device_model = factory.SubFactory(DeviceModelFactory)
     building = None
     room = None
+
+    @factory.post_generation
+    def tags(self, create, extracted, **kwargs):
+        if not create or not extracted:
+            return
+        if not extracted:
+            extracted = DeviceTagFactory.create_batch(10)
+        self.buildings.add(*extracted)
 
 
 class DeviceAccessoryFactory(DjangoModelFactory):

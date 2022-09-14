@@ -12,6 +12,15 @@ from locations.models import Building, Room
 # from googlesync.models import DeviceBuildingToOUMapping
 
 
+class DeviceTag(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    active = models.BooleanField(default=True)
+    icon = models.ImageField(upload_to="devicetag/")
+
+    def __str__(self):
+        return f"{self.name}"
+
+
 class DeviceStatus(models.Model):
     name = models.CharField(max_length=255, unique=True)
     is_inactive = models.BooleanField(default=False)
@@ -109,6 +118,7 @@ class Device(models.Model):
     )
     objects = DeviceManager()
     history = AuditlogHistoryField()
+    tags = models.ManyToManyField(DeviceTag, blank=True, related_name="devices")
 
     def __str__(self):
         if self.asset_id:

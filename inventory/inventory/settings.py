@@ -147,6 +147,10 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+# Media files (user uploaded media)
+MEDIA_ROOT = Path(BASE_DIR.parent).joinpath(env("MEDIA_PATH"))
+MEDIA_URL = env("MEDIA_URL")
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 

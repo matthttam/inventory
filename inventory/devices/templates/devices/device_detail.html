@@ -5,7 +5,8 @@
 {% block content %}
     
     {% if device %}
-
+        {% include './partials/device_tag_icons.html' %}
+        
         <div class="row">
             <div class="col md-6">
                 {% include './partials/device_infobox.html' with infobox_footer='devices/partials/device_control_buttons.html' col_label_class="col-md-4" %}

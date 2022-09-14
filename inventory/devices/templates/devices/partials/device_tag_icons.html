@@ -1,0 +1,5 @@
+{% for tag in device.tags.all %}
+    {% with object=tag %}
+        {% include 'partials/tag_icon.html' %}
+    {% endwith %}
+{% endfor %}
