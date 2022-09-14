@@ -11,9 +11,16 @@ $(document).ready(function () {
         fixedHeader: true,
         searchDelay: 350,
         columns: [
-            { name: 'id', data: 'id', visible: false},
-            { name: 'asset_id', data: 'asset_id'},
-            { name: 'serial_number', data: 'serial_number'},
+            { data: 'id', visible: false},
+            { data: 'asset_id'},
+            { data: 'serial_number'},
+            { data: 'status__name'},
+            { data: 'device_model__manufacturer__name'},
+            { data: 'device_model__name'},
+            { data: 'building__name'},
+            { data: 'is_google_linked', visible: false},
+            { data: 'google_device__organization_unit'},
+            { data: 'google_device__most_recent_user', visible: false},
             getActionColumnDef(),
         ]
     });

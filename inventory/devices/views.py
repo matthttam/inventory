@@ -15,7 +15,7 @@ from django_datatable_serverside_mixin.views import (
 )
 
 from auditlog.models import LogEntry
-
+from django.db.models import When, Case
 from inventory.utils import (
     get_permitted_actions,
     get_table_context,
@@ -30,11 +30,22 @@ class DeviceDatatableServerSideProcessingView(
     PermissionRequiredMixin, ServerSideDatatableMixin
 ):
     permission_required = "devices.view_device"
-    queryset = Device.objects.all()
+    queryset = Device.objects.all().annotate(
+        is_google_linked=Case(
+            When(google_device__isnull=True, then=False), default=True
+        )
+    )
     columns = [
         "id",
         "asset_id",
         "serial_number",
+        "status__name",
+        "device_model__manufacturer__name",
+        "device_model__name",
+        "building__name",
+        "is_google_linked",
+        "google_device__organization_unit",
+        "google_device__most_recent_user",
     ]
 
 
@@ -45,7 +56,19 @@ class DeviceListView(PermissionRequiredMixin, TemplateView):
         "tables": {
             "device_list": {
                 "id": "device_list",
-                "headers": ["ID", "Asset ID", "Serial Number", "Actions"],
+                "headers": [
+                    "ID",
+                    "Asset ID",
+                    "Serial Number",
+                    "Status",
+                    "Manufacturer",
+                    "Model",
+                    "Building",
+                    "Google Link",
+                    "Google OU",
+                    "Google Most Recent User",
+                    "Actions",
+                ],
             }
         },
     }
