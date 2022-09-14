@@ -37,6 +37,8 @@ class DeviceDatatableServerSideProcessingView(
     )
     columns = [
         "id",
+        "is_currently_assigned",
+        "current_assignment_count",
         "asset_id",
         "serial_number",
         "status__name",
@@ -58,6 +60,8 @@ class DeviceListView(PermissionRequiredMixin, TemplateView):
                 "id": "device_list",
                 "headers": [
                     "ID",
+                    "Assigned",
+                    "Assignment Count",
                     "Asset ID",
                     "Serial Number",
                     "Status",
