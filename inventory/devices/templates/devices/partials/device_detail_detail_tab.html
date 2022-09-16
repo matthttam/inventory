@@ -1,0 +1,33 @@
+{% extends 'partials/card.html' %}
+
+{% block card_title %}{% endblock %}
+
+{% block card_body_content%}
+
+    <h5 class="">Device Details</h4>
+    <div class="card-text p-4">
+        <div class="row row-cols-2 row-cols-lg-2 g-2 g-lg-3">
+            <div class="col">
+                <ul class="list-unstyled">
+                    <li>Device ID : {{ device.id }}</li>
+                    <li>Asset Tag : {{ device.asset_id }}</li>
+                    <li>Serial Number : {{ device.serial_number }}</li>
+                    <li>Status : {{ device.status }}</li>
+                    <li>Model : {{ device.device_model }}</li>
+                </ul>
+            </div>
+            <div class="col">
+                <ul class="list-unstyled">
+                    <li>Building : {{ device.building }}</li>
+                    <li>Room : {{ device.room }}</li>
+                    <li>Tags : {% include './device_tag_list.html' %}</li>
+                    <li>Notes : {{ device.notes }}</li>
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock card_body_content %}

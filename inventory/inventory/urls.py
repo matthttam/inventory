@@ -32,6 +32,3 @@ urlpatterns = [
     path("googlesync/", include("googlesync.urls")),
     path("profile/", include("profiles.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-print(settings.MEDIA_ROOT)
-print(settings.STATIC_ROOT)

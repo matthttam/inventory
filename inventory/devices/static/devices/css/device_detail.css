@@ -1,0 +1,17 @@
+.inventory-inner-nav a{
+    padding: 8px;
+    padding-right: 85px;
+    font-size: 14px;
+    
+}
+.inventory-inner-nav a.active{
+    background-color: #dce9fafd;
+}
+
+.tab-pane{
+    padding-left: 20px;
+}
+
+.card-text > * li{
+    padding-top: 0.5rem;
+}

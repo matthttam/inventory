@@ -2,17 +2,54 @@
 
 {% block title %}Inventory - Device Detail{% endblock %}
 
+{% block head %}
+
+    {{ block.super }}
+
+    {% load static %}
+    <link href="{% static 'devices/css/device_detail.css'%}" rel="stylesheet" />
+
+
+{% endblock head %}
+
 {% block content %}
     
     {% if device %}
-        {% include './partials/device_tag_icons.html' %}
-        
         <div class="row">
-            <div class="col md-6">
-                {% include './partials/device_infobox.html' with infobox_footer='devices/partials/device_control_buttons.html' col_label_class="col-md-4" %}
-            </div>
-            <div class="col md-3">
-                {% include './partials/device_auditlog.html' %}
+
+                <div class="col-md-auto nav inventory-inner-nav flex-column">
+      
+
+                        <a class="nav-link active" href="#" aria-current="page" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail" type="button" role="tab" aria-controls="detail" aria-selected="true">Device Details</a>
+                        <a class="nav-link" href="#" aria-current="page" id="audit-tab" data-bs-toggle="tab" data-bs-target="#audit" type="button" role="tab" aria-controls="audit" aria-selected="true">Device History</a>
+
+                </div>
+
+            <div class="col md-10 tab-content">
+                <div class="hstack gap-3">
+                    <h1 class="display-6">Device: {{ object }}</h1>
+                    <div class="vr"></div>
+                    {% if object.is_currently_assigned %}
+                        <h6 class=""><span class="text-success">Assigned</span></h6>
+                    {% else %}
+                        <h6 class=""><span class="text-secondary">Unassigned</span></h6>
+                    {% endif %}
+                    <div class="vr"></div>
+                    {% include './partials/device_tag_icons.html' %}
+                </div>
+                
+                <hr class="border border-secondary border-1 opacity-35">
+                <div class="">
+                    
+                </div>
+                <div class="tab-pane active" id="detail" role="tabpanel" aria-labelledby="detail-tab" tabindex="0">
+                    {% include './partials/device_detail_detail_tab.html' %}
+                </div>
+                <div class="tab-pane" id="audit" role="tabpanel" aria-labelledby="audit-tab" tabindex="0">
+                    {% include './partials/device_auditlog.html' %}
+                </div>
+
+                
             </div>
         </div>
 
