@@ -24,6 +24,8 @@ from inventory.utils import (
 )
 from .forms import DeviceForm
 from .models import Device
+from django.db.models import Prefetch
+from assignments.models import DeviceAssignment
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -46,7 +48,6 @@ class DeviceDatatableServerSideProcessingView(
                 Case(When(google_device__isnull=True, then=V(0)), default=V(1))
             )
         )
-        .annotate(test=V("blah"))
     )
     columns = [
         "id",
@@ -100,8 +101,16 @@ class DeviceListView(PermissionRequiredMixin, TemplateView):
 
 class DeviceDetailView(PermissionRequiredMixin, DetailView):
     permission_required = "devices.view_device"
-    model = Device
+    # model = Device
     extra_context = {"tables": get_history_table_context("device_history")}
+    queryset = Device.objects.prefetch_related(
+        Prefetch(
+            "deviceassignments",
+            queryset=DeviceAssignment.objects.filter(return_datetime=None),
+            to_attr="outstanding_assignments",
+        )
+    )
+    # def get_object(self):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

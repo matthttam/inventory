@@ -21,7 +21,8 @@
       
 
                         <a class="nav-link active" href="#" aria-current="page" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail" type="button" role="tab" aria-controls="detail" aria-selected="true">Device Details</a>
-                        <a class="nav-link" href="#" aria-current="page" id="audit-tab" data-bs-toggle="tab" data-bs-target="#audit" type="button" role="tab" aria-controls="audit" aria-selected="true">Device History</a>
+                        <a class="nav-link" href="#" aria-current="page" id="device-history-tab" data-bs-toggle="tab" data-bs-target="#device-history" type="button" role="tab" aria-controls="device-history" aria-selected="true">Device History</a>
+                        <a class="nav-link" href="#" aria-current="page" id="assignment-history-tab" data-bs-toggle="tab" data-bs-target="#assignment-history" type="button" role="tab" aria-controls="assignment-history" aria-selected="true">Assignment History</a>
 
                 </div>
 
@@ -45,10 +46,12 @@
                 <div class="tab-pane active" id="detail" role="tabpanel" aria-labelledby="detail-tab" tabindex="0">
                     {% include './partials/device_detail_detail_tab.html' %}
                 </div>
-                <div class="tab-pane" id="audit" role="tabpanel" aria-labelledby="audit-tab" tabindex="0">
-                    {% include './partials/device_auditlog.html' %}
+                <div class="tab-pane" id="device-history" role="tabpanel" aria-labelledby="device-history-tab" tabindex="0">
+                    {% include './partials/device_detail_device_history_tab.html' %}
                 </div>
-
+                <div class="tab-pane" id="assignment-history" role="tabpanel" aria-labelledby="assignment-history-tab" tabindex="0">
+                    {% include './partials/device_detail_assignment_history_tab.html' %}
+                </div>
                 
             </div>
         </div>

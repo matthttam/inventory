@@ -3,7 +3,7 @@ from auditlog.registry import auditlog
 from django.apps import apps
 from django.core.management import call_command
 from django.db import models
-from django.db.models import Case, Count, F, Q, Value, When
+from django.db.models import Case, Count, F, Q, Max, When, Value as V
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
@@ -94,6 +94,13 @@ class DeviceManager(models.Manager):
             is_active=Case(
                 When(status__is_inactive=False, then=True),
                 default=False,
+            )
+        )
+
+        # Set is_google_linked
+        qs = qs.annotate(
+            is_google_linked=Max(
+                Case(When(google_device__isnull=True, then=V(0)), default=V(1))
             )
         )
         return qs
