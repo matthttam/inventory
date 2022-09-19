@@ -1,0 +1,31 @@
+{% extends 'partials/table.html' %}
+{% block table_id %}{% endblock %}
+
+{% block thead %}
+    <tr>
+        <th>Assignment ID</th>
+        <th>Person Internal ID</th>
+        <th>Person</th>
+        <th>Person Type</th>
+        <th>Assignment Date</th>
+        <th>Return Date</th>
+    </tr>
+{% endblock thead %}
+
+{% block tbody %}
+
+{% for assignment in assignments %}
+    <tr>
+        <td>{{ assignment.id }}</td>
+        <td>{{ assignment.person.internal_id }}</td>
+        <td>{{ assignment.person }}</td>
+        <td>{{ assignment.person.type }}</td>
+        <td>{{ assignment.assignment_datetime }}</td>
+        <td>{{ assignment.return_datetime }}</td>
+    </tr>
+{% endfor %}
+
+{% endblock tbody %}
+
+{% block tfoot %}
+{% endblock tfoot %}

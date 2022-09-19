@@ -15,42 +15,39 @@
 {% block content %}
     
     {% if device %}
-        <div class="row">
-
-                <div class="col-md-auto nav inventory-inner-nav flex-column">
-      
-
-                        <a class="nav-link active" href="#" aria-current="page" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail" type="button" role="tab" aria-controls="detail" aria-selected="true">Device Details</a>
-                        <a class="nav-link" href="#" aria-current="page" id="device-history-tab" data-bs-toggle="tab" data-bs-target="#device-history" type="button" role="tab" aria-controls="device-history" aria-selected="true">Device History</a>
-                        <a class="nav-link" href="#" aria-current="page" id="assignment-history-tab" data-bs-toggle="tab" data-bs-target="#assignment-history" type="button" role="tab" aria-controls="assignment-history" aria-selected="true">Assignment History</a>
-
+        <div class="row" style="height: 100%">
+            <div class="col-md-2 px-0">
+                <nav class="nav inventory-inner-nav bg-light p-2 border-end border-secondary border-2 border-opacity-25">
+                    <div class="sticky-top" style="margin-top: 50px;">
+                        <a class="nav-link active" href="#" aria-current="page" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail" type="button" role="tab" aria-controls="detail" aria-selected="true"><i class="bi bi-info-circle"></i> Details</a>
+                        <a class="nav-link" href="#" aria-current="page" id="device-history-tab" data-bs-toggle="tab" data-bs-target="#device-history" type="button" role="tab" aria-controls="device-history" aria-selected="true"><i class="bi bi-calendar"></i> History</a>
+                        <a class="nav-link" href="#" aria-current="page" id="assignment-history-tab" data-bs-toggle="tab" data-bs-target="#assignment-history" type="button" role="tab" aria-controls="assignment-history" aria-selected="true"><i class="bi bi-calendar2-check"></i> Assignment History</a>
+                    </div>
+                </nav>
+            </div>
+            <div class="col-md-10 tab-content px-0">
+                <div class="inventory-inner-top sticky-top bg-light px-3 border-bottom border-secondary border-2 border-opacity-25">
+                    <div class="hstack gap-3">
+                        <h1 class="display-6">Device: {{ object }}</h1>
+                        <div class="vr"></div>
+                        {% if object.is_currently_assigned %}
+                            <h6 class=""><span class="text-success">Assigned</span></h6>
+                        {% else %}
+                            <h6 class=""><span class="text-secondary">Unassigned</span></h6>
+                        {% endif %}
+                        <div class="vr"></div>
+                        {% include './partials/device_tag_icons.html' %}
+                    </div>     
                 </div>
 
-            <div class="col md-10 tab-content">
-                <div class="hstack gap-3">
-                    <h1 class="display-6">Device: {{ object }}</h1>
-                    <div class="vr"></div>
-                    {% if object.is_currently_assigned %}
-                        <h6 class=""><span class="text-success">Assigned</span></h6>
-                    {% else %}
-                        <h6 class=""><span class="text-secondary">Unassigned</span></h6>
-                    {% endif %}
-                    <div class="vr"></div>
-                    {% include './partials/device_tag_icons.html' %}
-                </div>
-                
-                <hr class="border border-secondary border-1 opacity-35">
-                <div class="">
-                    
-                </div>
                 <div class="tab-pane active" id="detail" role="tabpanel" aria-labelledby="detail-tab" tabindex="0">
-                    {% include './partials/device_detail_detail_tab.html' %}
+                    {% include './partials/device_detail/tab_device_detail.html' %}
                 </div>
                 <div class="tab-pane" id="device-history" role="tabpanel" aria-labelledby="device-history-tab" tabindex="0">
-                    {% include './partials/device_detail_device_history_tab.html' %}
+                    {% include './partials/device_detail/tab_device_history.html' %}
                 </div>
                 <div class="tab-pane" id="assignment-history" role="tabpanel" aria-labelledby="assignment-history-tab" tabindex="0">
-                    {% include './partials/device_detail_assignment_history_tab.html' %}
+                    {% include './partials/device_detail/tab_assignment_history.html' %}
                 </div>
                 
             </div>

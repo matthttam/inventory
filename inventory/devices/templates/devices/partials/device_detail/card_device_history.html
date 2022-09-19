@@ -1,13 +1,12 @@
 {% extends 'partials/card.html' %}
-{% load tz %}
 
 {% block card_title %}{% endblock %}
-{% block card_body_content%}
 
-<p name="device_card_body" class="card-text fs-5">
+{% block card_body_content%}
+<h5 class="card-title">Device History</h4>
+    <div class="card-text p-4">
     {% with prefix=tables.device_history %}
     {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers tbody_template="partials/table_body_history.html" %}
     {% endwith %}
-</p>
-{% endblock %}
-    
+</div>
+    {% endblock card_body_content %}
