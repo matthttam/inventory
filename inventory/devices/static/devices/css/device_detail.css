@@ -1,10 +1,12 @@
 .inventory-inner-nav a{
-    font-size: 14px;
-    
+    font-size: 18px;
 }
 
 .inventory-inner-nav a.active{
     background-color: #dce9fafd;
+}
+.inventory-inner-nav a.nav-link:hover{
+    background-color: #cacff0fd;
 }
 
 .card-text > * li{
@@ -48,3 +50,13 @@
     -o-transition:      -o-transform 550ms ease;
     -webkit-transition: -webkit-transform 550ms ease;
   }
+
+  .half-circle {
+    /*clip-path: circle(50px at 60px);*/
+    z-index:99999;
+    clip-path: polygon(45% 0, 100% 0, 100% 100%, 45% 100%, 15% 50%);
+
+    border-top-right-radius: 110px;
+    border-bottom-right-radius: 110px;
+    border-left: 0px;
+}
