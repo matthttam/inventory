@@ -7,10 +7,6 @@
     background-color: #dce9fafd;
 }
 
-.inventory-inner-nav{
-    height: 100%;
-}
-
 .card-text > * li{
     padding-top: 0.5rem;
 }
@@ -24,5 +20,31 @@
 
 .inventory-inner-top{
     top: 56px;
-    margin-left: 0px;
+    z-index: 2000;
 }
+
+.inventory-icon-rotate-180 {
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    transform: rotate(180deg);
+    display: inline-block;
+    -moz-transition:    -moz-transform 550ms ease;
+    -ms-transition:     -ms-transform 550ms ease;
+    -o-transition:      -o-transform 550ms ease;
+    -webkit-transition: -webkit-transform 550ms ease;
+  }
+
+  .inventory-icon-rotate-360 {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+    display: inline-block;
+    -moz-transition:    -moz-transform 550ms ease;
+    -ms-transition:     -ms-transform 550ms ease;
+    -o-transition:      -o-transform 550ms ease;
+    -webkit-transition: -webkit-transform 550ms ease;
+  }
