@@ -3,7 +3,7 @@
 {% block title %}Inventory - Person Confirm Delete{% endblock %}
 
 {% block content %}
-
+<div class="container-fluid mt-2">
     <form method="post">{% csrf_token %}
         <h1 clas="display-3">Are you sure you want to delete "{{ object }}"?</h1>
 
@@ -15,5 +15,5 @@
 
         {{ form }}
     </form>
-
+</div>
 {% endblock content %}

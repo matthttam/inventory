@@ -3,16 +3,16 @@
 {% block title %}Inventory - Assignment Confirm Delete{% endblock %}
 
 {% block content %}
+    <div class="container-fluid mt-2">
+        <form method="post">{% csrf_token %}
+            <h1 clas="display-3">Are you sure you want to delete "{{ object }}"?</h1>
+            {% block infobox %}
 
-    <form method="post">{% csrf_token %}
-        <h1 clas="display-3">Are you sure you want to delete "{{ object }}"?</h1>
-        {% block infobox %}
+                {% include './partials/deviceassignment_infobox.html' with infobox_footer='assignments/partials/deviceassignment_delete_form_buttons.html'%}
 
-            {% include './partials/deviceassignment_infobox.html' with infobox_footer='assignments/partials/deviceassignment_delete_form_buttons.html'%}
+            {% endblock infobox %}
 
-        {% endblock infobox %}
-
-        {{ form }}
-    </form>
-
+            {{ form }}
+        </form>
+    </div>
 {% endblock content %}

@@ -5,14 +5,14 @@
 {% block content %}
 
 {% if profile %}
+    <div class="container-fluid mt-2">
+        <ul>
 
-    <ul>
+            <li>Timezone: {{profile.timezone}}</li>
 
-        <li>Timezone: {{profile.timezone}}</li>
-
-    </ul>
-    <a class="btn btn-primary m-2" role="button" href="{% url 'profile:edit'%}">Edit Profile</a>
-
+        </ul>
+        <a class="btn btn-primary m-2" role="button" href="{% url 'profile:edit'%}">Edit Profile</a>
+    </div>
 {% else %}
 
     <p>Profile Not Found</p>

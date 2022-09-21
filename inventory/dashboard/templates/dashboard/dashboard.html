@@ -22,7 +22,7 @@
             <main style="min-height: 100%;">
                 
                     {% block content %}
-                    
+                    <div class="container-fluid mt-2">
                     {% if perms.assignments.add_deviceassignment %}
                     
                         {% url 'assignments:quickassign' as quickassign_url%}
@@ -32,7 +32,7 @@
 
                         {% include "partials/button.html" with href=quickassign_url class="btn btn-block p-3 btn-lg btn-success w-100" value="Quick Assign"%}
                     {% endif %}
-                    
+                    </div>
                     {% endblock %}
                     
 

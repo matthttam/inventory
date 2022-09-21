@@ -3,12 +3,12 @@
 {% block title %}Inventory - Profile Edit{% endblock %}
 
 {% block content %}
-
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input class="btn btn-primary m-2" role="button" type="submit" value="Save">
-        <a class="btn btn-primary m-2" role="button" href="{% url 'people:index' %}">Cancel</a>
-    </form>
-
+    <div class="container-fluid mt-2">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input class="btn btn-primary m-2" role="button" type="submit" value="Save">
+            <a class="btn btn-primary m-2" role="button" href="{% url 'people:index' %}">Cancel</a>
+        </form>
+    </div>
 {% endblock content %}

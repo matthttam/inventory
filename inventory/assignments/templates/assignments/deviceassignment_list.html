@@ -14,14 +14,14 @@
 {% endblock head %}
 
 {% block content %}
+    <div class="container-fluid mt-2">
+        {% with prefix=tables.assignment_list %}
+            {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers %}
+        {% endwith %}
 
-    {% with prefix=tables.assignment_list %}
-        {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers %}
-    {% endwith %}
-
-    {% if perms.assignments.add_deviceassignment %}
-        <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:new' %}">Create Assignment</a>
-        <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:quickassign' %}">Quick Assign</a>
-    {% endif %}
-
+        {% if perms.assignments.add_deviceassignment %}
+            <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:new' %}">Create Assignment</a>
+            <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:quickassign' %}">Quick Assign</a>
+        {% endif %}
+    </div>
 {% endblock content %}
