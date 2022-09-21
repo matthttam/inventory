@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "inventory",
     "debug_toolbar",
     "auditlog",
+    "sorl.thumbnail",
     "dashboard",
     "devices",
     "locations",
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -59,6 +61,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
+    # "django.middleware.cache.FetchFromCacheMiddleware",
 ]
 
 ROOT_URLCONF = "inventory.urls"
@@ -97,6 +100,19 @@ DATABASES = {
     #    "ENGINE": 'django.db.backends.sqlite3',
     #    'NAME': 'test_database',
     # }
+}
+
+# Cache
+# Cache time to live is 15 minutes.
+CACHE_MIDDLEWARE_ALIAS = "default"
+CACHE_MIDDLEWARE_SECONDS = 15
+CACHE_MIDDLEWARE_KEY_PREFIX = ""
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    }
 }
 
 # Password validation

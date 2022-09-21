@@ -7,6 +7,7 @@ from .models import (
     DeviceStatus,
     DeviceTag,
 )
+from sorl.thumbnail.admin import AdminImageMixin
 
 
 @admin.register(Device)
@@ -37,5 +38,5 @@ class DeviceAccessoryAdmin(admin.ModelAdmin):
 
 
 @admin.register(DeviceTag)
-class DeviceTagAdmin(admin.ModelAdmin):
+class DeviceTagAdmin(AdminImageMixin, admin.ModelAdmin):
     list_display = ("name", "active", "icon")

@@ -8,6 +8,7 @@ from .views import (
     PersonDeleteView,
     PersonDatatableServerSideProcessingView,
 )
+from django.views.decorators.cache import cache_page
 
 app_name = "people"
 urlpatterns = [

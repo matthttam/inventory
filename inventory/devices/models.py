@@ -8,6 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 from locations.models import Building, Room
+from sorl.thumbnail import ImageField
 
 # from googlesync.models import DeviceBuildingToOUMapping
 
@@ -15,7 +16,8 @@ from locations.models import Building, Room
 class DeviceTag(models.Model):
     name = models.CharField(max_length=255, unique=True)
     active = models.BooleanField(default=True)
-    icon = models.ImageField(upload_to="devicetag/")
+    # icon = models.ImageField(upload_to="devicetag/")
+    icon = ImageField(upload_to="devicetag/")
 
     def __str__(self):
         return f"{self.name}"
