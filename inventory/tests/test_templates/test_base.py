@@ -18,7 +18,7 @@ class BaseTest(SimpleTestCase):
 
     def test_css(self):
         bootstrap_css = self.soup.select(
-            'link[href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"]'
+            'link[href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"]'
         )
         bootstrap_icons_css = self.soup.select(
             'link[href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"]'
@@ -32,7 +32,7 @@ class BaseTest(SimpleTestCase):
             'script[src="https://code.jquery.com/jquery-3.6.0.min.js"]'
         )
         bootstrap_js = self.soup.select(
-            'script[src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"]'
+            'script[src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"]'
         )
         self.assertEqual(len(jquery_js), 1)
         self.assertEqual(len(bootstrap_js), 1)

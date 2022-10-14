@@ -4,6 +4,7 @@ from authentication.tests.factories import SuperuserUserFactory, User, UserFacto
 from devices.models import Device
 from devices.tests.factories import DeviceFactory
 from inventory.tests.helpers import get_permission
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 new_link = '<a class="btn btn-primary m-2" role="button" href="/devices/new/">Create Device</a>'
 
@@ -51,7 +52,7 @@ class DeviceListSuperuserTest(TestCase):
         self.assertInHTML("Inventory - Devices", self.response.content.decode())
 
 
-class DeviceListWithoutPermissionTest(TestCase):
+class DeviceListWithoutPermissionLiveTest(TestCase):
     """
     Checks that the Detail List loads the appropriate links
     when the user only has permission to view devices

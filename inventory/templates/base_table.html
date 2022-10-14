@@ -2,7 +2,7 @@
     <thead>
         {% block thead %}
             {% for value in headers %}
-            <th>{{value}}</th>
+            <th>{{value|safe}}</th>
             {% empty %}
             No Headers Provided for Template
             {% endfor %}

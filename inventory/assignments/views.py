@@ -96,7 +96,7 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
                     "Device Model",
                     "Assignment Date",
                     "Return Date",
-                    "Actions",
+                    '<div class="text-center">Action</div>',
                 ],
             }
         },

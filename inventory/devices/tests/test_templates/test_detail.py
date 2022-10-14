@@ -21,10 +21,7 @@ class DeviceDetailSuperuserTest(TestCase):
 
     def test_template_used(self):
         self.assertTemplateUsed(self.response, "devices/device_detail.html")
-        self.assertTemplateUsed(self.response, "devices/partials/device_infobox.html")
-        self.assertTemplateUsed(
-            self.response, "devices/partials/device_control_buttons.html"
-        )
 
     def test_title(self):
+        # print(self.response.content.decode())
         self.assertInHTML("Inventory - Device Detail", self.response.content.decode())

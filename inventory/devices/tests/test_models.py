@@ -286,4 +286,4 @@ class DeviceTagTest(TestCase):
 
     def test_icon_upload_to(self):
         upload_to = self.device_tag._meta.get_field("icon").upload_to
-        self.assertEqual(upload_to, "uploads/devicetag/")
+        self.assertEqual(upload_to, "devicetag/")

@@ -9,5 +9,8 @@
     "editor.defaultFormatter": "ms-python.black-formatter"
   },
   "git.ignoreLimitWarning": true,
-  "editor.stickyScroll.enabled": true
+  "editor.stickyScroll.enabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+
 }

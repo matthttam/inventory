@@ -40,10 +40,11 @@ function getActionColumnDef(){
         name: 'actions', 
         data: 'actions', 
         render:function(data, type, row, meta){
+            console.log(meta)
             return getActionButtons(row)
         },
         sortable: false,
         filterable: false,
-        title: '<div class="text-center">Action</div>',
+        //title: '<div class="text-center">Action</div>',
     }
 }
