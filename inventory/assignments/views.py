@@ -31,13 +31,53 @@ from people.models import Person
 from devices.models import Device
 from .models import DeviceAssignment
 from .forms import DeviceAssignmentForm, DeviceAssignmentTurninForm
-from django.db.models import F
+from django.views.decorators.cache import cache_page
+from django.template import Template, Context
+
+from django.views.generic.base import ContextMixin, TemplateResponseMixin
+from django.shortcuts import render
 
 
 @method_decorator(csrf_exempt, name="dispatch")
 class DeviceAssignmentDatatableServerSideProcessingView(
-    PermissionRequiredMixin, ServerSideDatatableMixin
+    PermissionRequiredMixin, TemplateResponseMixin, ServerSideDatatableMixin
 ):
+    def get_template_names(self):
+        return []
+
+    def data_callback(self, data: list[dict]) -> list[dict]:
+        # context = self.get_context_data()
+        # rendered = render(
+        #    self.request,
+        #    "assignments/partials/deviceassignment_list/table_row_buttons.html",
+        # )
+        # print(context)
+        # print(rendered)
+
+        for row in data:
+            context = Context(
+                {
+                    "perms": {
+                        "assignments": {
+                            "view_deviceassignment": True,
+                        }
+                    },
+                    "deviceassignment": {"id": row["id"]},
+                }
+            )
+
+            # row["actions"] = context
+
+            template = Template(
+                "{% include  'assignments/partials/deviceassignment_list/table_row_buttons.html'%}"
+            )
+
+            rendered = template.render(context)
+            row["actions"] = rendered
+            # row["actions"] = f'<div>test{row["id"]}</div>'
+            # row["actions"] = rendered
+        return super().data_callback(data)
+
     permission_required = "assignments.view_deviceassignment"
     queryset = (
         DeviceAssignment.objects.all()
@@ -116,6 +156,12 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
             ],
         )
         return context
+
+
+class DeviceAssignmentRowButtonsView(PermissionRequiredMixin, DetailView):
+    permission_required = "assignments.view_deviceassignment"
+    model = DeviceAssignment
+    template_name = "assignments/partials/deviceassignment_list/table_row_buttons.html"
 
 
 class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):

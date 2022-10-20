@@ -1,0 +1,20 @@
+    <div class="container d-flex justify-content-center">
+        <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+            <div name='action_buttons' class="btn-group me-2" role="group" aria-label="First group">
+                test
+{% if perms.assignments.view_deviceassignment %}
+                <a href="{% url "assignments:detail" deviceassignment.id %}" type="button" class="btn btn-primary" alt="view"><i class="bi bi-eye"></i></a>
+{% endif %}
+{% if perms.assignments.change_deviceassignment %}
+                <a href="{% url "assignments:edit" deviceassignment.id %}" type="button" class="btn btn-secondary" alt="edit"><i class="bi bi-pencil"></i></a>
+{% endif %}
+{% if perms.assignments.turnin_deviceassignment %}
+                <a href="{% url "assignments:turnin" deviceassignment.id %}" type="button" class="btn btn-success" alt="edit"><i class="bi bi-clipboard-check"></i></a>
+{% endif %}
+{% if perms.assignments.delete_deviceassignment %}
+                <a href="{% url "assignments:delete" deviceassignment.id %}" type="button" class="btn btn-danger" alt="delete"><i class="bi bi-trash2"></i></a>
+{% endif %}
+            </div>
+        </div>
+    </div>
+    

@@ -43,7 +43,32 @@ $(document).ready(function () {
                     return new Date(data).toLocaleDateString()
                 }
             },
-            getActionColumnDef(),
+            /*{ data: 'id',
+            render: function(data, type, row, meta){
+                //return row.id
+                row_buttons = $.ajax({
+                    url: "ajax/"+row.id+"/row_buttons/",
+                    success: function(result){
+                        console.log("done with: "+row.id)
+                        $("div#row_buttons_"+row.id).html(result)
+                    }
+                })
+                return '<div id="row_buttons_'+row.id+'"></div>'
+                return row_buttons.responseText
+                //if(row_buttons.statusCode != 200){
+                //    return "Error getting buttons"
+                //}else{
+                    /*
+                return row_buttons.responseText
+                //}
+                
+            } }*/
+            { 
+                name: 'actions', 
+                data: 'actions', 
+                sortable: false,
+                filterable: false,},
+            // getActionColumnDef(),
         ]
     });
 
