@@ -27,24 +27,34 @@
                             <div class="position-absolute translate-start bg-light border-opacity-25 half-circle border-dark border " style="top: 13px; right:-25px;">
                                 <a class="inventory-icon-rotate-360" data-inv-toggle="collapse" data-inv-target=".inner-nav-text" href="#">
                                     <div style="clip-path: revert-layer;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-short" viewBox="0 0 16 16" >
-                                        <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
-                                      </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-short" viewBox="0 0 16 16" >
+                                            <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
+                                        </svg>
                                     </div>
                                 </a>
                             </div>
                         
                         
                         <a class="nav-link active" href="#" aria-current="page" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail" type="button" role="tab" aria-controls="detail" aria-selected="true">
-                            <i class="bi bi-info-circle" style=""></i>
-                            <span class="inner-nav-text text-truncate align-bottom"> Details</span>
+
+                            <svg xmlns="http://www.w3.org/2000/svg" class="align-top" width="27" height="27" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 18 18">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                            </svg>
+                            <span class="inner-nav-text text-truncate align-bottom">Details</span>
                         </a>
                         <a class="nav-link" href="#" aria-current="page" id="device-history-tab" data-bs-toggle="tab" data-bs-target="#device-history" type="button" role="tab" aria-controls="device-history" aria-selected="true">
-                            <i class="bi bi-calendar"></i>
-                            <span class="inner-nav-text text-truncate align-bottom"> History</span></a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="align-top" width="27" height="27" fill="currentColor" class="bi bi-calendar" viewBox="0 0 18 18">
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                            </svg>
+                            <span class="inner-nav-text text-truncate align-bottom">History</span></a>
                         <a class="nav-link" href="#" aria-current="page" id="assignment-history-tab" data-bs-toggle="tab" data-bs-target="#assignment-history" type="button" role="tab" aria-controls="assignment-history" aria-selected="true">
-                            <i class="bi bi-calendar2-check"></i>
-                            <span class="inner-nav-text text-truncate align-bottom"> Assignment History</span></a>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="align-top" width="27" height="27" fill="currentColor" class="bi bi-calendar2-check" viewBox="0 0 18 18">
+                                <path d="M10.854 8.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2z"/>
+                                <path d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4z"/>
+                            </svg>
+                            <span class="inner-nav-text text-truncate align-bottom">Assignment History</span></a>
                         </div>
                     </div>
                 </nav>
@@ -56,11 +66,13 @@
                             <div class="hstack gap-3">
                                 <h1 class="display-6">Device: {{ object }}</h1>
                                 <div class="vr"></div>
+                                <h6 class="m-0">
                                 {% if object.is_currently_assigned %}
-                                    <h6 class=""><span class="text-success">Assigned</span></h6>
+                                    <span class="text-success">Assigned</span>
                                 {% else %}
-                                    <h6 class=""><span class="text-secondary">Unassigned</span></h6>
+                                    <span class="text-secondary">Unassigned</span>
                                 {% endif %}
+                                </h6>
                                 <div class="vr"></div>
                                 {% include './partials/device_tag_icons.html' %}
                             </div>     

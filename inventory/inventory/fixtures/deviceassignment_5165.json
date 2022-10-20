@@ -1,0 +1,12 @@
+[
+{
+    "model": "assignments.deviceassignment",
+    "pk": 5165,
+    "fields": {
+        "assignment_datetime": "2022-09-19T18:08:14.389Z",
+        "return_datetime": null,
+        "device": 2,
+        "person": 15358
+    }
+}
+]
