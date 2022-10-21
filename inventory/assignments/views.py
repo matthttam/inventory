@@ -114,7 +114,9 @@ class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["log_entries"] = self.object.history.all().order_by("timestamp")
+        context["log_entries"] = (
+            context.get("object").history.all().order_by("timestamp")
+        )
         context["infobox"] = get_deviceassignment_infobox_data(context.get("object"))
         return context
 

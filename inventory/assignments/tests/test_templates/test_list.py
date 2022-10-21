@@ -1,19 +1,8 @@
-from assignments.models import DeviceAssignment
 from assignments.tests.factories import DeviceAssignmentFactory
-from authentication.tests.factories import SuperuserUserFactory, User, UserFactory
+from authentication.tests.factories import SuperuserUserFactory, User
 from bs4 import BeautifulSoup
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import TestCase
 from django.urls import reverse
-from inventory.tests.helpers import (
-    get_chrome_driver,
-    get_permission,
-    RealTransactionalStaticLiveServerTestCase,
-)
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from seleniumlogin import force_login
 
 
 class DeviceAssignmentListTemplateTest(TestCase):
