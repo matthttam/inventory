@@ -1,81 +1,39 @@
-import re, operator
+import operator
 from functools import reduce
-from django.views.generic import (
-    DetailView,
-    UpdateView,
-    CreateView,
-    DeleteView,
-    FormView,
-)
-from django.views.generic.base import TemplateView
-from django.utils import timezone
-from django_datatable_serverside_mixin.views import (
-    ServerSideDatatableMixin,
-)
+
+from devices.models import Device
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import CharField, Q
+from django.db.models import Value as V
+from django.db.models.functions import Concat
+from django.shortcuts import redirect
+from django.template.loader import render_to_string
+from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.urls import reverse, reverse_lazy
-from django.db.models.functions import Concat
-from django.db.models import CharField, Value as V, Q
-from django.shortcuts import redirect
-
-from auditlog.models import LogEntry
-
-from inventory.utils import (
-    get_permitted_actions,
-    get_history_table_context,
-)
-from inventory.views import JSONListView, JSONFormView
+from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from django.views.generic.base import TemplateView
+from django_datatable_serverside_mixin.views import ServerSideDataTablesMixin
+from inventory.utils import get_history_table_context
+from inventory.views import JSONFormView, JSONListView
 from people.models import Person
-from devices.models import Device
-from .models import DeviceAssignment
-from .forms import DeviceAssignmentForm, DeviceAssignmentTurninForm
-from django.views.decorators.cache import cache_page
-from django.template import Template, Context
 
-from django.views.generic.base import ContextMixin, TemplateResponseMixin
-from django.shortcuts import render
+from .forms import DeviceAssignmentForm, DeviceAssignmentTurninForm
+from .models import DeviceAssignment
 
 
 @method_decorator(csrf_exempt, name="dispatch")
 class DeviceAssignmentDatatableServerSideProcessingView(
-    PermissionRequiredMixin, TemplateResponseMixin, ServerSideDatatableMixin
+    PermissionRequiredMixin, ServerSideDataTablesMixin
 ):
-    def get_template_names(self):
-        return []
-
     def data_callback(self, data: list[dict]) -> list[dict]:
-        # context = self.get_context_data()
-        # rendered = render(
-        #    self.request,
-        #    "assignments/partials/deviceassignment_list/table_row_buttons.html",
-        # )
-        # print(context)
-        # print(rendered)
-
         for row in data:
-            context = Context(
-                {
-                    "perms": {
-                        "assignments": {
-                            "view_deviceassignment": True,
-                        }
-                    },
-                    "deviceassignment": {"id": row["id"]},
-                }
+            row["actions"] = render_to_string(
+                "assignments/partials/deviceassignment_list/table_row_buttons.html",
+                context={"deviceassignment": row},
+                request=self.request,
             )
 
-            # row["actions"] = context
-
-            template = Template(
-                "{% include  'assignments/partials/deviceassignment_list/table_row_buttons.html'%}"
-            )
-
-            rendered = template.render(context)
-            row["actions"] = rendered
-            # row["actions"] = f'<div>test{row["id"]}</div>'
-            # row["actions"] = rendered
         return super().data_callback(data)
 
     permission_required = "assignments.view_deviceassignment"
@@ -141,21 +99,6 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
             }
         },
     }
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["permitted_actions"] = get_permitted_actions(
-            self.request,
-            "assignments",
-            "deviceassignment",
-            action_paths=[
-                ("view", "detail"),
-                ("change", "edit"),
-                ("turnin", "turnin"),
-                ("delete", "delete"),
-            ],
-        )
-        return context
 
 
 class DeviceAssignmentRowButtonsView(PermissionRequiredMixin, DetailView):

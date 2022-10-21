@@ -20,7 +20,7 @@ urlpatterns = [
     path("", DeviceAssignmentListView.as_view(), name="index"),
     path(
         "ajax/<int:pk>/row_buttons/",
-        cache_page(60 * 15)(DeviceAssignmentRowButtonsView.as_view()),
+        (DeviceAssignmentRowButtonsView.as_view()),
         name="row_buttons",
     ),
     path(

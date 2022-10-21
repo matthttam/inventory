@@ -35,7 +35,7 @@ $(document).ready(function () {
             { data: 'is_google_linked', visible: false, searchable: false },
             { data: 'google_device__organization_unit' },
             { data: 'google_device__most_recent_user', visible: false },
-            getActionColumnDef(),
+            { data: 'actions', sortable: false, filterable: false },
         ]
     });
 });

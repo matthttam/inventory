@@ -1,36 +1,36 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import (
-    TemplateView,
-    DetailView,
-    UpdateView,
     CreateView,
     DeleteView,
+    DetailView,
+    TemplateView,
+    UpdateView,
 )
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.urls import reverse_lazy
+from django_datatable_serverside_mixin.views import ServerSideDataTablesMixin
+from inventory.utils import get_history_table_context
 
-from django_datatable_serverside_mixin.views import (
-    ServerSideDatatableMixin,
-)
-
-from auditlog.models import LogEntry
-
-from inventory.utils import (
-    get_permitted_actions,
-    get_table_context,
-    get_history_table_context,
-)
-
-# from inventory.aggregates import GroupConcat
-from .models import Person
 from .forms import PersonForm
+from .models import Person
 
 
 @method_decorator(csrf_exempt, name="dispatch")
 class PersonDatatableServerSideProcessingView(
-    PermissionRequiredMixin, ServerSideDatatableMixin
+    PermissionRequiredMixin, ServerSideDataTablesMixin
 ):
+    def data_callback(self, data: list[dict]) -> list[dict]:
+        for row in data:
+            row["actions"] = render_to_string(
+                "people/partials/person_list/table_row_buttons.html",
+                context={"person": row},
+                request=self.request,
+            )
+
+        return super().data_callback(data)
+
     permission_required = "people.view_person"
     queryset = Person.objects.all().select_related("type", "status", "primary_building")
     # .annotate(        building_name_list=GroupConcat("buildings__name", ", ")    )
@@ -70,13 +70,6 @@ class PersonListView(PermissionRequiredMixin, TemplateView):
             }
         },
     }
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["permitted_actions"] = get_permitted_actions(
-            self.request, "people", "person"
-        )
-        return context
 
 
 class PersonDetailView(PermissionRequiredMixin, DetailView):

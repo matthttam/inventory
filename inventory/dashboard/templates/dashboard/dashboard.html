@@ -24,7 +24,6 @@
                     {% block content %}
                     <div class="container-fluid mt-2">
                     {% if perms.assignments.add_deviceassignment %}
-                        {% url 'assignments:detail' 1 %}
                         {% url 'assignments:quickassign' as quickassign_url%}
                         <h1 class="display-1 my-5">
                             Click below to begin assigning devices:

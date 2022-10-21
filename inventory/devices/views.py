@@ -1,37 +1,40 @@
+from assignments.models import DeviceAssignment
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import Case, Max, Prefetch
+from django.db.models import Value as V
+from django.db.models import When
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import (
-    TemplateView,
-    DetailView,
-    UpdateView,
     CreateView,
     DeleteView,
+    DetailView,
+    TemplateView,
+    UpdateView,
 )
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.urls import reverse_lazy
+from django_datatable_serverside_mixin.views import ServerSideDataTablesMixin
+from inventory.utils import get_history_table_context
 
-from django_datatable_serverside_mixin.views import (
-    ServerSideDatatableMixin,
-)
-
-from auditlog.models import LogEntry
-from django.db.models import When, Case, Max, Value as V
-
-from inventory.utils import (
-    get_permitted_actions,
-    get_table_context,
-    get_history_table_context,
-)
 from .forms import DeviceForm
 from .models import Device
-from django.db.models import Prefetch
-from assignments.models import DeviceAssignment
 
 
 @method_decorator(csrf_exempt, name="dispatch")
 class DeviceDatatableServerSideProcessingView(
-    PermissionRequiredMixin, ServerSideDatatableMixin
+    PermissionRequiredMixin, ServerSideDataTablesMixin
 ):
+    def data_callback(self, data: list[dict]) -> list[dict]:
+        for row in data:
+            row["actions"] = render_to_string(
+                "devices/partials/device_list/table_row_buttons.html",
+                context={"device": row},
+                request=self.request,
+            )
+
+        return super().data_callback(data)
+
     permission_required = "devices.view_device"
     queryset = (
         Device.objects.all()
@@ -91,13 +94,6 @@ class DeviceListView(PermissionRequiredMixin, TemplateView):
         },
     }
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["permitted_actions"] = get_permitted_actions(
-            self.request, "devices", "device"
-        )
-        return context
-
 
 class DeviceDetailView(PermissionRequiredMixin, DetailView):
     permission_required = "devices.view_device"
@@ -110,7 +106,6 @@ class DeviceDetailView(PermissionRequiredMixin, DetailView):
             to_attr="outstanding_assignments",
         )
     )
-    # def get_object(self):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
