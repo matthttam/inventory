@@ -101,12 +101,6 @@ class DeviceAssignmentListView(PermissionRequiredMixin, TemplateView):
     }
 
 
-class DeviceAssignmentRowButtonsView(PermissionRequiredMixin, DetailView):
-    permission_required = "assignments.view_deviceassignment"
-    model = DeviceAssignment
-    template_name = "assignments/partials/deviceassignment_list/table_row_buttons.html"
-
-
 class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):
     permission_required = "assignments.view_deviceassignment"
     model = DeviceAssignment

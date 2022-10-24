@@ -14,6 +14,11 @@ from authentication.tests.factories import UserFactory
 from django.contrib.auth.models import User
 from authentication.tests.decorators import assert_redirect_to_login
 from inventory.tests.helpers import get_permission
+from devices.views import DeviceDatatableServerSideProcessingView
+from django.core.exceptions import FieldError
+import json
+from unittest.mock import Mock, patch, ANY
+from django.core.handlers.wsgi import WSGIRequest
 
 
 class DeviceListViewAuthenticatedWithPermissionTest(TestCase):
@@ -163,6 +168,143 @@ class DeviceDeleteViewAuthenticatedWithPermissionTest(TestCase):
         self.assertEqual(len(devices), 0)
 
 
+class DeviceDatatableServerSideProcessingViewAuthenticatedWithPermissionTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        UserFactory(id=1)
+        DeviceFactory(id=1)
+
+    def setUp(self):
+        self.user = User.objects.get(id=1)
+        self.device = Device.objects.get(id=1)
+        self.client.force_login(self.user)
+        self.user.user_permissions.add(get_permission(Device, "view_device"))
+
+    def test_dt_index(self):
+        response = self.client.get(reverse("devices:dt_index"), self.get_dt_querydata())
+        self.assertEqual(response.status_code, 200)
+
+    def test_columns_defined_correctly(self):
+
+        view = DeviceDatatableServerSideProcessingView()
+        self.assertTrue(isinstance(view.columns, list))
+        try:
+            returnable_values = view.queryset.values(*view.columns)
+        except FieldError:
+            self.fail(
+                "dt_index view specifies columns not accessible from the queryset!"
+            )
+
+    @patch("devices.views.render_to_string")
+    def test_data_callback_adds_actions(self, mock_render_to_string):
+        mock_render_to_string.return_value = "<div>mock_actions_html</div>"
+        response = self.client.get(reverse("devices:dt_index"), self.get_dt_querydata())
+        json_data = json.loads(response.content)
+        mock_render_to_string.assert_called_with(
+            "devices/partials/device_list/table_row_buttons.html",
+            context=ANY,
+            request=ANY,
+        )
+        args, kwargs = mock_render_to_string.call_args
+        self.assertEqual(kwargs["context"]["device"]["id"], 1)
+        self.assertTrue(isinstance(kwargs["request"], WSGIRequest))
+        self.assertEqual(
+            json_data["data"][0]["actions"],
+            mock_render_to_string.return_value,
+            msg="actions field not set correctly!",
+        )
+
+    def get_dt_querydata(self):
+        return {
+            "draw": "1",
+            "columns[0][data]": "id",
+            "columns[0][name]": "",
+            "columns[0][searchable]": "true",
+            "columns[0][orderable]": "true",
+            "columns[0][search][value]": "",
+            "columns[0][search][regex]": "false",
+            "columns[1][data]": "is_currently_assigned",
+            "columns[1][name]": "",
+            "columns[1][searchable]": "true",
+            "columns[1][orderable]": "true",
+            "columns[1][search][value]": "",
+            "columns[1][search][regex]": "false",
+            "columns[2][data]": "current_assignment_count",
+            "columns[2][name]": "",
+            "columns[2][searchable]": "true",
+            "columns[2][orderable]": "true",
+            "columns[2][search][value]": "",
+            "columns[2][search][regex]": "false",
+            "columns[3][data]": "asset_id",
+            "columns[3][name]": "",
+            "columns[3][searchable]": "true",
+            "columns[3][orderable]": "true",
+            "columns[3][search][value]": "",
+            "columns[3][search][regex]": "false",
+            "columns[4][data]": "serial_number",
+            "columns[4][name]": "",
+            "columns[4][searchable]": "true",
+            "columns[4][orderable]": "true",
+            "columns[4][search][value]": "",
+            "columns[4][search][regex]": "false",
+            "columns[5][data]": "status__name",
+            "columns[5][name]": "",
+            "columns[5][searchable]": "true",
+            "columns[5][orderable]": "true",
+            "columns[5][search][value]": "",
+            "columns[5][search][regex]": "false",
+            "columns[6][data]": "device_model__manufacturer__name",
+            "columns[6][name]": "",
+            "columns[6][searchable]": "true",
+            "columns[6][orderable]": "true",
+            "columns[6][search][value]": "",
+            "columns[6][search][regex]": "false",
+            "columns[7][data]": "device_model__name",
+            "columns[7][name]": "",
+            "columns[7][searchable]": "true",
+            "columns[7][orderable]": "true",
+            "columns[7][search][value]": "",
+            "columns[7][search][regex]": "false",
+            "columns[8][data]": "building__name",
+            "columns[8][name]": "",
+            "columns[8][searchable]": "true",
+            "columns[8][orderable]": "true",
+            "columns[8][search][value]": "",
+            "columns[8][search][regex]": "false",
+            "columns[9][data]": "is_google_linked",
+            "columns[9][name]": "",
+            "columns[9][searchable]": "false",
+            "columns[9][orderable]": "true",
+            "columns[9][search][value]": "",
+            "columns[9][search][regex]": "false",
+            "columns[10][data]": "google_device__organization_unit",
+            "columns[10][name]": "",
+            "columns[10][searchable]": "true",
+            "columns[10][orderable]": "true",
+            "columns[10][search][value]": "",
+            "columns[10][search][regex]": "false",
+            "columns[11][data]": "google_device__most_recent_user",
+            "columns[11][name]": "",
+            "columns[11][searchable]": "true",
+            "columns[11][orderable]": "true",
+            "columns[11][search][value]": "",
+            "columns[11][search][regex]": "false",
+            "columns[12][data]": "actions",
+            "columns[12][name]": "",
+            "columns[12][searchable]": "true",
+            "columns[12][orderable]": "false",
+            "columns[12][search][value]": "",
+            "columns[12][search][regex]": "false",
+            "order[0][column]": "0",
+            "order[0][dir]": "asc",
+            "start": "0",
+            "length": "10",
+            "search[value]": "",
+            "search[regex]": "false",
+            "_": "1666646122583",
+        }
+
+
 class DeviceViewUnauthenticatedTest(TestCase):
     @assert_redirect_to_login(reverse("devices:index"))
     def test_device_list_redirects_to_login(self):
@@ -182,6 +324,10 @@ class DeviceViewUnauthenticatedTest(TestCase):
 
     @assert_redirect_to_login(reverse("devices:delete", args=[1]))
     def test_device_delete_redirects_to_login(self):
+        pass
+
+    @assert_redirect_to_login(reverse("devices:dt_index"))
+    def test_device_dt_index_redirects_to_login(self):
         pass
 
 
@@ -212,4 +358,8 @@ class DeviceViewsAuthenticatedWithoutPermissionTest(TestCase):
 
     def test_device_delete_redirects_to_login(self):
         response = self.client.get(reverse("devices:delete", args=[1]))
+        self.assertEqual(response.status_code, 403)
+
+    def test_device_dt_index_redirects_to_login(self):
+        response = self.client.get(reverse("devices:dt_index"))
         self.assertEqual(response.status_code, 403)

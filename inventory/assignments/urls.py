@@ -11,18 +11,12 @@ from .views import (
     QuickAssignDeviceListJSONView,
     QuickAssignSubmitView,
     DeviceAssignmentTurninView,
-    DeviceAssignmentRowButtonsView,
 )
 from django.views.decorators.cache import cache_page
 
 app_name = "assignments"
 urlpatterns = [
     path("", DeviceAssignmentListView.as_view(), name="index"),
-    path(
-        "ajax/<int:pk>/row_buttons/",
-        (DeviceAssignmentRowButtonsView.as_view()),
-        name="row_buttons",
-    ),
     path(
         "dt/",
         DeviceAssignmentDatatableServerSideProcessingView.as_view(),
