@@ -7,6 +7,8 @@
 {% with device.google_device as google_device%}
     <h5 class="card-title">Google Details</h5>
     <div class="card-text p-4">
+        {% if device.is_google_linked %}
+        
         <div class="row row-cols-2 row-cols-lg-2 g-2 g-lg-3">
             <div class="col">
                 <ul class="list-unstyled">
@@ -27,6 +29,9 @@
                 </ul>
             </div>
         </div>
+        {% else %}
+        Not linked to a Google Device
+        {% endif %}
     </div>
 {% endwith %}
 

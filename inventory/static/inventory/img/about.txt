@@ -1,0 +1,6 @@
+This favicon was generated using the following font:
+
+- Font Title: Noto Sans Sora Sompeng
+- Font Author: Copyright 2019 Google LLC. All Rights Reserved.
+- Font Source: http://fonts.gstatic.com/s/notosanssorasompeng/v17/PlIRFkO5O6RzLfvNNVSioxM2_OTrEhPyDLolKvCsHzCxWuGkYHR818DpZXJQd4Mu.ttf
+- Font License: SIL Open Font License, 1.1 (http://scripts.sil.org/OFL))

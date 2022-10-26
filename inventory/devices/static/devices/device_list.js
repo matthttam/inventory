@@ -6,14 +6,14 @@ $(document).ready(function () {
             url: "/devices/dt/",
         },
         colReorder: {
-            fixedColumnsRight:1
+            realtime: false,
+            fixedColumnsRight:1,
         },
         fixedHeader: true,
         searchDelay: 350,
-        columnDefs: [
+        /*columnDefs: [
             {
                 render: function (data, type, row) {
-                    console.log(row)
                     if(data == 1){
                         return '<div class="text-center"><i class="bi bi-check-lg text-success text-center" width="32" height="32"></i></div>'
                     }
@@ -21,7 +21,7 @@ $(document).ready(function () {
                 },
                 targets: 9,
             }
-        ],
+        ],*/
         columns: [
             { data: 'id', visible: false },
             { data: 'is_currently_assigned', visible: false },

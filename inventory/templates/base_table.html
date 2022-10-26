@@ -12,6 +12,7 @@
         {% block tbody %}
         {% endblock tbody %}
     </tbody>
+    {% if tfoot %}
     <tfoot>
         {% block tfoot %}
             {% if footers %}
@@ -21,4 +22,5 @@
             {% endif %}
         {% endblock tfoot %}
     </tfoot>
+    {% endif %}
 </table>

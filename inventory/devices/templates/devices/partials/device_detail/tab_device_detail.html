@@ -1,13 +1,5 @@
 {% include './card_device_detail.html' %}
 
-{% if device.is_currently_assigned %}
+{% include './card_outstanding_assignments.html' %}
 
-    {% include './card_outstanding_assignments.html' %}
-
-{% endif %}
-
-{% if device.is_google_linked %}
-
-    {% include './card_google_device_detail.html' %}
-
-{% endif %}
+{% include './card_google_device_detail.html' %}

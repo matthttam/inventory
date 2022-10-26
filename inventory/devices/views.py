@@ -33,6 +33,15 @@ class DeviceDatatableServerSideProcessingView(
                 request=self.request,
             )
 
+            if row["is_google_linked"] == 1:
+                row[
+                    "is_google_linked"
+                ] = '<div class="text-center"><i class="bi bi-check-lg text-success text-center" width="32" height="32"></i></div>'
+            else:
+                row[
+                    "is_google_linked"
+                ] = '<div class="text-center"><i class="bi bi-x-lg text-danger text-center" width="32" height="32"></i></div>'
+
         return super().data_callback(data)
 
     permission_required = "devices.view_device"
