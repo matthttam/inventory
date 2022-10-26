@@ -13,7 +13,7 @@
 
 
 {% block base_content %}
-<body class="sb-nav-fixed {% if request.COOKIES.sb_sidebar_toggle == "true" %}sb-sidenav-toggled{% endif %}">
+<body class="sb-nav-fixed {% if request.COOKIES.sb_sidenav_toggle == "true" %}sb-sidenav-toggled{% endif %}">
         
     {% include './partials/_top_nav.html' %}
     <div id="layoutSidenav">

@@ -5,7 +5,7 @@
 {% block card_body_content%}
 
     <h5 class="card-title">Assignment Details</h5>
-    <div class="card-text p-4">
+    <div class="card-text p-4 table-responsive">
         {% include 'assignments/partials/deviceassignment_detail/table_deviceassignment.html' with assignments=device.outstanding_assignments %}
     </div>
 

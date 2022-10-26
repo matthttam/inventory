@@ -9,6 +9,17 @@
     background-color: #cacff0fd;
 }
 
+.inventory-sidenav-toggled .inner-nav-text{
+
+    display: none;
+}
+
+@media (min-width: 912px) {
+    .inventory-sidenav-toggled .inner-nav-text {
+      display: none;
+    }
+  }
+
 .card-text > * li{
     padding-top: 0.5rem;
 }
