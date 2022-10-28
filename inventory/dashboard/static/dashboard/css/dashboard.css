@@ -11706,7 +11706,12 @@ body:not(.sb-sidenav-toggled) #layoutSidenav #layoutSidenav_content:before {
   font-size: 0.75rem;
   border-radius: 0.25rem !important;
 }
-
+/*
 #layoutSidenav_content {
-  overflow: auto !important;
+   overflow-y: hidden !important; 
+  overflow-y: hidden;
+}
+*/
+#layoutSidenav_nav{
+  height: 100%
 }

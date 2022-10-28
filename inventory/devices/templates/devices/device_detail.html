@@ -17,12 +17,12 @@
     <div class="container-fluid p-0">
     {% if device %}
         <div class="row mx-0 g-0 h-100 d-flex flex-nowrap">
-            <div class="col-auto" style="z-index: 1021;">
+            <div class="col-auto sticky-top" style="z-index: 1021; top:56;">
             {% include './partials/device_detail/inner_nav.html' %}
             </div>
 
             <div class="col">
-                <div class="col sticky-top m-0 pt-2" style="align-self: flex-start">
+                <div class="col detail-sticky-header">
                     <div class=" bg-light px-3 border-bottom border-secondary border-2 border-opacity-25">
                         <div class="hstack gap-3">
                             <h1 class="display-6">Device: {{ object }}</h1>
@@ -39,7 +39,7 @@
                         </div>     
                     </div>
                 </div>
-                <div class="col tab-content">
+                <div class="col tab-content" style="margin-top: 76px;">
                     <div class="tab-pane  show active" id="device-detail" role="tabpanel" aria-labelledby="device-detail-tab" tabindex="0">
                         {% include './partials/device_detail/tab_device_detail.html' %}
                     </div>
