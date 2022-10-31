@@ -19,10 +19,6 @@
     {% with prefix=tables.device_list %}
         {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers %}
     {% endwith %}
-    
-    {% if perms.devices.add_device %}
-        <a class="btn btn-primary m-2" role="button" href="{% url 'devices:new' %}">Create Device</a>
-    {% endif %}
 
     </div>
 {% endblock content %}

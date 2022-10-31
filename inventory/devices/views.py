@@ -32,15 +32,16 @@ class DeviceDatatableServerSideProcessingView(
                 context={"device": row},
                 request=self.request,
             )
-
-            if row["is_google_linked"] == 1:
-                row[
-                    "is_google_linked"
-                ] = '<div class="text-center"><i class="bi bi-check-lg text-success text-center" width="32" height="32"></i></div>'
-            else:
-                row[
-                    "is_google_linked"
-                ] = '<div class="text-center"><i class="bi bi-x-lg text-danger text-center" width="32" height="32"></i></div>'
+            row["is_currently_assigned"] = render_to_string(
+                "partials/check_or_x.html",
+                context={"boolean": row["is_currently_assigned"]},
+                request=self.request,
+            )
+            row["is_google_linked"] = render_to_string(
+                "partials/check_or_x.html",
+                context={"boolean": row["is_google_linked"]},
+                request=self.request,
+            )
 
         return super().data_callback(data)
 

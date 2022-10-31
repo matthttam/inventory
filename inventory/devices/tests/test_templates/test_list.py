@@ -6,11 +6,6 @@ from devices.tests.factories import DeviceFactory
 from inventory.tests.helpers import get_permission
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
-new_link = '<a class="btn btn-primary m-2" role="button" href="/devices/new/">Create Device</a>'
-
-DEFAULT_LINKS = []
-ALL_LINKS = [new_link]
-
 
 class DeviceListSuperuserTest(TestCase):
     """Checks that the List View loads the appropriate links"""
@@ -24,24 +19,6 @@ class DeviceListSuperuserTest(TestCase):
         self.user = User.objects.get(username="my_superuser@example.com")
         self.client.force_login(self.user)
         self.response = self.client.get(reverse("devices:index"))
-
-    def test_default_links_exist(self):
-        if len(DEFAULT_LINKS) == 0:
-            return
-        for link in DEFAULT_LINKS:
-            self.assertInHTML(
-                link,
-                self.response.content.decode(),
-            )
-
-    def test_all_links_exist(self):
-        if len(ALL_LINKS) == 0:
-            return
-        for link in ALL_LINKS:
-            self.assertInHTML(
-                link,
-                self.response.content.decode(),
-            )
 
     def test_template_used(self):
         self.assertTemplateUsed(self.response, "devices/device_list.html")

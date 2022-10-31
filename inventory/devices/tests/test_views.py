@@ -17,8 +17,11 @@ from inventory.tests.helpers import get_permission
 from devices.views import DeviceDatatableServerSideProcessingView
 from django.core.exceptions import FieldError
 import json
-from unittest.mock import Mock, patch, ANY
+from unittest.mock import Mock, patch, ANY, call
 from django.core.handlers.wsgi import WSGIRequest
+from callee import InstanceOf, String, Integer
+from callee.collections import Dict
+from callee.operators import Eq
 
 
 class DeviceListViewAuthenticatedWithPermissionTest(TestCase):
@@ -197,14 +200,40 @@ class DeviceDatatableServerSideProcessingViewAuthenticatedWithPermissionTest(Tes
 
     @patch("devices.views.render_to_string")
     def test_data_callback_adds_actions(self, mock_render_to_string):
-        mock_render_to_string.return_value = "<div>mock_actions_html</div>"
+        mock_render_to_string.side_effect = [
+            "<div>mock_actions_html</div>",
+            "<div>mock_check</div>",
+            "<div>mock_check</div>",
+        ]
         response = self.client.get(reverse("devices:dt_index"), self.get_dt_querydata())
         json_data = json.loads(response.content)
-        mock_render_to_string.assert_called_with(
-            "devices/partials/device_list/table_row_buttons.html",
-            context=ANY,
-            request=ANY,
+
+        self.assertEqual(mock_render_to_string.call_count, 3)
+        mock_render_to_string.assert_has_calls(
+            [
+                call(
+                    "devices/partials/device_list/table_row_buttons.html",
+                    context={"device": Dict(of={"id": 1})},
+                    # context=Dict(String() & Eq("device"), Dict(String(), ANY)),
+                    # context=Dict(String(), Dict()),
+                    # context={"device": Dict(keys=String())},
+                    request=InstanceOf(WSGIRequest),
+                ),
+                call(
+                    "partials/check_or_x.html",
+                    context={"boolean": ANY},
+                    request=InstanceOf(WSGIRequest),
+                ),
+                call(
+                    "partials/check_or_x.html",
+                    context={"boolean": ANY},
+                    request=InstanceOf(WSGIRequest),
+                ),
+            ],
+            any_order=True,
         )
+        print(mock_render_to_string.call_args)
+        return
         args, kwargs = mock_render_to_string.call_args
         self.assertEqual(kwargs["context"]["device"]["id"], 1)
         self.assertTrue(isinstance(kwargs["request"], WSGIRequest))
