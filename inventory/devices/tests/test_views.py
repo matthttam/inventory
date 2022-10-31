@@ -175,7 +175,7 @@ class DeviceDatatableServerSideProcessingViewAuthenticatedWithPermissionTest(Tes
     @classmethod
     def setUpTestData(cls):
         UserFactory(id=1)
-        DeviceFactory(id=1)
+        cls.device = DeviceFactory(id=1)
 
     def setUp(self):
         self.user = User.objects.get(id=1)
@@ -200,23 +200,22 @@ class DeviceDatatableServerSideProcessingViewAuthenticatedWithPermissionTest(Tes
 
     @patch("devices.views.render_to_string")
     def test_data_callback_adds_actions(self, mock_render_to_string):
+        actions_string = "<div>mock_actions_html</div>"
+        check_string = "<div>mock_check</div>"
         mock_render_to_string.side_effect = [
-            "<div>mock_actions_html</div>",
-            "<div>mock_check</div>",
-            "<div>mock_check</div>",
+            actions_string,
+            check_string,
+            check_string,
         ]
         response = self.client.get(reverse("devices:dt_index"), self.get_dt_querydata())
         json_data = json.loads(response.content)
-
+        print(json_data)
         self.assertEqual(mock_render_to_string.call_count, 3)
         mock_render_to_string.assert_has_calls(
             [
                 call(
                     "devices/partials/device_list/table_row_buttons.html",
-                    context={"device": Dict(of={"id": 1})},
-                    # context=Dict(String() & Eq("device"), Dict(String(), ANY)),
-                    # context=Dict(String(), Dict()),
-                    # context={"device": Dict(keys=String())},
+                    context={"device": ANY},
                     request=InstanceOf(WSGIRequest),
                 ),
                 call(
@@ -232,15 +231,21 @@ class DeviceDatatableServerSideProcessingViewAuthenticatedWithPermissionTest(Tes
             ],
             any_order=True,
         )
-        print(mock_render_to_string.call_args)
-        return
-        args, kwargs = mock_render_to_string.call_args
-        self.assertEqual(kwargs["context"]["device"]["id"], 1)
-        self.assertTrue(isinstance(kwargs["request"], WSGIRequest))
+
         self.assertEqual(
             json_data["data"][0]["actions"],
-            mock_render_to_string.return_value,
+            actions_string,
             msg="actions field not set correctly!",
+        )
+        self.assertEqual(
+            json_data["data"][0]["is_currently_assigned"],
+            check_string,
+            msg="is_currently_assigned field not set correctly!",
+        )
+        self.assertEqual(
+            json_data["data"][0]["is_google_linked"],
+            check_string,
+            msg="is_google_linked field not set correctly!",
         )
 
     def get_dt_querydata(self):
