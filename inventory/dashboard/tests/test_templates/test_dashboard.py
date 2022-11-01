@@ -12,6 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from seleniumlogin import force_login
+from sekizai.context import SekizaiContext
 
 
 class DashboardTestSuperuser(TestCase):
@@ -33,7 +34,7 @@ class DashboardTestSuperuser(TestCase):
 class DashboardTemplateTest(TestCase):
     def test_quickassign_button_without_permission(self):
         template = Template("{% include  'dashboard/dashboard.html'%}")
-        context = Context(
+        context = SekizaiContext(
             {
                 "perms": {
                     "assignments": {
@@ -53,7 +54,7 @@ class DashboardTemplateTest(TestCase):
 
     def test_quickassign_button_with_permissions(self):
         template = Template("{% include  'dashboard/dashboard.html'%}")
-        context = Context(
+        context = SekizaiContext(
             {
                 "perms": {
                     "assignments": {
@@ -68,7 +69,7 @@ class DashboardTemplateTest(TestCase):
         self.assertEqual(
             len(quickassign_link),
             1,
-            msg="Quick assign button does not existwith permissions!",
+            msg="Quick assign button does not exist with permissions!",
         )
 
 

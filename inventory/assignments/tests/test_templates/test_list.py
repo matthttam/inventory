@@ -20,7 +20,8 @@ class DeviceAssignmentListTemplateTest(TestCase):
     def test_template_used(self):
         self.assertTemplateUsed(self.response, "assignments/deviceassignment_list.html")
         self.assertTemplateUsed(self.response, "dashboard/dashboard.html")
-        self.assertTemplateUsed(self.response, "partials/datatables.html")
+        self.assertTemplateUsed(self.response, "partials/datatables_js.html")
+        self.assertTemplateUsed(self.response, "partials/datatables_css.html")
 
     def test_valid_html(self):
         self.assertInHTML("Inventory - Assignments", self.response.content.decode())

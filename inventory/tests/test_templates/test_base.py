@@ -1,11 +1,12 @@
 from django.test import SimpleTestCase
 from django.template import Context, Template
 from bs4 import BeautifulSoup
+from sekizai.context import SekizaiContext
 
 
 class BaseTest(SimpleTestCase):
     def setUp(self):
-        context = Context({})
+        context = SekizaiContext({})
         template = Template("{% include 'base.html' %}")
         self.rendered = template.render(context)
         self.soup = BeautifulSoup(self.rendered, "html.parser")
@@ -42,7 +43,7 @@ class BaseTest(SimpleTestCase):
         self.assertEqual("Inventory", title)
 
     def test_with_content(self):
-        parent_template_context = Context()
+        parent_template_context = SekizaiContext()
         parent_template_template = Template(
             "{% extends 'base.html' %}{% block base_content %}<h1>test</h1>{% endblock %}"
         )

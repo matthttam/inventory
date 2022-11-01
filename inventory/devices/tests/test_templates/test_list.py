@@ -20,7 +20,8 @@ class DeviceListSuperuserTest(TestCase):
     def test_template_used(self):
         self.assertTemplateUsed(self.response, "devices/device_list.html")
         self.assertTemplateUsed(self.response, "dashboard/dashboard.html")
-        self.assertTemplateUsed(self.response, "partials/datatables.html")
+        self.assertTemplateUsed(self.response, "partials/datatables_css.html")
+        self.assertTemplateUsed(self.response, "partials/datatables_js.html")
 
     def test_title(self):
         self.assertInHTML("Inventory - Devices", self.response.content.decode())

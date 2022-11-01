@@ -3,12 +3,13 @@ from django.test import SimpleTestCase
 from django.template import Context, Template
 from bs4 import BeautifulSoup
 from assignments.tests.factories import DeviceAssignmentFactory
+from sekizai.context import SekizaiContext
 
 
 class TableRowButtonsPermissionTest(SimpleTestCase):
     def setUp(self):
         deviceassignment = DeviceAssignmentFactory.build(id=1)
-        self.context = Context(
+        self.context = SekizaiContext(
             {
                 "deviceassignment": deviceassignment,
                 "perms": {

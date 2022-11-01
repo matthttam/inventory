@@ -1,17 +1,23 @@
 {% extends "dashboard/dashboard.html" %}
 
+{% load static sekizai_tags %}
+
 {% block title %}Inventory - Assignments{% endblock %}
 
-{% block head %}
-
-    {{ block.super }}
-
-    {% include "partials/datatables.html"%}
-
-    {% load static %}
+{% block js %}
+{{ block.super }}
+{% addtoblock "js" %}
+    {% include "partials/datatables_js.html"%}
     <script src="{% static 'assignments/deviceassignment_list.js'%}"></script>
+{% endaddtoblock %}
+{% endblock js %}
 
-{% endblock head %}
+{% block css %}
+{{ block.super }}
+{% addtoblock "css" %}
+    {% include "partials/datatables_css.html"%}
+{% endaddtoblock %}
+{% endblock css %}
 
 {% block content %}
     <div class="container-fluid mt-2">

@@ -1,16 +1,23 @@
 {% extends "base.html" %}
 
-{% load static %}
+{% load static sekizai_tags %}
 
 {% block title %}Inventory - Dashboard{% endblock %}
 
-{% block head %}
-{{ block.super }}
-<script src="{% static 'dashboard/js/dashboard.js'%}"></script>
-<link href="{% static 'dashboard/css/dashboard.css'%}" rel="stylesheet" />
-
+{% block js %}
+    {{ block.super }}
+    {% addtoblock "js" %}
+        <script src="{% static 'dashboard/js/dashboard.js'%}"></script>
+    {% endaddtoblock %}
 {% endblock %}
 
+
+{% block css %}
+    {{ block.super }}
+    {% addtoblock "css" %}
+        <link href="{% static 'dashboard/css/dashboard.css'%}" rel="stylesheet" />
+    {% endaddtoblock %}
+{% endblock css %}
 
 {% block base_content %}
 <body class="sb-nav-fixed {% if request.COOKIES.sb_sidenav_toggle == "true" %}sb-sidenav-toggled{% endif %}">
