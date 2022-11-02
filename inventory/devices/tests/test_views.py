@@ -67,16 +67,6 @@ class DeviceDetailViewAuthenticatedWithPermissionTest(TestCase):
     def test_valid_device(self):
         device = DeviceFactory(id=1, serial_number="ABCD1234")
         response = self.client.get(reverse("devices:detail", args=[1]))
-        self.assertTemplateUsed(response, "devices/device_detail.html")
-        self.assertTemplateUsed(
-            response, "devices/partials/device_detail/tab_device_detail.html"
-        )
-        self.assertTemplateUsed(
-            response, "devices/partials/device_detail/tab_device_history.html"
-        )
-        self.assertTemplateUsed(
-            response, "devices/partials/device_detail/tab_assignment_history.html"
-        )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "ABCD1234")
 

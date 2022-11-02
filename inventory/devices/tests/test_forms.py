@@ -13,14 +13,17 @@ from locations.models import Building, Room
 class DeviceFormTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        status = DeviceStatusFactory(name="test_status")
-        device_model = DeviceModelFactory(id=1)
+        cls.status = DeviceStatusFactory(name="test_status")
+        cls.device_model = DeviceModelFactory(id=1)
 
-    def setUp(self):
-        self.status = DeviceStatus.objects.get(name="test_status")
-        self.device_model = DeviceModel.objects.get(id=1)
+        # def setUp(self):
+        #     self.status = DeviceStatus.objects.get(name="test_status")
+        #     self.device_model = DeviceModel.objects.get(id=1)
 
     def test_valid_form(self):
+        """
+        Prepare a form with a new device model that should be valid.
+        """
         device = DeviceFactory.build(status=self.status, device_model=self.device_model)
         form = DeviceForm(
             data=model_to_dict(
@@ -61,6 +64,9 @@ class DeviceFormTest(TestCase):
         )
 
     def test_invalid_form(self):
+        """
+        Prepare a form with a duplicate device model that should be valid.
+        """
         device = DeviceFactory(status=self.status, device_model=self.device_model)
         form = DeviceForm(
             data=model_to_dict(
