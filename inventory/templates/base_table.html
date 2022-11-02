@@ -12,15 +12,15 @@
         {% block tbody %}
         {% endblock tbody %}
     </tbody>
-    {% if tfoot %}
+{% if footers %}
     <tfoot>
         {% block tfoot %}
             {% if footers %}
-                {% for value in headers %}
-                    <th></th>
+                {% for value in footers %}
+                    <th>{{value|safe}}</th>
                 {% endfor %}
             {% endif %}
         {% endblock tfoot %}
     </tfoot>
-    {% endif %}
+{% endif %}
 </table>

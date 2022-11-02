@@ -4,20 +4,14 @@
 
 {% block title %}Inventory - Dashboard{% endblock %}
 
-{% block js %}
-    {{ block.super }}
-    {% addtoblock "js" %}
+{% block js %}{{ block.super }}{% addtoblock "js" %}
         <script src="{% static 'dashboard/js/dashboard.js'%}"></script>
-    {% endaddtoblock %}
-{% endblock %}
+{% endaddtoblock %}{% endblock %}
 
 
-{% block css %}
-    {{ block.super }}
-    {% addtoblock "css" %}
+{% block css %}{{ block.super }}{% addtoblock "css" %}
         <link href="{% static 'dashboard/css/dashboard.css'%}" rel="stylesheet" />
-    {% endaddtoblock %}
-{% endblock css %}
+{% endaddtoblock %}{% endblock css %}
 
 {% block base_content %}
 <body class="sb-nav-fixed {% if request.COOKIES.sb_sidenav_toggle == "true" %}sb-sidenav-toggled{% endif %}">
@@ -43,7 +37,8 @@
                     
 
             </main>
-            <!--<footer class="py-4 bg-light mt-auto">
+            {% comment %}
+            <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
                         <div class="text-muted">Copyright &copy; Your Website 2022</div>
@@ -54,7 +49,8 @@
                         </div>
                     </div>
                 </div>
-            </footer>-->
+            </footer>
+            {% endcomment %}
         </div>
     </div>
 </body>

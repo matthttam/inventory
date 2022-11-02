@@ -1,0 +1,6 @@
+.card-text > * li{
+    padding-top: 0.5rem;
+}
+.card{
+    margin: 1rem;
+}

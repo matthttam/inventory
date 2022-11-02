@@ -1,8 +1,11 @@
 {% extends 'partials/card.html' %}
 
+{% load static sekizai_tags %}
+
 {% block card_title %}{% endblock %}
 
 {% block card_body_content%}
+
 <h5 class="card-title">Device History</h5>
     <div class="card-text p-4 table-responsive">
     {% with prefix=tables.device_history %}

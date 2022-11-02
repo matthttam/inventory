@@ -1,8 +1,14 @@
 {% extends 'base_table.html' %}
 
+{% load static sekizai_tags %}
+
 {% block table_id %}{{ table_id }}{% endblock %}
 
 {% block thead %}
+    {% addtoblock "css" %}
+        <link href="{% static 'inventory/css/partials/table.css' %}" rel="stylesheet" />
+    {% endaddtoblock %}
+
     <tr>
         {{ block.super }}
         {% if thead_template %}

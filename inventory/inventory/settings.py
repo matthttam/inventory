@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "assignments",
     "profiles",
     "googlesync",
+    "utils",
 ]
 
 MIDDLEWARE = [

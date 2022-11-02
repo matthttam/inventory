@@ -23,19 +23,6 @@
     }
   }
 */
-.card-text > * li{
-    padding-top: 0.5rem;
-}
-.card{
-    margin: 1rem;
-}
-/*.card{
-    padding-top: 1rem;
-    margin-top: 1rem;
-    margin-left: 1rem;
-    margin-right: 1rem;
-}*/
-
 .inventory-innernav.inventory-innernav-toggled .inventory-innernav-arrow {
     -webkit-transform: rotate(180deg);
     -moz-transform: rotate(180deg);
@@ -68,14 +55,4 @@
     border-top-right-radius: 110px;
     border-bottom-right-radius: 110px;
     border-left: 0px;
-}
-
-.detail-sticky-header {
-    position: fixed;
-    top: 56px;
-    display: block;
-    width: 100vw;
-    align-self: flex-start;
-    z-index: 1020;
-    margin: 0px;
 }

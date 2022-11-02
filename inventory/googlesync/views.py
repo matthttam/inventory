@@ -13,9 +13,10 @@ from .models import (
     GooglePersonMapping,
     GoogleDeviceMapping,
 )
+from utils.mixins import SuperuserRequiredMixin
 
 
-class GoogleConfigCreateUpdateView(UpdateView):
+class GoogleConfigCreateUpdateView(SuperuserRequiredMixin, UpdateView):
     model = GoogleConfig
     form_class = GoogleConfigForm
     template_name = "googlesync/googleconfig_form.html"
@@ -30,7 +31,7 @@ class GoogleConfigCreateUpdateView(UpdateView):
     # fields = ['client_id', 'project_id', 'client_secret']
 
 
-class GoogleServiceAccountConfigCreateUpdateView(UpdateView):
+class GoogleServiceAccountConfigCreateUpdateView(SuperuserRequiredMixin, UpdateView):
     model = GoogleServiceAccountConfig
     form_class = GoogleServiceAccountConfigForm
     template_name = "googlesync/googleconfig_form.html"
@@ -39,19 +40,19 @@ class GoogleServiceAccountConfigCreateUpdateView(UpdateView):
         return self.model.objects.first()
 
 
-class GooglePersonMappingListView(ListView):
+class GooglePersonMappingListView(SuperuserRequiredMixin, ListView):
     model = GooglePersonMapping
 
 
-class GoogleDeviceMappingListView(ListView):
+class GoogleDeviceMappingListView(SuperuserRequiredMixin, ListView):
     model = GoogleDeviceMapping
 
 
-class GooglePersonMappingUpdateView(UpdateView):
+class GooglePersonMappingUpdateView(SuperuserRequiredMixin, UpdateView):
     model = GooglePersonMapping
     fields = ["from_field", "to_field", "matching_priority"]
 
 
-class GoogleDeviceMappingUpdateView(UpdateView):
+class GoogleDeviceMappingUpdateView(SuperuserRequiredMixin, UpdateView):
     model = GoogleDeviceMapping
     fields = ["from_field", "to_field", "matching_priority"]

@@ -2,18 +2,6 @@
 
 {% block title %}Inventory - Google Person Mapping{% endblock %}
 
-{% block head %}
-{{ block.super }}
-{% include "partials/datatables.html"%}
-
-    <script>
-        $(document).ready(function () {
-            $('#googlepersonmapping_list').DataTable();
-        });
-    </script>
-
-{% endblock head %}
-
 {% block content %}
     <div class="container-fluid mt-2">
 

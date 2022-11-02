@@ -3,6 +3,7 @@
 
 {% block thead %}
     <tr>
+        <th></th>
         <th>Assignment ID</th>
         <th>Person Internal ID</th>
         <th>Person</th>
@@ -16,6 +17,7 @@
 
 {% for assignment in assignments %}
     <tr>
+        <td><a href="{% url 'assignments:detail' assignment.id %}"><button type="button" class="btn btn-outline-secondary"><i class="bi bi-link"></i></button></a></td>
         <td>{{ assignment.id }}</td>
         <td>{{ assignment.person.internal_id }}</td>
         <td>{{ assignment.person }}</td>

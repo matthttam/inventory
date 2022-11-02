@@ -1,5 +1,5 @@
 $(document).ready(function(){
-
+    
     // Auto hide innernav based on size and orientation changes.
     $(window).on('resize orientationChanged', function(e) {
         var breakpoint = 1300

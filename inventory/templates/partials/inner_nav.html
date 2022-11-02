@@ -1,3 +1,14 @@
+{% load static sekizai_tags %}
+
+{% addtoblock "css" %}
+    <link href="{% static 'inventory/css/partials/inner_nav.css'%}" rel="stylesheet" />
+{% endaddtoblock %}
+
+{% addtoblock "js" %}
+    <script src="{% static 'inventory/js/inner_nav.js'%}"></script>
+{% endaddtoblock %}
+
+
 <nav class="nav inventory-innernav {% if request.COOKIES.inventory_innernav_toggled == "true" %}inventory-innernav-toggled {% endif %}flex-column bg-light p-2 border-end border-secondary border-2 border-opacity-25 h-100" style="overflow-y: none;">
     <div class="sticky-top" style="top: 126px;">
         <div class="position-relative d-block h-100">
