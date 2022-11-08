@@ -70,7 +70,7 @@ class DetailCardDeviceDetailTest(SimpleTestCase):
         self.assertInHTML("<li>Notes : NOTES_ABCD1234</li>", render)
 
 
-class DetailsCardDeviceHistory(SimpleTestCase):
+class DetailsCardDeviceHistoryTest(SimpleTestCase):
     template = "devices/partials/device_detail/card_device_history.html"
 
     def test_template(self):
@@ -83,7 +83,7 @@ class DetailsCardDeviceHistory(SimpleTestCase):
                 render_to_string(self.template)
 
 
-class DetailCardDeviceAssignmentHistory(SimpleTestCase):
+class DetailCardDeviceAssignmentHistoryTest(SimpleTestCase):
     template = "devices/partials/device_detail/card_deviceassignment_history.html"
 
     def test_template(self):
@@ -96,7 +96,7 @@ class DetailCardDeviceAssignmentHistory(SimpleTestCase):
                 render_to_string(self.template)
 
 
-class DetailCardGoogleDeviceDetail(SimpleTestCase):
+class DetailCardGoogleDeviceDetailTest(SimpleTestCase):
     template = "devices/partials/device_detail/card_google_device_detail.html"
 
     def setUp(self) -> None:
@@ -153,7 +153,7 @@ class DetailCardGoogleDeviceDetail(SimpleTestCase):
         self.assertInHTML(f'<div class="card-text p-4">Not Linked to a Google Device</div>', render)
 
 
-class DetailCardOutstandingAssignments(SimpleTestCase):
+class DetailCardOutstandingAssignmentsTest(SimpleTestCase):
     template = "devices/partials/device_detail/card_google_device_detail.html"
 
     # def setUp(self) -> None:
@@ -171,3 +171,92 @@ class DetailCardOutstandingAssignments(SimpleTestCase):
         for template in templates:
             with self.assertTemplateUsed(template):
                 render_to_string(self.template)
+
+
+class DetailInnerNavTest(SimpleTestCase):
+    pass
+
+
+class DetailStickyHeaderTest(SimpleTestCase):
+    pass
+
+
+class DetailTabDeviceDetailTest(SimpleTestCase):
+    pass
+
+
+class DetailTabDeviceHistoryTest(SimpleTestCase):
+    pass
+
+
+class DetailTabDeviceAssignmentHistoryTest(SimpleTestCase):
+    pass
+
+
+class ListTableRowButtonsTest(SimpleTestCase):
+    pass
+
+
+class DeviceInfoboxTest(SimpleTestCase):
+    pass
+
+
+class DeviceTagIcons(SimpleTestCase):
+    template = "devices/partials/device_tag_icons.html"
+
+    def test_no_tags(self):
+        tag = DeviceTagFactory.build()
+        context = {"device": {"tags": {"all": []}}}
+        templates = [
+            "partials/tag_icon.html",
+        ]
+        for template in templates:
+            with self.assertTemplateNotUsed(template):
+                render_to_string(self.template, context=context)
+
+    def test_with_tags(self):
+        tag = DeviceTagFactory.build()
+        context = {
+            "device": {
+                "tags": {
+                    "all": [
+                        tag,
+                    ]
+                }
+            }
+        }
+        templates = [
+            "partials/tag_icon.html",
+        ]
+        for template in templates:
+            with self.assertTemplateUsed(template):
+                render_to_string(self.template, context=context)
+
+
+class DeviceTagList(SimpleTestCase):
+    template = "devices/partials/device_tag_list.html"
+
+    def test_tag_name(self):
+        tag = DeviceTagFactory.build()
+        context = {
+            "device": {
+                "tags": {
+                    "all": [
+                        tag,
+                    ]
+                }
+            }
+        }
+        render = render_to_string(self.template, context=context)
+        self.assertInHTML(
+            f'<span class="badge rounded-pill text-bg-primary d-inline-block ms-2">{tag.name}</span>', render
+        )
+
+    def test_multiple_tag_names(self):
+        tags = DeviceTagFactory.build_batch(size=3)
+        context = {"device": {"tags": {"all": tags}}}
+        render = render_to_string(self.template, context=context)
+        for tag in tags:
+            self.assertInHTML(
+                f'<span class="badge rounded-pill text-bg-primary d-inline-block ms-2">{tag.name}</span>', render
+            )

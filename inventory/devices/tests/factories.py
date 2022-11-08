@@ -21,7 +21,7 @@ fake.add_provider(CompanyProvider)
 
 
 def get_device_tag_generator(filename="example.jpg", width=300, height=300):
-    return lambda _: ContentFile(
+    return lambda: ContentFile(
         factory.django.ImageField()._make_data({"width": width, "height": height}),
         filename,
     )
@@ -34,7 +34,7 @@ class DeviceTagFactory(DjangoModelFactory):
 
     name = factory.LazyFunction(lambda: fake.unique.company())
     active = True
-    factory.LazyFunction(get_device_tag_generator())
+    icon = factory.LazyFunction(get_device_tag_generator())
 
 
 class DeviceStatusFactory(DjangoModelFactory):
