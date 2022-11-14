@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from dashboard import views
 from .views import InventoryAboutView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
@@ -29,4 +31,4 @@ urlpatterns = [
     path("accounts/", include("authentication.urls")),
     path("googlesync/", include("googlesync.urls")),
     path("profile/", include("profiles.urls")),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

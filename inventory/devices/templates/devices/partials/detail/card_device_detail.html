@@ -1,0 +1,41 @@
+{% extends 'partials/detail/card_detail.html' %}
+
+{% block card_title %}{% endblock %}
+
+{% block card_body_content%}
+    {% block card_body_header %}
+    <h5 class="card-title">Device Details
+        <a href="{% url 'devices:index' %}" class="d-inline-block ms-2"><i class="bi bi-card-list text-primary" title="Device List"></i></a>
+        {% if perms.devices.change_device %}
+            <a href="{% url 'devices:edit' device.id %}" class="d-inline-block ms-2"><i class="bi bi-pencil-square text-secondary" title="Edit Device"></i></a>
+        {% endif %}
+        {% if perms.devices.delete_device %}
+            <a href="{% url 'devices:delete' device.id %}" class="d-inline-block ms-2"><i class="bi bi-trash2 text-danger" title="Delete Device"></i></a>
+        {% endif %}
+    </h5>
+    {% endblock card_body_header %}
+
+    <div class="card-text p-4">
+        <div class="row row-cols-2 row-cols-lg-2 g-2 g-lg-3">
+            <div class="col">
+                <ul class="list-unstyled">
+                    <li>Device ID : {{ device.id }}</li>
+                    <li>Asset Tag : {{ device.asset_id }}</li>
+                    <li>Serial Number : {{ device.serial_number }}</li>
+                    <li>Status : {{ device.status }}</li>
+                    <li>Model : {{ device.device_model }}</li>
+                </ul>
+            </div>
+            <div class="col">
+                <ul class="list-unstyled">
+                    <li>Building : {{ device.building }}</li>
+                    <li>Room : {{ device.room }}</li>
+                    <li>Tags : {% include 'devices/partials/device_tag_list.html' %}</li>
+                    <li>Notes : {{ device.notes }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% block card_body_footer %}
+    {% endblock card_body_footer %}
+{% endblock card_body_content %}

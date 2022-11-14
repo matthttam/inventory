@@ -36,9 +36,11 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "markdownify.apps.MarkdownifyConfig",
+    "sekizai",
     "inventory",
     "debug_toolbar",
     "auditlog",
+    "sorl.thumbnail",
     "dashboard",
     "devices",
     "locations",
@@ -46,9 +48,11 @@ INSTALLED_APPS = [
     "assignments",
     "profiles",
     "googlesync",
+    "utils",
 ]
 
 MIDDLEWARE = [
+    # "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -59,6 +63,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
+    # "django.middleware.cache.FetchFromCacheMiddleware",
 ]
 
 ROOT_URLCONF = "inventory.urls"
@@ -74,6 +79,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "sekizai.context_processors.sekizai",
             ],
         },
     },
@@ -97,6 +103,19 @@ DATABASES = {
     #    "ENGINE": 'django.db.backends.sqlite3',
     #    'NAME': 'test_database',
     # }
+}
+
+# Cache
+# Cache time to live is 15 minutes.
+CACHE_MIDDLEWARE_ALIAS = "default"
+CACHE_MIDDLEWARE_SECONDS = 15
+CACHE_MIDDLEWARE_KEY_PREFIX = ""
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    }
 }
 
 # Password validation
@@ -146,6 +165,10 @@ STATIC_ROOT = Path(BASE_DIR.parent).joinpath(env("STATIC_PATH"))
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+# Media files (user uploaded media)
+MEDIA_ROOT = Path(BASE_DIR.parent).joinpath(env("MEDIA_PATH"))
+MEDIA_URL = env("MEDIA_URL")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -220,3 +243,7 @@ LOGGING = {
         },
     },
 }
+
+# Opt in to the new div based form rendering in preparation for Django 5.0
+# https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-FORM_RENDERER
+FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"

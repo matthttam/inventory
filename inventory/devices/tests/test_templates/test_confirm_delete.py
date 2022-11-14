@@ -21,7 +21,6 @@ class DeviceConfirmDeleteTest(TestCase):
 
     def test_templates(self):
         self.assertTemplateUsed(self.response, "dashboard/dashboard.html")
-        self.assertTemplateUsed(self.response, "devices/partials/device_infobox.html")
 
     def test_title(self):
         self.assertInHTML(

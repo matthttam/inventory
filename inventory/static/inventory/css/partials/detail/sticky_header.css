@@ -1,0 +1,9 @@
+.detail-sticky-header {
+    position: fixed;
+    top: 56px;
+    display: block;
+    width: 100vw;
+    align-self: flex-start;
+    z-index: 1020;
+    margin: 0px;
+}

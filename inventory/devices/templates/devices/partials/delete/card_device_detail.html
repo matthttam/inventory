@@ -1,0 +1,13 @@
+{% extends "devices/partials/detail/card_device_detail.html" %}
+
+{% block card_body_header %}
+<h2>Are you sure you want to delete "{{ device }}"?</h2>
+{% endblock card_body_header %}
+
+{% block card_body_footer %}
+    <form method="post">{% csrf_token %}
+        {{ form }}
+        <button class="button btn btn-danger mx-3 p-3" type="submit">Delete {{ device }}</button>
+        <a class="button btn btn-primary mx-3 p-3" href="{%url 'devices:detail' device.id%}">Cancel</a>
+    </form>
+{% endblock card_body_footer %}

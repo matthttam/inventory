@@ -1,0 +1,29 @@
+{% load static sekizai_tags %}
+
+{% addtoblock "css" %}
+    <link href="{% static 'inventory/css/partials/inner_nav.css'%}" rel="stylesheet" />
+{% endaddtoblock %}
+
+{% addtoblock "js" %}
+    <script src="{% static 'inventory/js/inner_nav.js'%}"></script>
+{% endaddtoblock %}
+
+
+<nav class="nav inventory-innernav {% if request.COOKIES.inventory_innernav_toggled == "true" %}inventory-innernav-toggled {% endif %}flex-column bg-light p-2 border-end border-secondary border-2 border-opacity-25 h-100" style="overflow-y: none;">
+    <div class="sticky-top" style="top: 126px;">
+        <div class="position-relative d-block h-100">
+            <!--  arrow  -->
+            <div class="position-absolute translate-start bg-light border-opacity-25 half-circle border-dark border " style="top: 13px; right:-25px;">
+                <a class="inventory-innernav-arrow" data-inv-toggle="collapse" data-inv-target=".inventory-innernav-text" href="#">
+                    <div style="clip-path: revert-layer;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-short" viewBox="0 0 16 16" >
+                            <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
+                        </svg>
+                    </div>
+                </a>
+            </div>
+            {% block nav_links %}
+            {% endblock %}
+        </div>
+    </div>
+</nav>

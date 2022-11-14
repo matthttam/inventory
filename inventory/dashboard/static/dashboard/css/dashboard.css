@@ -625,7 +625,7 @@ progress {
   font-size: 0.875em;
   color: #6c757d;
 }
-
+/*
 .container,
 .container-fluid,
 .container-xxl,
@@ -638,7 +638,7 @@ progress {
   padding-left: var(--bs-gutter-x, 0.75rem);
   margin-right: auto;
   margin-left: auto;
-}
+}*/
 
 @media (min-width: 576px) {
   .container-sm, .container {
@@ -665,6 +665,7 @@ progress {
     max-width: 1320px;
   }
 }
+/*
 .row {
   --bs-gutter-x: 1.5rem;
   --bs-gutter-y: 0;
@@ -682,7 +683,7 @@ progress {
   padding-left: calc(var(--bs-gutter-x) * 0.5);
   margin-top: var(--bs-gutter-y);
 }
-
+*/
 .col {
   flex: 1 0 0%;
 }
@@ -6861,6 +6862,7 @@ textarea.form-control-lg {
   transform: translateY(-50%) !important;
 }
 
+/*
 .border {
   border: 1px solid #dee2e6 !important;
 }
@@ -6956,7 +6958,7 @@ textarea.form-control-lg {
 .border-5 {
   border-width: 5px !important;
 }
-
+*/
 .w-25 {
   width: 25% !important;
 }
@@ -11341,10 +11343,12 @@ body {
   margin-left: -225px;
 }
 
-.sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav {
+
+body:not(.sb-sidenav-toggled) #layoutSidenav #layoutSidenav_nav {
   transform: translateX(0);
 }
-.sb-sidenav-toggled #layoutSidenav #layoutSidenav_content:before {
+
+body:not(.sb-sidenav-toggled) #layoutSidenav #layoutSidenav_content:before {
   content: "";
   display: block;
   position: absolute;
@@ -11358,7 +11362,9 @@ body {
   transition: opacity 0.3s ease-in-out;
 }
 
-@media (min-width: 992px) {
+
+@media (min-width: 994px) {
+  
   #layoutSidenav #layoutSidenav_nav {
     transform: translateX(0);
   }
@@ -11366,17 +11372,18 @@ body {
     margin-left: 0;
     transition: margin 0.15s ease-in-out;
   }
-
   .sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav {
     transform: translateX(-225px);
   }
   .sb-sidenav-toggled #layoutSidenav #layoutSidenav_content {
     margin-left: -225px;
   }
-  .sb-sidenav-toggled #layoutSidenav #layoutSidenav_content:before {
+  body:not(.sb-sidenav-toggled) #layoutSidenav #layoutSidenav_content:before {
     display: none;
   }
+
 }
+
 .sb-nav-fixed .sb-topnav {
   z-index: 1039;
 }
@@ -11698,4 +11705,13 @@ body {
   width: 20px !important;
   font-size: 0.75rem;
   border-radius: 0.25rem !important;
+}
+/*
+#layoutSidenav_content {
+   overflow-y: hidden !important; 
+  overflow-y: hidden;
+}
+*/
+#layoutSidenav_nav{
+  height: 100%
 }

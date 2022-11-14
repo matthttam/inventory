@@ -1,11 +1,12 @@
 from django.test import SimpleTestCase
 from django.template import Context, Template
 from bs4 import BeautifulSoup
+from sekizai.context import SekizaiContext
 
 
 class BaseTest(SimpleTestCase):
     def setUp(self):
-        context = Context({})
+        context = SekizaiContext({})
         template = Template("{% include 'base.html' %}")
         self.rendered = template.render(context)
         self.soup = BeautifulSoup(self.rendered, "html.parser")
@@ -18,10 +19,10 @@ class BaseTest(SimpleTestCase):
 
     def test_css(self):
         bootstrap_css = self.soup.select(
-            'link[href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"]'
+            'link[href="/static/inventory/css/bootstrap.min.css"]'
         )
         bootstrap_icons_css = self.soup.select(
-            'link[href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"]'
+            'link[href="/static/inventory/css/bootstrap-icons.css"]'
         )
 
         self.assertEqual(len(bootstrap_css), 1)
@@ -29,10 +30,10 @@ class BaseTest(SimpleTestCase):
 
     def test_javascript(self):
         jquery_js = self.soup.select(
-            'script[src="https://code.jquery.com/jquery-3.6.0.min.js"]'
+            'script[src="/static/inventory/js/jquery-3.6.0.min.js"]'
         )
         bootstrap_js = self.soup.select(
-            'script[src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"]'
+            'script[src="/static/inventory/js/bootstrap.bundle.min.js"]'
         )
         self.assertEqual(len(jquery_js), 1)
         self.assertEqual(len(bootstrap_js), 1)
@@ -42,7 +43,7 @@ class BaseTest(SimpleTestCase):
         self.assertEqual("Inventory", title)
 
     def test_with_content(self):
-        parent_template_context = Context()
+        parent_template_context = SekizaiContext()
         parent_template_template = Template(
             "{% extends 'base.html' %}{% block base_content %}<h1>test</h1>{% endblock %}"
         )

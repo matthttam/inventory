@@ -1,27 +1,28 @@
 {% extends "dashboard/dashboard.html" %}
 
+{% load static sekizai_tags %}
+
 {% block title %}Inventory - Assignments{% endblock %}
 
-{% block head %}
-
-    {{ block.super }}
-
-    {% include "partials/datatables.html"%}
-
-    {% load static %}
+{% block js %}
+{{ block.super }}
+{% addtoblock "js" %}
+    {% include "partials/datatables_js.html"%}
     <script src="{% static 'assignments/deviceassignment_list.js'%}"></script>
+{% endaddtoblock %}
+{% endblock js %}
 
-{% endblock head %}
+{% block css %}
+{{ block.super }}
+{% addtoblock "css" %}
+    {% include "partials/datatables_css.html"%}
+{% endaddtoblock %}
+{% endblock css %}
 
 {% block content %}
-
-    {% with prefix=tables.assignment_list %}
-        {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers %}
-    {% endwith %}
-
-    {% if perms.assignments.add_deviceassignment %}
-        <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:new' %}">Create Assignment</a>
-        <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:quickassign' %}">Quick Assign</a>
-    {% endif %}
-
+    <div class="container-fluid mt-2">
+        {% with prefix=tables.assignment_list %}
+            {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers %}
+        {% endwith %}
+    </div>
 {% endblock content %}

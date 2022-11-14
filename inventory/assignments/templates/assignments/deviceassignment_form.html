@@ -3,12 +3,12 @@
 {% block title %}Inventory - Assignment Edit{% endblock %}
 
 {% block content %}
-
+<div class="container-fluid mt-2">
     <form method="post" id="deviceassignment_form">
         {% csrf_token %}
         {{ form.as_p }}
         <button class="btn btn-primary m-2" role="button" type="submit">Save</button>
         <a class="btn btn-primary m-2" role="button" href="{% url 'assignments:index' %}">Cancel</a>
     </form>
-
+</div>
 {% endblock content %}

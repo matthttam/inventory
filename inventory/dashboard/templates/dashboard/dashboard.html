@@ -1,30 +1,30 @@
 {% extends "base.html" %}
 
-{% load static %}
+{% load static sekizai_tags %}
 
 {% block title %}Inventory - Dashboard{% endblock %}
 
-{% block head %}
-{{ block.super }}
-<script src="{% static 'dashboard/js/dashboard.js'%}"></script>
-<link href="{% static 'dashboard/css/dashboard.css'%}" rel="stylesheet" />
+{% block js %}{{ block.super }}{% addtoblock "js" %}
+        <script src="{% static 'dashboard/js/dashboard.js'%}"></script>
+{% endaddtoblock %}{% endblock %}
 
-{% endblock %}
 
+{% block css %}{{ block.super }}{% addtoblock "css" %}
+        <link href="{% static 'dashboard/css/dashboard.css'%}" rel="stylesheet" />
+{% endaddtoblock %}{% endblock css %}
 
 {% block base_content %}
-<body class="sb-nav-fixed {% if request.COOKIES.sb_sidebar_toggle == "true" %}sb-sidenav-toggled{% endif %}">
+<body class="sb-nav-fixed {% if request.COOKIES.sb_sidenav_toggle == "true" %}sb-sidenav-toggled{% endif %}">
         
     {% include './partials/_top_nav.html' %}
     <div id="layoutSidenav">
         {% include './partials/_side_nav.html' %}
         <div id="layoutSidenav_content">
-            <main>
-                <div class="container-fluid p-4">
+            <main style="min-height: 100%;">
+                
                     {% block content %}
-                    
+                    <div class="container-fluid mt-2">
                     {% if perms.assignments.add_deviceassignment %}
-                    
                         {% url 'assignments:quickassign' as quickassign_url%}
                         <h1 class="display-1 my-5">
                             Click below to begin assigning devices:
@@ -32,12 +32,13 @@
 
                         {% include "partials/button.html" with href=quickassign_url class="btn btn-block p-3 btn-lg btn-success w-100" value="Quick Assign"%}
                     {% endif %}
-                    
+                    </div>
                     {% endblock %}
                     
-                </div>
+
             </main>
-            <!--<footer class="py-4 bg-light mt-auto">
+            {% comment %}
+            <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
                         <div class="text-muted">Copyright &copy; Your Website 2022</div>
@@ -48,7 +49,8 @@
                         </div>
                     </div>
                 </div>
-            </footer>-->
+            </footer>
+            {% endcomment %}
         </div>
     </div>
 </body>

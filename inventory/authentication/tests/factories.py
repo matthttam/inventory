@@ -8,6 +8,8 @@ from faker.providers import (
 from factory.django import DjangoModelFactory
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 
 # Faker Setup
 fake = Faker()
@@ -20,6 +22,10 @@ fake.add_provider(InternetProvider)
 class UserFactory(DjangoModelFactory):
     class Meta:
         model = User
+        django_get_or_create = (
+            "email",
+            "username",
+        )
 
     first_name = fake.first_name()
     last_name = fake.last_name()
@@ -31,6 +37,21 @@ class UserFactory(DjangoModelFactory):
     is_active = True
     is_staff = False
     is_superuser = False
+
+    @factory.post_generation
+    def user_permissions(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for model, permission in extracted:
+                content_type = ContentType.objects.get_for_model(model)
+                self.user_permissions.add(
+                    Permission.objects.get_or_create(
+                        codename=permission, content_type=content_type
+                    )[0]
+                )
+            # Expect a list of tuples (ModelClass, "my_permission")
 
 
 class SuperuserUserFactory(UserFactory):

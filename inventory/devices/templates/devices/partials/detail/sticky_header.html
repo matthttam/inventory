@@ -1,0 +1,19 @@
+{% extends 'partials/detail/sticky_header.html' %}
+
+{% block sticky_header_content %}
+
+<div class="hstack gap-3">
+    <h1 class="display-6">Device: {{ device }}</h1>
+    <div class="vr"></div>
+    <h6 class="m-0">
+    {% if device.is_currently_assigned %}
+        <span class="text-success">Assigned</span>
+    {% else %}
+        <span class="text-secondary">Unassigned</span>
+    {% endif %}
+    </h6>
+    <div class="vr"></div>
+    {% include 'devices/partials/device_tag_icons.html' %}
+</div>
+
+{% endblock %}

@@ -43,7 +43,12 @@ $(document).ready(function () {
                     return new Date(data).toLocaleDateString()
                 }
             },
-            getActionColumnDef(),
+            { 
+                name: 'actions', 
+                data: 'actions', 
+                sortable: false,
+                filterable: false,},
+
         ]
     });
 

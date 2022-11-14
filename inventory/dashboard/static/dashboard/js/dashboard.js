@@ -1,28 +1,21 @@
-/*!
-    * Start Bootstrap - SB Admin v7.0.5 (https://startbootstrap.com/template/sb-admin)
-    * Copyright 2013-2022 Start Bootstrap
-    * Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-sb-admin/blob/master/LICENSE)
-    */
-    // 
-// Scripts
-// 
+$(document).ready(function(){
+    $('#sidebarToggle').on('click', event => {
+        event.preventDefault();
+        document.body.classList.toggle('sb-sidenav-toggled');
+        value = document.body.classList.contains('sb-sidenav-toggled')
+        localStorage.setItem('sb|sidenav-toggle', value);
+        document.cookie="sb_sidenav_toggle="+value+"; path=/;expires="
+    })
 
-window.addEventListener('DOMContentLoaded', event => {
-
-    // Toggle the side navigation
-    const sidebarToggle = document.body.querySelector('#sidebarToggle');
-    if (sidebarToggle) {
-        // Uncomment Below to persist sidebar toggle between refreshes
-        // if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
-        //     document.body.classList.toggle('sb-sidenav-toggled');
-        // }
-        sidebarToggle.addEventListener('click', event => {
-            event.preventDefault();
-            document.body.classList.toggle('sb-sidenav-toggled');
-            value = document.body.classList.contains('sb-sidenav-toggled')
-            localStorage.setItem('sb|sidebar-toggle', value);
-            document.cookie="sb_sidebar_toggle="+value
-        });
-    }
-
-});
+    $(window).on('resize orientationChanged', function(e) {
+        var breakpoint = 994
+        var windowWidth = $(window).width();
+        sbSideNav = $('.sb-nav-fixed').first()
+        is_hidden = sbSideNav.hasClass('sb-sidenav-toggled')
+        if(windowWidth < breakpoint && !is_hidden){
+            $("#sidebarToggle").trigger('click')
+        }else if(windowWidth > breakpoint && is_hidden){
+            $("#sidebarToggle").trigger('click')
+        }
+    })
+})

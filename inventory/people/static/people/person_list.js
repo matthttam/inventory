@@ -20,7 +20,7 @@ $(document).ready(function () {
             { data: 'status__name' },
             { data: 'primary_building__name' },
             { data: 'outstanding_assignment_count' },
-            getActionColumnDef(),
+            { data: 'actions', sortable: false, filterable: false },
         ]
     });
 });

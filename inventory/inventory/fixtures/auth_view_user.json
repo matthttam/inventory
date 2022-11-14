@@ -1,0 +1,22 @@
+[
+{
+    "model": "auth.user",
+    "pk": 19,
+    "fields": {
+        "password": "pbkdf2_sha256$320000$ulmFDhoD7C9S7FEjGROsq3$C7VuwzLuWQzsBctv/bZItc7a1lZFoqJhJTHmFA/8Eno=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "view_user@example.com",
+        "first_name": "Megan",
+        "last_name": "Chang",
+        "email": "view_user@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2022-10-19T14:18:52.406Z",
+        "groups": [],
+        "user_permissions": [
+            72
+        ]
+    }
+}
+]

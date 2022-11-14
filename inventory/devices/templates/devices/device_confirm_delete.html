@@ -3,15 +3,7 @@
 {% block title %}Inventory - Device Confirm Delete{% endblock %}
 
 {% block content %}
-
-    <form method="post">{% csrf_token %}
-        <p>Are you sure you want to delete "{{ object }}"?</p>
-        {% block infobox %}
-        {% include './partials/device_infobox.html'%}
-        {% endblock infobox %}
-        {{ form }}
-        <button class="button btn btn-danger mx-3 p-3" type="submit">Delete {{ object }}</button>
-        <a class="button btn btn-primary mx-3 p-3" href="{%url 'devices:detail' object.id%}">Cancel</a>
-    </form>
-
+<div class="container-fluid mt-2">
+    {% include 'devices/partials/delete/card_device_detail.html' %}
+</div>
 {% endblock content %}

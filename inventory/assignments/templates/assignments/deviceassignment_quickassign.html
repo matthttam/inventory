@@ -1,20 +1,29 @@
 {% extends "dashboard/dashboard.html" %}
 
+{% load static sekizai_tags %}
+
 {% block title %}Inventory - Quick Assign{% endblock %}
 
-{% block head %}
+{% block js %}
 {{ block.super }}
+{% addtoblock "js" %}
+    <script src="{% static 'inventory/js/csrftoken.js' %}"></script>
+    {% include "partials/select2_js.html"%}
+    <script src="{% static 'assignments/deviceassignment_quick_assign.js'%}"></script>
+{% endaddtoblock %}
 {{ ajax_urls|json_script:"ajax_urls" }}
-{% include 'partials/select2.html'%}
+{% endblock js %}
 
-{% load static %}
-<script src="{% static 'inventory/js/csrftoken.js' %}" rel="stylesheet"></script>
-<link href="{% static 'assignments/deviceassignment_quick_assign.css'%}" rel="stylesheet" />
-<script src="{% static 'assignments/deviceassignment_quick_assign.js'%}"></script>
-{% endblock %}
+{% block css %}
+{{ block.super }}
+{% addtoblock "css" %}
+    <link href="{% static 'assignments/deviceassignment_quick_assign.css'%}" rel="stylesheet" />
+    {% include "partials/select2_css.html"%}
+{% endaddtoblock %}
+{% endblock css %}
 
 {% block content %}
-
+<div class="container-fluid mt-2">
 <div class="jumbotron font-weight-bold">
 
     <div id="splash_area">
@@ -42,5 +51,5 @@
         </div>
     </form>
 </div>
-
+</div>
 {% endblock content %}

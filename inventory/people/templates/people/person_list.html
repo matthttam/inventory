@@ -1,26 +1,29 @@
 {% extends "dashboard/dashboard.html" %}
 
+{% load  static sekizai_tags %}
+
 {% block title %}Inventory - People{% endblock %}
 
-{% block head %}
-
-    {{ block.super }}
-
-    {% include "partials/datatables.html"%}
-
-    {% load static %}
+{% block js %}
+{{ block.super }}
+{% addtoblock "js" %}
+    {% include "partials/datatables_js.html"%}
     <script src="{% static 'people/person_list.js'%}"></script>
+{% endaddtoblock %}
+{% endblock js %}
 
-{% endblock head %}
+{% block css %}
+{{ block.super }}
+{% addtoblock "css" %}
+    {% include "partials/datatables_css.html"%}
+{% endaddtoblock %}
+{% endblock css %}
 
 {% block content %}
-
-    {% with prefix=tables.person_list %}
-        {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers %}
-    {% endwith %}
-
-    {% if perms.people.add_person %}
-        <a class="btn btn-primary m-2" role="button" href="{% url 'people:new' %}">Create Person</a>
-    {% endif %}
-
+    <div class="container-fluid mt-2">
+        {% with prefix=tables.person_list %}
+            {% include 'partials/table.html' with table_id=prefix.id headers=prefix.headers %}
+        {% endwith %}
+    </div>
 {% endblock content %}
+

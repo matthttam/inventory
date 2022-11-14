@@ -3,13 +3,24 @@ from auditlog.registry import auditlog
 from django.apps import apps
 from django.core.management import call_command
 from django.db import models
-from django.db.models import Case, Count, F, Q, Value, When
+from django.db.models import Case, Count, F, Q, Max, When, Value as V
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 from locations.models import Building, Room
+from sorl.thumbnail import ImageField
 
 # from googlesync.models import DeviceBuildingToOUMapping
+
+
+class DeviceTag(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    active = models.BooleanField(default=True)
+    # icon = models.ImageField(upload_to="devicetag/")
+    icon = ImageField(upload_to="devicetag/")
+
+    def __str__(self):
+        return f"{self.name}"
 
 
 class DeviceStatus(models.Model):
@@ -87,6 +98,13 @@ class DeviceManager(models.Manager):
                 default=False,
             )
         )
+
+        # Set is_google_linked
+        qs = qs.annotate(
+            is_google_linked=Max(
+                Case(When(google_device__isnull=True, then=V(0)), default=V(1))
+            )
+        )
         return qs
 
 
@@ -109,6 +127,7 @@ class Device(models.Model):
     )
     objects = DeviceManager()
     history = AuditlogHistoryField()
+    tags = models.ManyToManyField(DeviceTag, blank=True, related_name="devices")
 
     def __str__(self):
         if self.asset_id:

@@ -12,6 +12,7 @@ from .views import (
     QuickAssignSubmitView,
     DeviceAssignmentTurninView,
 )
+from django.views.decorators.cache import cache_page
 
 app_name = "assignments"
 urlpatterns = [

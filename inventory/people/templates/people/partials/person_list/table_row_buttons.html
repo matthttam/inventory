@@ -1,0 +1,18 @@
+{% extends 'partials/action_button_group.html' %}
+
+{% block buttons %}
+
+{% if perms.people.view_person %}
+    <a href="{% url "people:detail" person.id %}" type="button" class="btn btn-primary" alt="view"><i class="bi bi-eye"></i></a>
+{% endif %}
+
+{% if perms.people.change_person %}
+    <a href="{% url "people:edit" person.id %}" type="button" class="btn btn-secondary" alt="edit"><i class="bi bi-pencil"></i></a>
+{% endif %}
+
+{% if perms.people.delete_person %}
+    <a href="{% url "people:delete" person.id %}" type="button" class="btn btn-danger" alt="delete"><i class="bi bi-trash2"></i></a>
+{% endif %}
+
+{% endblock buttons %}
+    

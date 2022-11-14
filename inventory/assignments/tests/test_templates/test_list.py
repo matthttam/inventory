@@ -1,25 +1,11 @@
+from assignments.tests.factories import DeviceAssignmentFactory
+from authentication.tests.factories import SuperuserUserFactory, User
+from bs4 import BeautifulSoup
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from authentication.tests.factories import SuperuserUserFactory, User, UserFactory
-from assignments.models import DeviceAssignment
-from assignments.tests.factories import DeviceAssignmentFactory
-from inventory.tests.helpers import get_permission
-from inventory.tests.helpers import get_chrome_driver, chrome_click_element
-from seleniumlogin import force_login
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-
-new_link = '<a class="btn btn-primary m-2" role="button" href="/assignments/new/">Create Assignment</a>'
-quickassign_link = '<a class="btn btn-primary m-2" role="button" href="/assignments/quickassign/">Quick Assign</a>'
-DEFAULT_LINKS = []
-ALL_LINKS = [new_link, quickassign_link]
 
 
-class DeviceAssignmenListSuperuserTest(TestCase):
-    """Checks that the List View loads the appropriate links"""
-
+class DeviceAssignmentListTemplateTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         SuperuserUserFactory(username="my_superuser@example.com")
@@ -29,183 +15,254 @@ class DeviceAssignmenListSuperuserTest(TestCase):
         self.user = User.objects.get(username="my_superuser@example.com")
         self.client.force_login(self.user)
         self.response = self.client.get(reverse("assignments:index"))
-
-    def test_default_links_exist(self):
-        if len(DEFAULT_LINKS) == 0:
-            return
-        for link in DEFAULT_LINKS:
-            self.assertInHTML(
-                link,
-                self.response.content.decode(),
-            )
-
-    def test_all_links_exist(self):
-        if len(ALL_LINKS) == 0:
-            return
-        for link in ALL_LINKS:
-            self.assertInHTML(
-                link,
-                self.response.content.decode(),
-            )
+        self.soup = BeautifulSoup(self.response.content.decode(), "html.parser")
 
     def test_template_used(self):
         self.assertTemplateUsed(self.response, "assignments/deviceassignment_list.html")
         self.assertTemplateUsed(self.response, "dashboard/dashboard.html")
-        self.assertTemplateUsed(self.response, "partials/datatables.html")
+        self.assertTemplateUsed(self.response, "partials/datatables_js.html")
+        self.assertTemplateUsed(self.response, "partials/datatables_css.html")
 
-    def test_title(self):
+    def test_valid_html(self):
         self.assertInHTML("Inventory - Assignments", self.response.content.decode())
 
-
-class DeviceAssignmentListWithoutPermissionTest(TestCase):
-    """
-    Checks that the Detail List loads the appropriate links
-    when the user only has permission to view devices
-    """
-
-    @classmethod
-    def setUpTestData(cls):
-        UserFactory(username="my_regularuser@example.com")
-        DeviceAssignmentFactory(id=1)
-
-    def setUp(self):
-        self.user = User.objects.get(username="my_regularuser@example.com")
-        self.client.force_login(self.user)
-        self.response = self.client.get(reverse("assignments:index"))
-
-    def test_new_link(self):
-        self.assertNotIn(
-            new_link,
-            self.response.content.decode(),
-        )
+    def test_title(self):
+        self.assertEqual("Inventory - Assignments", self.soup.title.string)
 
 
-class DeviceAssignmentListWithPermissionTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        UserFactory(username="my_regularuser@example.com")
-        DeviceAssignmentFactory(id=1)
+# class DeviceAssignmentListSuperuserLiveTest(StaticLiveServerTestCase):
+#    """Checks that the List View loads the appropriate links"""
+#
+#    @classmethod
+#    def setUpClass(cls):
+#        super().setUpClass()
+#        cls.browser = get_chrome_driver()
+#        SuperuserUserFactory(username="my_superuser@example.com")
+#        cls.user = User.objects.get(username="my_superuser@example.com")
+#        force_login(cls.user, cls.browser, f"{cls.live_server_url}/")
+#        DeviceAssignmentFactory(id=1)
+#        cls.browser.get(f"{cls.live_server_url}/assignments/")
+#        WebDriverWait(cls.browser, 60).until(
+#            EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
+#        )
+#        cls.soup = BeautifulSoup(cls.browser.page_source, "html.parser")
+#
+#    @classmethod
+#    def tearDownClass(cls):
+#        #cls.browser.quit()
+#        super().tearDownClass()
+#
+#    def test_action_header(self):
+#        action_header = self.soup.find("th", string="Action")
+#        self.assertIsNotNone(action_header)
+#
+#    def test_view_link_exists(self):
+#        view_link = self.soup.select_one('a[href="/assignments/1/"]')
+#        self.assertIsNotNone(view_link)
+#
+#    def test_edit_link_exists(self):
+#        edit_link = self.soup.select_one('a[href="/assignments/1/edit/"]')
+#        self.assertIsNotNone(edit_link)
+#
+#    def test_turnin_link_exists(self):
+#        turnin_link = self.soup.select_one('a[href="/assignments/1/turnin/"]')
+#        self.assertIsNotNone(turnin_link)
+#
+#    def test_delete_link_exists(self):
+#        delete_link = self.soup.select_one('a[href="/assignments/1/delete/"]')
+#        self.assertIsNotNone(delete_link)
 
-    def setUp(self):
-        self.user = User.objects.get(username="my_regularuser@example.com")
-        self.client.force_login(self.user)
-        self.user.user_permissions.add(
-            get_permission(DeviceAssignment, "view_deviceassignment")
-        )
 
-    def test_new_link(self):
-        self.user.user_permissions.add(
-            get_permission(DeviceAssignment, "add_deviceassignment")
-        )
-        self.response = self.client.get(reverse("assignments:index"))
-        self.assertInHTML(
-            new_link,
-            self.response.content.decode(),
-        )
-
-    def test_quickassign_link(self):
-        self.user.user_permissions.add(
-            get_permission(DeviceAssignment, "add_deviceassignment")
-        )
-        self.response = self.client.get(reverse("assignments:index"))
-        self.assertInHTML(
-            new_link,
-            self.response.content.decode(),
-        )
-
-
-class DeviceAssignmentLiveTest(StaticLiveServerTestCase):
-    def get_element(self, locator):
-        return WebDriverWait(self.browser, 10).until(
-            EC.visibility_of_element_located(locator)
-        )
-
-    def setUp(self):
-        self.browser = get_chrome_driver()
-        superuser = SuperuserUserFactory()
-        force_login(superuser, self.browser, f"{self.live_server_url}/")
-        self.assignment = DeviceAssignmentFactory()
-        self.browser.get(f"{self.live_server_url}/assignments/")
-        self.assignment_row = self.get_element(
-            (
-                By.XPATH,
-                f'//*[@id="assignment_list"]/tbody/tr[@id="deviceassignment_{self.assignment.id}"]',
-            )
-        )
-
-    def test_action_column_header(self):
-        actions_header = self.get_element(
-            (
-                By.XPATH,
-                '//*[@id="assignment_list"]/thead/tr/th//*[normalize-space(text()) = "Action"]',
-            )
-        )
-        self.assertEqual(
-            actions_header.text,
-            "Action",
-            msg="Action header found does not say 'Action'",
-        )
-
-    def test_action_view_button(self):
-        url = f"/assignments/{self.assignment.id}/"
-        view_button = self.assignment_row.find_element(
-            by=By.XPATH, value=f'//a[@href="{url}"]'
-        )
-        self.assertIn(
-            "btn-primary",
-            view_button.get_attribute("class"),
-            msg="view button missing class 'btn-primary'",
-        )
-        self.assertIn(
-            "btn",
-            view_button.get_attribute("class"),
-            msg="view button missing class 'btn'",
-        )
-
-    def test_action_edit_button(self):
-        url = f"/assignments/{self.assignment.id}/edit/"
-        edit_button = self.assignment_row.find_element(
-            by=By.XPATH, value=f'//a[@href="{url}"]'
-        )
-        self.assertIn(
-            "btn-secondary",
-            edit_button.get_attribute("class"),
-            msg="edit button missing class 'btn-primary'",
-        )
-        self.assertIn(
-            "btn",
-            edit_button.get_attribute("class"),
-            msg="edit button missing class 'btn'",
-        )
-
-    def test_action_turnin_button(self):
-        url = f"/assignments/{self.assignment.id}/turnin/"
-        turnin_button = self.assignment_row.find_element(
-            by=By.XPATH, value=f'//a[@href="{url}"]'
-        )
-        self.assertIn(
-            "btn-success",
-            turnin_button.get_attribute("class"),
-            msg="turnin button missing class 'btn-success'",
-        )
-        self.assertIn(
-            "btn",
-            turnin_button.get_attribute("class"),
-            msg="turnin button missing class 'btn'",
-        )
-
-    def test_action_delete_button(self):
-        url = f"/assignments/{self.assignment.id}/delete/"
-        delete_button = self.assignment_row.find_element(
-            by=By.XPATH, value=f'//a[@href="{url}"]'
-        )
-        self.assertIn(
-            "btn-danger",
-            delete_button.get_attribute("class"),
-            msg="delete button missing class 'btn-danger'",
-        )
-        self.assertIn(
-            "btn",
-            delete_button.get_attribute("class"),
-            msg="delete button missing class 'btn'",
-        )
+##class DeviceAssignmentListWithViewPermissionLiveTest(StaticLiveServerTestCase):
+##    """
+##    Checks that the Detail List loads the appropriate links
+##    when the user only has permission to view devices
+##    """
+##
+##    @classmethod
+##    def setUpClass(cls):
+##        super().setUpClass()
+##        cls.browser = get_chrome_driver()
+##        UserFactory(
+##            username="view_user@example.com",
+##            user_permissions=[
+##                (DeviceAssignment, "view_deviceassignment"),
+##            ],
+##        )
+##        cls.user = User.objects.get(username="view_user@example.com")
+##        force_login(cls.user, cls.browser, f"{cls.live_server_url}/")
+##        DeviceAssignmentFactory()
+##        cls.browser.get(f"{cls.live_server_url}/assignments/")
+##        WebDriverWait(cls.browser, 60).until(
+##            EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
+##        )
+##        cls.soup = BeautifulSoup(cls.browser.page_source, "html.parser")
+##
+##    @classmethod
+##    def tearDownClass(cls):
+##        # cls.browser.quit()
+##        super().tearDownClass()
+##
+##    # def _fixture_setup(self):
+##    # pass
+##
+##    def test_view_link_exists(self):
+##        view_link = self.soup.select_one('a[href="/assignments/1/"]')
+##        self.assertIsNotNone(view_link)
+##
+##    def test_edit_link_missing(self):
+##        edit_link = self.soup.select_one('a[href="/assignments/1/edit/"]')
+##        self.assertIsNone(edit_link)
+##
+##    def test_turnin_link_missing(self):
+##        turnin_link = self.soup.select_one('a[href="/assignments/1/turnin/"]')
+##        self.assertIsNone(turnin_link)
+##
+##    def test_delete_link_missing(self):
+##        delete_link = self.soup.select_one('a[href="/assignments/1/delete/"]')
+##        self.assertIsNone(delete_link)
+##
+##
+##class DeviceAssignmentListWithEditPermissionLiveTest(StaticLiveServerTestCase):
+##    """
+##    Checks that the Detail List loads the appropriate links
+##    when the user only has permission to view devices
+##    """
+##
+##    @classmethod
+##    def setUpClass(cls):
+##        super().setUpClass()
+##        cls.browser = get_chrome_driver()
+##        UserFactory(
+##            username="edit_user@example.com",
+##            user_permissions=[
+##                (DeviceAssignment, "view_deviceassignment"),
+##                (DeviceAssignment, "change_deviceassignment"),
+##            ],
+##        )
+##        cls.user = User.objects.get(username="edit_user@example.com")
+##        force_login(cls.user, cls.browser, f"{cls.live_server_url}/")
+##        DeviceAssignmentFactory()
+##        cls.browser.get(f"{cls.live_server_url}/assignments/")
+##        WebDriverWait(cls.browser, 60).until(
+##            EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
+##        )
+##        cls.soup = BeautifulSoup(cls.browser.page_source, "html.parser")
+##
+##    @classmethod
+##    def tearDownClass(cls):
+##        # cls.browser.quit()
+##        super().tearDownClass()
+##
+##    def test_view_link_exists(self):
+##        view_link = self.soup.select_one('a[href="/assignments/1/"]')
+##        self.assertIsNotNone(view_link)
+##
+##    def test_edit_link_exists(self):
+##        edit_link = self.soup.select_one('a[href="/assignments/1/edit/"]')
+##        self.assertIsNotNone(edit_link)#
+#
+#    def test_turnin_link_missing(self):
+#        turnin_link = self.soup.select_one('a[href="/assignments/1/turnin/"]')
+#        self.assertIsNone(turnin_link)#
+#
+#    def test_delete_link_missing(self):
+#        delete_link = self.soup.select_one('a[href="/assignments/1/delete/"]')
+#        self.assertIsNone(delete_link)#
+#
+#
+# class DeviceAssignmentListWithTurninPermissionLiveTest(StaticLiveServerTestCase):
+#    """
+#    Checks that the Detail List loads the appropriate links
+#    when the user only has permission to view devices
+#    """#
+#
+#    @classmethod
+#    def setUpClass(cls):
+#        super().setUpClass()
+#        cls.browser = get_chrome_driver()
+#        UserFactory(
+#            username="turnin_user@example.com",
+#            user_permissions=[
+#                (DeviceAssignment, "view_deviceassignment"),
+#                (DeviceAssignment, "turnin_deviceassignment"),
+#            ],
+#        )
+#        cls.user = User.objects.get(username="turnin_user@example.com")
+#        force_login(cls.user, cls.browser, f"{cls.live_server_url}/")
+#        DeviceAssignmentFactory()
+#        cls.browser.get(f"{cls.live_server_url}/assignments/")
+#        WebDriverWait(cls.browser, 60).until(
+#            EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
+#        )
+#        cls.soup = BeautifulSoup(cls.browser.page_source, "html.parser")#
+#
+#    @classmethod
+#    def tearDownClass(cls):
+#        # cls.browser.quit()
+#        super().tearDownClass()#
+#
+#    def test_view_link_exists(self):
+#        view_link = self.soup.select_one('a[href="/assignments/1/"]')
+#        self.assertIsNotNone(view_link)#
+#
+#    def test_edit_link_missing(self):
+#        edit_link = self.soup.select_one('a[href="/assignments/1/edit/"]')
+#        self.assertIsNone(edit_link)#
+#
+#    def test_turnin_link_exists(self):
+#        turnin_link = self.soup.select_one('a[href="/assignments/1/turnin/"]')
+#        self.assertIsNotNone(turnin_link)#
+#
+#    def test_delete_link_missing(self):
+#        delete_link = self.soup.select_one('a[href="/assignments/1/delete/"]')
+#        self.assertIsNone(delete_link)#
+#
+#
+# class DeviceAssignmentListWithDeletePermissionLiveTest(StaticLiveServerTestCase):
+#    """
+#    Checks that the Detail List loads the appropriate links
+#    when the user only has permission to view devices
+#    """
+#
+#    @classmethod
+#    def setUpClass(cls):
+#        super().setUpClass()
+#        cls.browser = get_chrome_driver()
+#        UserFactory(
+#            username="delete_user@example.com",
+#            user_permissions=[
+#                (DeviceAssignment, "view_deviceassignment"),
+#                (DeviceAssignment, "delete_deviceassignment"),
+#            ],
+#        )
+#        cls.user = User.objects.get(username="delete_user@example.com")
+#        force_login(cls.user, cls.browser, f"{cls.live_server_url}/")
+#        DeviceAssignmentFactory()
+#        cls.browser.get(f"{cls.live_server_url}/assignments/")
+#        WebDriverWait(cls.browser, 60).until(
+#            EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
+#        )
+#        cls.soup = BeautifulSoup(cls.browser.page_source, "html.parser")
+#
+#    @classmethod
+#    def tearDownClass(cls):
+#        # cls.browser.quit()
+#        super().tearDownClass()
+#
+#    def test_view_link_exists(self):
+#        view_link = self.soup.select_one('a[href="/assignments/1/"]')
+#        self.assertIsNotNone(view_link)
+#
+#    def test_edit_link_missing(self):
+#        edit_link = self.soup.select_one('a[href="/assignments/1/edit/"]')
+#        self.assertIsNone(edit_link)
+#
+#    def test_turnin_link_missing(self):
+#        turnin_link = self.soup.select_one('a[href="/assignments/1/turnin/"]')
+#        self.assertIsNone(turnin_link)
+#
+#    def test_delete_link_exists(self):
+#        delete_link = self.soup.select_one('a[href="/assignments/1/delete/"]')
+#        self.assertIsNotNone(delete_link)
+#

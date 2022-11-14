@@ -10,6 +10,7 @@ from devices.models import (
     Device,
     DeviceModel,
     DeviceManager,
+    DeviceTag,
 )
 from googlesync.models import GoogleDevice
 from locations.models import Room, Building
@@ -20,6 +21,7 @@ from .factories import (
     DeviceFactory,
     DeviceAccessoryFactory,
     DeviceManufacturerFactory,
+    DeviceTagFactory,
 )
 
 
@@ -224,7 +226,7 @@ class DeviceAccessoryTest(TestCase):
         name_label = self.device_accessory._meta.get_field("name").verbose_name
         self.assertEqual(name_label, "name")
 
-    def test_name_label(self):
+    def test_verbose_name_plural(self):
         name_label = self.device_accessory._meta.verbose_name_plural
         self.assertEqual(name_label, "Device accessories")
 
@@ -256,3 +258,32 @@ class DeviceAccessoryTest(TestCase):
             device_accessory.__str__(),
             f"{device_accessory.name} ({ device_model_names })",
         )
+
+
+class DeviceTagTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        DeviceTagFactory(name="test")
+
+    def setUp(self):
+        self.device_tag = DeviceTag.objects.get(name="test")
+
+    def test_name_label(self):
+        name_label = self.device_tag._meta.get_field("name").verbose_name
+        self.assertEqual(name_label, "name")
+
+    def test_name_max_length(self):
+        max_length = self.device_tag._meta.get_field("name").max_length
+        self.assertEqual(max_length, 255)
+
+    def test_name_unique(self):
+        unique = self.device_tag._meta.get_field("name").unique
+        self.assertTrue(unique)
+
+    def test_active_default_value(self):
+        default = self.device_tag._meta.get_field("active").default
+        self.assertTrue(default)
+
+    def test_icon_upload_to(self):
+        upload_to = self.device_tag._meta.get_field("icon").upload_to
+        self.assertEqual(upload_to, "devicetag/")

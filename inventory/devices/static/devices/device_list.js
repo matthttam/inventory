@@ -6,7 +6,8 @@ $(document).ready(function () {
             url: "/devices/dt/",
         },
         colReorder: {
-            fixedColumnsRight:1
+            realtime: false,
+            fixedColumnsRight:1,
         },
         fixedHeader: true,
         searchDelay: 350,
@@ -20,10 +21,10 @@ $(document).ready(function () {
             { data: 'device_model__manufacturer__name' },
             { data: 'device_model__name' },
             { data: 'building__name' },
-            { data: 'is_google_linked', visible: false },
+            { data: 'is_google_linked', visible: false, searchable: false },
             { data: 'google_device__organization_unit' },
             { data: 'google_device__most_recent_user', visible: false },
-            getActionColumnDef(),
+            { data: 'actions', sortable: false, filterable: false },
         ]
     });
 });

@@ -1,39 +1,60 @@
+from assignments.models import DeviceAssignment
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import Case, Max, Prefetch
+from django.db.models import Value as V
+from django.db.models import When
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import (
-    TemplateView,
-    DetailView,
-    UpdateView,
     CreateView,
     DeleteView,
+    DetailView,
+    TemplateView,
+    UpdateView,
 )
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.urls import reverse_lazy
+from django_datatable_serverside_mixin.views import ServerSideDataTablesMixin
+from inventory.utils import get_history_table_context
 
-from django_datatable_serverside_mixin.views import (
-    ServerSideDatatableMixin,
-)
-
-from auditlog.models import LogEntry
-from django.db.models import When, Case
-from inventory.utils import (
-    get_permitted_actions,
-    get_table_context,
-    get_history_table_context,
-)
 from .forms import DeviceForm
 from .models import Device
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class DeviceDatatableServerSideProcessingView(
-    PermissionRequiredMixin, ServerSideDatatableMixin
-):
+class DeviceDatatableServerSideProcessingView(PermissionRequiredMixin, ServerSideDataTablesMixin):
+    def data_callback(self, data: list[dict]) -> list[dict]:
+        for row in data:
+            row["actions"] = render_to_string(
+                "devices/partials/list/table_row_buttons.html",
+                context={"device": row},
+                request=self.request,
+            )
+            row["is_currently_assigned"] = render_to_string(
+                "partials/check_or_x.html",
+                context={"boolean": row["is_currently_assigned"]},
+                request=self.request,
+            )
+            row["is_google_linked"] = render_to_string(
+                "partials/check_or_x.html",
+                context={"boolean": row["is_google_linked"]},
+                request=self.request,
+            )
+
+        return super().data_callback(data)
+
     permission_required = "devices.view_device"
-    queryset = Device.objects.all().annotate(
-        is_google_linked=Case(
-            When(google_device__isnull=True, then=False), default=True
+    queryset = (
+        Device.objects.all()
+        .select_related(
+            "status",
+            "device_model",
+            "device_model__manufacturer",
+            "building",
+            "google_device",
+            "room",
         )
+        .annotate(is_google_linked=Max(Case(When(google_device__isnull=True, then=V(0)), default=V(1))))
     )
     columns = [
         "id",
@@ -68,32 +89,31 @@ class DeviceListView(PermissionRequiredMixin, TemplateView):
                     "Manufacturer",
                     "Model",
                     "Building",
-                    "Google Link",
-                    "Google OU",
-                    "Google Most Recent User",
+                    "G Link",
+                    "G OU",
+                    "G Most Recent User",
                     "Actions",
                 ],
             }
         },
     }
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["permitted_actions"] = get_permitted_actions(
-            self.request, "devices", "device"
-        )
-        return context
-
 
 class DeviceDetailView(PermissionRequiredMixin, DetailView):
     permission_required = "devices.view_device"
-    model = Device
+    # model = Device
     extra_context = {"tables": get_history_table_context("device_history")}
+    queryset = Device.objects.prefetch_related(
+        Prefetch(
+            "deviceassignments",
+            queryset=DeviceAssignment.objects.filter(return_datetime=None),
+            to_attr="outstanding_assignments",
+        )
+    )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["log_entries"] = self.object.history.all().order_by("timestamp")
-        context["infobox"] = get_device_infobox_data(context.get("object"))
+        context["log_entries"] = context.get("object").history.all().order_by("timestamp")
         return context
 
 
@@ -113,21 +133,3 @@ class DeviceDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = "devices.delete_device"
     model = Device
     success_url = reverse_lazy("devices:index")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["infobox"] = get_device_infobox_data(context.get("object"))
-        return context
-
-
-def get_device_infobox_data(device) -> list:
-
-    return [
-        {"label": "Device ID :", "value": device.id},
-        {"label": "Serial Number :", "value": device.serial_number},
-        {"label": "Asset Tag :", "value": device.asset_id},
-        {"label": "Status :", "value": device.status},
-        {"label": "Model :", "value": device.device_model},
-        {"label": "Building :", "value": device.building},
-        {"label": "Room :", "value": device.room},
-    ]

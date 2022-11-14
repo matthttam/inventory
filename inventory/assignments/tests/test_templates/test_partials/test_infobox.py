@@ -7,12 +7,13 @@ from django.urls import reverse
 from zoneinfo import ZoneInfo
 from authentication.tests.factories import SuperuserUserFactory
 from datetime import datetime
+from sekizai.context import SekizaiContext
 
 list_link_selector = 'a[href="/assignments/"]'
 update_link_selector = 'a[href="/assignments/1/edit/"]'
 delete_link_selector = 'a[href="/assignments/1/delete/"]'
 
-default_context = Context(
+default_context = SekizaiContext(
     {
         "TIME_ZONE": "America/Chicago",
         "deviceassignment": {

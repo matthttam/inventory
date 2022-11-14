@@ -40,8 +40,13 @@ class DeviceAssignmentQuickAssignTemplateTest(TestCase):
 
 
 class DeviceAssignmentQuickAssignLiveTest(StaticLiveServerTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.browser = get_chrome_driver()
+
     def setUp(self):
-        self.browser = get_chrome_driver()
+        # self.browser = get_chrome_driver()
         superuser = SuperuserUserFactory()
         force_login(superuser, self.browser, f"{self.live_server_url}/")
         self.browser.get(f"{self.live_server_url}/assignments/quickassign/")
@@ -68,6 +73,11 @@ class DeviceAssignmentQuickAssignLiveTest(StaticLiveServerTestCase):
         ]
         DeviceFactory(**self.my_device_list[0])
         DeviceFactory(**self.my_device_list[1])
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.quit()
+        super().tearDownClass()
 
     def get_device_search_box(self):
         return self.browser.find_element(

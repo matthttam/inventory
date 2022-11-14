@@ -1,0 +1,18 @@
+{% extends 'partials/action_button_group.html' %}
+
+{% block buttons %}
+
+{% if perms.devices.view_device %}
+    <a href="{% url "devices:detail" device.id %}" type="button" class="btn btn-primary" alt="view"><i class="bi bi-eye"></i></a>
+{% endif %}
+
+{% if perms.devices.change_device %}
+    <a href="{% url "devices:edit" device.id %}" type="button" class="btn btn-secondary" alt="edit"><i class="bi bi-pencil"></i></a>
+{% endif %}
+
+{% if perms.devices.delete_device %}
+    <a href="{% url "devices:delete" device.id %}" type="button" class="btn btn-danger" alt="delete"><i class="bi bi-trash2"></i></a>
+{% endif %}
+
+{% endblock buttons %}
+    
