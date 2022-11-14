@@ -184,9 +184,7 @@ class DeviceDatatableServerSideProcessingViewAuthenticatedWithPermissionTest(Tes
         try:
             returnable_values = view.queryset.values(*view.columns)
         except FieldError:
-            self.fail(
-                "dt_index view specifies columns not accessible from the queryset!"
-            )
+            self.fail("dt_index view specifies columns not accessible from the queryset!")
 
     @patch("devices.views.render_to_string")
     def test_data_callback_adds_actions(self, mock_render_to_string):
@@ -204,7 +202,7 @@ class DeviceDatatableServerSideProcessingViewAuthenticatedWithPermissionTest(Tes
         mock_render_to_string.assert_has_calls(
             [
                 call(
-                    "devices/partials/device_list/table_row_buttons.html",
+                    "devices/partials/list/table_row_buttons.html",
                     context={"device": ANY},
                     request=InstanceOf(WSGIRequest),
                 ),

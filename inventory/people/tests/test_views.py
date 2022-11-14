@@ -31,7 +31,7 @@ class PersonListViewAuthenticatedWithPermissionTest(TestCase):
         self.assertTemplateUsed(response, "people/person_list.html")
 
     def test_one_person(self):
-        PersonFactory(id=1)
+        PersonFactory()
         response = self.client.get(reverse("people:index"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "people/person_list.html")
@@ -179,9 +179,7 @@ class PersonDatatableServerSideProcessingViewAuthenticatedWithPermissionTest(Tes
         try:
             returnable_values = view.queryset.values(*view.columns)
         except FieldError:
-            self.fail(
-                "dt_index view specifies columns not accessible from the queryset!"
-            )
+            self.fail("dt_index view specifies columns not accessible from the queryset!")
 
     @patch("people.views.render_to_string")
     def test_data_callback_adds_actions(self, mock_render_to_string):

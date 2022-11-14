@@ -22,13 +22,11 @@ from .models import Device
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class DeviceDatatableServerSideProcessingView(
-    PermissionRequiredMixin, ServerSideDataTablesMixin
-):
+class DeviceDatatableServerSideProcessingView(PermissionRequiredMixin, ServerSideDataTablesMixin):
     def data_callback(self, data: list[dict]) -> list[dict]:
         for row in data:
             row["actions"] = render_to_string(
-                "devices/partials/device_list/table_row_buttons.html",
+                "devices/partials/list/table_row_buttons.html",
                 context={"device": row},
                 request=self.request,
             )
@@ -56,11 +54,7 @@ class DeviceDatatableServerSideProcessingView(
             "google_device",
             "room",
         )
-        .annotate(
-            is_google_linked=Max(
-                Case(When(google_device__isnull=True, then=V(0)), default=V(1))
-            )
-        )
+        .annotate(is_google_linked=Max(Case(When(google_device__isnull=True, then=V(0)), default=V(1))))
     )
     columns = [
         "id",
@@ -119,9 +113,7 @@ class DeviceDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["log_entries"] = (
-            context.get("object").history.all().order_by("timestamp")
-        )
+        context["log_entries"] = context.get("object").history.all().order_by("timestamp")
         return context
 
 

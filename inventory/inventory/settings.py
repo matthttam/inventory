@@ -243,3 +243,7 @@ LOGGING = {
         },
     },
 }
+
+# Opt in to the new div based form rendering in preparation for Django 5.0
+# https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-FORM_RENDERER
+FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
