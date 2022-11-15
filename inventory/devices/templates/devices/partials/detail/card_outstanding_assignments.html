@@ -7,7 +7,7 @@
     <h5 class="card-title">Current Assignment Details</h5>
     <div class="card-text p-4 table-responsive">
         {% if device.is_currently_assigned %}
-            {% include 'assignments/partials/deviceassignment_detail/table_deviceassignment.html' with assignments=device.outstanding_assignments %}
+            {% include 'assignments/partials/detail/table_deviceassignment.html' with assignments=device.outstanding_assignments %}
         {% else %}
             Not Currently Assigned
         {% endif %}

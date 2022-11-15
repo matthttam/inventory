@@ -1,5 +1,6 @@
 from devices.tests.factories import DeviceFactory, DeviceModelFactory, DeviceStatusFactory, DeviceTagFactory
 from assignments.tests.factories import DeviceAssignmentFactory, DeviceAssignmentWithReturnDatetimeFactory
+from people.tests.factories import PersonFactory
 from django.template import Context, Template
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase
@@ -9,12 +10,12 @@ from bs4 import BeautifulSoup
 from sekizai.context import SekizaiContext
 
 
-class DeleteCardDeviceDetailTest(SimpleTestCase):
-    template = "devices/partials/delete/card_device_detail.html"
+class DeleteCardDeviceAssignmentDetail(SimpleTestCase):
+    template = "assignments/partials/delete/card_deviceassignment_detail.html"
 
     def test_template(self):
         templates = [
-            "partials/detail/card_detail.html",
+            "assignments/partials/detail/card_deviceassignment_detail.html",
         ]
         for template in templates:
             with self.assertTemplateUsed(template):
@@ -33,68 +34,96 @@ class DeleteCardDeviceDetailTest(SimpleTestCase):
         pass
 
 
-class DetailCardDeviceDetailTest(SimpleTestCase):
-    template = "devices/partials/detail/card_device_detail.html"
+class DetailCardDeviceDetail(SimpleTestCase):
+    template = "assignments/partials/detail/card_deviceassignment_detail.html"
+
+    def setUp(self) -> None:
+        self.device = DeviceFactory.build()
+        self.person = PersonFactory.build()
+        self.deviceassignment = DeviceAssignmentWithReturnDatetimeFactory.build(
+            id=100, person=self.person, device=self.device
+        )
+        self.deviceassignment.assigned_by = "Test User"
+        self.context = {"deviceassignment": self.deviceassignment}
+        self.render = render_to_string(self.template, context=self.context)
+        return super().setUp()
 
     def test_template(self):
         templates = [
-            "partials/card.html",
-            "devices/partials/device_tag_list.html",
+            "partials/detail/card_detail.html",
         ]
         for template in templates:
             with self.assertTemplateUsed(template):
                 render_to_string(self.template)
 
-    def test_has_device_id(self):
-        context = {"device": DeviceFactory.stub(id=100)}
-        render = render_to_string(self.template, context=context)
-        self.assertInHTML("<li>Device ID : 100</li>", render)
+    def test_has_deviceassignment_id(self):
+        self.assertInHTML(f"<li>Assignment ID : {self.deviceassignment.id}</li>", self.render)
 
-    def test_has_device_asset_id(self):
-        context = {"device": DeviceFactory.stub(asset_id="ASSET_1234ABCD")}
-        render = render_to_string(self.template, context=context)
-        self.assertInHTML("<li>Asset Tag : ASSET_1234ABCD</li>", render)
+    def test_has_deviceassignment_device(self):
+        self.assertInHTML(f"<li>Device : {self.deviceassignment.device}</li>", self.render)
 
-    def test_has_device_serial_number(self):
-        context = {"device": DeviceFactory.stub(serial_number="SERIAL_ABCD1234")}
-        render = render_to_string(self.template, context=context)
-        self.assertInHTML("<li>Serial Number : SERIAL_ABCD1234</li>", render)
+    def test_has_deviceassignment_person(self):
+        self.assertInHTML(f"<li>Person : {self.deviceassignment.person}</li>", self.render)
 
-    def test_has_device_status(self):
-        status = DeviceStatusFactory.build()
-        context = {"device": DeviceFactory.stub(status=status)}
-        render = render_to_string(self.template, context=context)
-        self.assertInHTML(f"<li>Status : {status}</li>", render)
+    def test_has_assigned_by(self):
+        self.assertInHTML(f"<li>Assigned By : {self.deviceassignment.assigned_by}</li>", self.render)
 
-    def test_has_device_model(self):
-        device_model = DeviceModelFactory.build()
-        context = {"device": DeviceFactory.stub(device_model=device_model)}
-        render = render_to_string(self.template, context=context)
-        self.assertInHTML(f"<li>Model : {device_model}</li>", render)
+    def test_has_deviceassignment_assigned_on(self):
+        rendered_datetime = Template("{{datetime}}").render(
+            Context({"datetime": self.deviceassignment.assignment_datetime})
+        )
+        self.assertInHTML(f"<li>Assigned On : {rendered_datetime}</li>", self.render)
 
-    def test_has_device_building(self):
-        building = BuildingFactory.build()
-        context = {"device": DeviceFactory.stub(building=building)}
-        render = render_to_string(self.template, context=context)
-        self.assertInHTML(f"<li>Building : {building}</li>", render)
+    def test_has_deviceassignment_returned_on(self):
+        rendered_datetime = Template("{{datetime}}").render(
+            Context({"datetime": self.deviceassignment.return_datetime})
+        )
+        self.assertInHTML(f"<li>Returned On : {rendered_datetime}</li>", self.render)
 
-    def test_has_device_room(self):
-        room = RoomFactory.build()
-        context = {"device": DeviceFactory.stub(room=room)}
-        render = render_to_string(self.template, context=context)
-        self.assertInHTML(f"<li>Room : {room}</li>", render)
 
-    def test_has_device_tags(self):
-        tags = DeviceTagFactory.build_batch(size=3)
-        context = {"device": DeviceFactory.stub(room=tags)}
-        render = render_to_string(self.template, context=context)
-        tag_render = render_to_string("devices/partials/device_tag_list.html", context=context)
-        self.assertInHTML(f"<li>Tags : {tag_render}</li>", render)
+class DetailCardDeviceAssignmentDetail(SimpleTestCase):
+    def test_template(self):
+        pass
 
-    def test_has_notes(self):
-        context = {"device": DeviceFactory.stub(notes="NOTES_ABCD1234")}
-        render = render_to_string(self.template, context=context)
-        self.assertInHTML("<li>Notes : NOTES_ABCD1234</li>", render)
+
+class DetailCardDeviceAssignmentHistory(SimpleTestCase):
+    def test_template(self):
+        pass
+
+
+class DetailCardPersonDetail(SimpleTestCase):
+    def test_template(self):
+        pass
+
+
+class DetailInnerNav(SimpleTestCase):
+    def test_template(self):
+        pass
+
+
+class DetailStickyHeader(SimpleTestCase):
+    def test_template(self):
+        pass
+
+
+class DetailTabDeviceAssignmentDetail(SimpleTestCase):
+    def test_template(self):
+        pass
+
+
+class DetailTabDeviceAssignmentHistory(SimpleTestCase):
+    def test_template(self):
+        pass
+
+
+class DetailTableDeviceAssignment(SimpleTestCase):
+    def test_template(self):
+        pass
+
+
+class ListTableRowButtons(SimpleTestCase):
+    def test_template(self):
+        pass
 
 
 class DetailCardDeviceDetailButtonPermissionTest(SimpleTestCase):

@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from auditlog.registry import auditlog
 from auditlog.models import AuditlogHistoryField
+from auditlog.models import LogEntry
 
 from devices.models import Device, DeviceAccessory
 from people.models import Person
@@ -29,9 +30,7 @@ class AssignmentManager(models.Manager):
 
 
 class AssignmentAbstract(models.Model):
-    assignment_datetime = models.DateTimeField(
-        verbose_name="assignment date", auto_now_add=True
-    )
+    assignment_datetime = models.DateTimeField(verbose_name="assignment date", auto_now_add=True)
     return_datetime = models.DateTimeField(
         blank=True,
         null=True,
@@ -46,9 +45,7 @@ class AssignmentAbstract(models.Model):
 
 
 class DeviceAssignment(AssignmentAbstract):
-    device = models.ForeignKey(
-        Device, on_delete=models.PROTECT, related_name="deviceassignments"
-    )
+    device = models.ForeignKey(Device, on_delete=models.PROTECT, related_name="deviceassignments")
     person = models.ForeignKey(
         Person,
         on_delete=models.PROTECT,
@@ -64,6 +61,14 @@ class DeviceAssignment(AssignmentAbstract):
 
     def __str__(self):
         return f"Assignment {self.id}"
+
+    def creation_entry(self):
+        return self.history.filter(action=LogEntry.Action.CREATE).first()
+
+    def assigned_by(self):
+        if self.creation_entry():
+            return self.creation_entry().actor
+        return None
 
 
 class DeviceAccessoryAssignment(AssignmentAbstract):

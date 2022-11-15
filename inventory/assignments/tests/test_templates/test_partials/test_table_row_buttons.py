@@ -22,9 +22,7 @@ class TableRowButtonsPermissionTest(SimpleTestCase):
                 },
             }
         )
-        self.template = Template(
-            "{% include  'assignments/partials/deviceassignment_list/table_row_buttons.html'%}"
-        )
+        self.template = Template("{% include  'assignments/partials/list/table_row_buttons.html'%}")
         self.view_link_selector = 'a[href="/assignments/1/"]'
         self.edit_link_selector = 'a[href="/assignments/1/edit/"]'
         self.turnin_link_selector = 'a[href="/assignments/1/turnin/"]'

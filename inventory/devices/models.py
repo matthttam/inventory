@@ -68,9 +68,7 @@ class DeviceManager(models.Manager):
         return self.filter(is_currently_assigned=True)
 
     def ready_to_assign(self):
-        return self.filter(is_currently_assigned=False).filter(
-            status__is_inactive=False
-        )
+        return self.filter(is_currently_assigned=False).filter(status__is_inactive=False)
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -100,11 +98,7 @@ class DeviceManager(models.Manager):
         )
 
         # Set is_google_linked
-        qs = qs.annotate(
-            is_google_linked=Max(
-                Case(When(google_device__isnull=True, then=V(0)), default=V(1))
-            )
-        )
+        qs = qs.annotate(is_google_linked=Max(Case(When(google_device__isnull=True, then=V(0)), default=V(1))))
         return qs
 
 
@@ -114,9 +108,7 @@ class Device(models.Model):
     notes = models.CharField(max_length=255, blank=True)
     status = models.ForeignKey(DeviceStatus, on_delete=models.PROTECT)
     device_model = models.ForeignKey(DeviceModel, on_delete=models.PROTECT)
-    building = models.ForeignKey(
-        Building, on_delete=models.SET_NULL, null=True, blank=True
-    )
+    building = models.ForeignKey(Building, on_delete=models.SET_NULL, null=True, blank=True)
     room = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True, blank=True)
     google_device = models.OneToOneField(
         "googlesync.GoogleDevice",
@@ -161,13 +153,8 @@ def device_assignment_actions(sender, instance, update_fields, **kwargs):
 
 def device_assignment_creation_action(person, device):
     mapping_model = apps.get_model("googlesync.DeviceBuildingToGoogleOUMapping")
-    mapping = mapping_model.objects.filter(
-        building=device.building, person_type=person.type
-    ).first()
-    if (
-        mapping is not None
-        and mapping.organization_unit != device.google_device.organization_unit
-    ):
+    mapping = mapping_model.objects.filter(building=device.building, person_type=person.type).first()
+    if mapping is not None and mapping.organization_unit != device.google_device.organization_unit:
         response = change_device_ou(
             mapping.organization_unit,
             device,
@@ -213,4 +200,4 @@ class DeviceAccessory(models.Model):
 
 
 # Audit Log Registrations
-auditlog.register(Device)
+auditlog.register(Device, m2m_fields=["tags"])

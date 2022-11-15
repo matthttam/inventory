@@ -1,0 +1,26 @@
+{% extends 'partials/detail/sticky_header.html' %}
+
+{% block sticky_header_content %}
+
+<div class="hstack gap-3">
+    <h4 class="text-nowrap"><div class="d-none d-md-inline">Assignment </div>{{ deviceassignment.id }}</h4>
+    <div class="vr"></div>
+    <h1 class="display-6">{{ deviceassignment.device }}</h1>
+    <div class="vr"></div>
+    <h1 class="display-6">{{ deviceassignment.person }}</h1>
+    <div class="vr"></div>
+    <div class="d-none d-sm-block">
+        <h6 class="m-0">
+        {% if deviceassignment.is_outstanding %}
+            <span class="text-danger h4">Outstanding</span>
+        {% else %}
+            <span class="text-success h4">Turned In</span>
+            
+        {% endif %}
+        </h6>
+        
+    </div>
+    <div class="vr d-none d-sm-block"></div>
+</div>
+
+{% endblock %}

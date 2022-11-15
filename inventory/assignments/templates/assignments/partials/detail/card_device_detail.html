@@ -1,0 +1,10 @@
+{% extends 'devices/partials/detail/card_device_detail.html' %}
+
+{% block card_body_header %}
+<h5 class="card-title">Device Details
+
+{% if perms.devices.view_device %}
+    <a href="{% url 'devices:detail' deviceassignment.device.id %}" class="d-inline-block ms-2"><i class="bi bi-link text-secondary" title="View Device"></i></a>
+{% endif %}
+</h5>
+{% endblock %}

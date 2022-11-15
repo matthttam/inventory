@@ -1,0 +1,38 @@
+{% extends 'partials/detail/card_detail.html' %}
+
+{% block card_title %}{% endblock %}
+
+{% block card_body_content%}
+    {% block card_body_header %}
+    <h5 class="card-title">Assignment Details
+        <a href="{% url 'assignments:index' %}" class="d-inline-block ms-2"><i class="bi bi-card-list text-primary" title="Assignment List"></i></a>
+        {% if perms.deviceassignments.change_deviceassignment %}
+            <a href="{% url 'assignments:edit' deviceassignment.id %}" class="d-inline-block ms-2"><i class="bi bi-pencil-square text-secondary" title="Edit Assignment"></i></a>
+        {% endif %}
+        {% if perms.deviceassignments.delete_deviceassignment %}
+            <a href="{% url 'assignments:delete' deviceassignment.id %}" class="d-inline-block ms-2"><i class="bi bi-trash2 text-danger" title="Delete Assignment"></i></a>
+        {% endif %}
+    </h5>
+    {% endblock card_body_header %}
+
+    <div class="card-text p-4">
+        <div class="row row-cols-2 row-cols-lg-2 g-2 g-lg-3">
+            <div class="col">
+                <ul class="list-unstyled">
+                    <li>Assignment ID : {{ deviceassignment.id }}</li>
+                    <li>Device : {{ deviceassignment.device }}</li>
+                    <li>Person : {{ deviceassignment.person }}</li>
+                </ul>
+            </div>
+            <div class="col">
+                <ul class="list-unstyled">
+                    <li>Assigned By : {{ deviceassignment.assigned_by }}</li>
+                    <li>Assigned On : {{ deviceassignment.assignment_datetime }}</li>
+                    <li>Returned On : {{ deviceassignment.return_datetime }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% block card_body_footer %}
+    {% endblock card_body_footer %}
+{% endblock card_body_content %}

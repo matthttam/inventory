@@ -1,0 +1,10 @@
+{% extends 'people/partials/detail/card_person_detail.html' %}
+
+{% block card_body_header %}
+<h5 class="card-title">Person Details
+
+{% if perms.people.view_person %}
+    <a href="{% url 'people:detail' deviceassignment.person.id %}" class="d-inline-block ms-2"><i class="bi bi-link text-secondary" title="View Person"></i></a>
+{% endif %}
+</h5>
+{% endblock %}

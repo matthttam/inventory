@@ -1,0 +1,8 @@
+{% include './card_deviceassignment_detail.html' %}
+
+{% include 'assignments/partials/detail/card_device_detail.html' with device=deviceassignment.device %}
+
+{% comment %}
+Will work once Person detail has been updated!
+{% include 'assignments/partials/detail/card_person_detail.html' with person=deviceassignment.person %}
+{% endcomment %}

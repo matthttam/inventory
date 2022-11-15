@@ -1,9 +1,21 @@
 {% load static sekizai_tags %}
 
+
+{% addtoblock "css" %}
+    <link href="{% static 'inventory/css/partials/detail/sticky_header.css'%}" rel="stylesheet" />
+{% endaddtoblock %}
+
+{% addtoblock "js" %}
+    <script src="{% static 'inventory/js/partials/detail/sticky_header.js'%}"></script>
+{% endaddtoblock %}
+{% comment %}
 {% block css %}{{ block.super }}{% addtoblock "css" %}
     <link href="{% static 'inventory/css/partials/detail/sticky_header.css' %}" rel="stylesheet" />
 {% endaddtoblock %}{% endblock %}
-
+{% block js %}{{ block.super }}{% addtoblock "js" %}
+    <script src="{% static 'inventory/js/partials/detail/sticky_header.js' %}" />
+{% endaddtoblock %}{% endblock %}
+{% endcomment %}
 <div class="col detail-sticky-header">
     <div class=" bg-light px-3 border-bottom border-secondary border-2 border-opacity-25">
         {% block sticky_header_content %}

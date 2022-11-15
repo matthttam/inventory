@@ -6,7 +6,7 @@
 
     <h5 class="card-title">Assignment History</h5>
     <div class="card-text p-4 table-responsive">
-        {% include 'assignments/partials/deviceassignment_detail/table_deviceassignment.html' with assignments=device.deviceassignments.all %}
+        {% include 'assignments/partials/detail/table_deviceassignment.html' with assignments=device.deviceassignments.all %}
     </div>
 
 {% endblock card_body_content %}

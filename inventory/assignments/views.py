@@ -23,13 +23,11 @@ from .models import DeviceAssignment
 
 
 @method_decorator(csrf_exempt, name="dispatch")
-class DeviceAssignmentDatatableServerSideProcessingView(
-    PermissionRequiredMixin, ServerSideDataTablesMixin
-):
+class DeviceAssignmentDatatableServerSideProcessingView(PermissionRequiredMixin, ServerSideDataTablesMixin):
     def data_callback(self, data: list[dict]) -> list[dict]:
         for row in data:
             row["actions"] = render_to_string(
-                "assignments/partials/deviceassignment_list/table_row_buttons.html",
+                "assignments/partials/list/table_row_buttons.html",
                 context={"deviceassignment": row},
                 request=self.request,
             )
@@ -108,9 +106,7 @@ class DeviceAssignmentDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["log_entries"] = (
-            context.get("object").history.all().order_by("timestamp")
-        )
+        context["log_entries"] = context.get("object").history.all().order_by("timestamp")
         context["infobox"] = get_deviceassignment_infobox_data(context.get("object"))
         return context
 
@@ -190,9 +186,7 @@ class QuickAssignPersonListJSONView(PermissionRequiredMixin, JSONListView):
             search_word_list = q.replace(",", "").split(" ")
             if len(search_word_list) > 1:
                 # filter |= Q(full_name__in=search_word_list)
-                filter |= reduce(
-                    operator.and_, (Q(full_name__icontains=x) for x in search_word_list)
-                )
+                filter |= reduce(operator.and_, (Q(full_name__icontains=x) for x in search_word_list))
             people = people.filter(filter)
 
         people = people.values(
@@ -216,12 +210,10 @@ class QuickAssignDeviceListJSONView(PermissionRequiredMixin, JSONListView):
         # q = re.sub("\s+", " ", re.sub(r"[\W]", " ", q))
         devices = Device.objects.all()
         if q != "":
-            devices = devices.filter(
-                Q(serial_number__icontains=q) | Q(asset_id__icontains=q)
-            )
-        devices = devices.values(
-            "id", "asset_id", "serial_number", "is_active", "is_currently_assigned"
-        ).order_by("-is_active", "is_currently_assigned", "asset_id", "serial_number")
+            devices = devices.filter(Q(serial_number__icontains=q) | Q(asset_id__icontains=q))
+        devices = devices.values("id", "asset_id", "serial_number", "is_active", "is_currently_assigned").order_by(
+            "-is_active", "is_currently_assigned", "asset_id", "serial_number"
+        )
         return devices
 
 

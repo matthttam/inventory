@@ -25,9 +25,7 @@ class DeviceAssignmentListViewAuthenticatedWithPermissionTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
-        self.user.user_permissions.add(
-            get_permission(DeviceAssignment, "view_deviceassignment")
-        )
+        self.user.user_permissions.add(get_permission(DeviceAssignment, "view_deviceassignment"))
 
     def test_no_deviceassignments(self):
         response = self.client.get(reverse("assignments:index"))
@@ -55,9 +53,7 @@ class DeviceAssignmentDetailViewAuthenticatedWithPermissionTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
-        self.user.user_permissions.add(
-            get_permission(DeviceAssignment, "view_deviceassignment")
-        )
+        self.user.user_permissions.add(get_permission(DeviceAssignment, "view_deviceassignment"))
 
     def test_invalid_deviceassignment(self):
         response = self.client.get(reverse("assignments:detail", args=[1]))
@@ -69,9 +65,7 @@ class DeviceAssignmentDetailViewAuthenticatedWithPermissionTest(TestCase):
         device_assignment = DeviceAssignmentFactory(id=1, device=device, person=person)
         response = self.client.get(reverse("assignments:detail", args=[1]))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(
-            response, "assignments/partials/deviceassignment_auditlog.html"
-        )
+        self.assertTemplateUsed(response, "assignments/partials/deviceassignment_auditlog.html")
         self.assertTemplateUsed(response, "assignments/deviceassignment_detail.html")
         self.assertContains(response, "TestName123")
         self.assertContains(response, "TestSerial123")
@@ -87,9 +81,7 @@ class DeviceAssignmentUpdateViewAuthenticatedWithPermissionTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
-        self.user.user_permissions.add(
-            get_permission(DeviceAssignment, "change_deviceassignment")
-        )
+        self.user.user_permissions.add(get_permission(DeviceAssignment, "change_deviceassignment"))
 
     def test_invalid_deviceassignment(self):
         response = self.client.get(reverse("assignments:edit", args=[1]))
@@ -111,9 +103,7 @@ class DeviceAssignmentTurninViewAuthenticatedWithPermissionTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
-        self.user.user_permissions.add(
-            get_permission(DeviceAssignment, "turnin_deviceassignment")
-        )
+        self.user.user_permissions.add(get_permission(DeviceAssignment, "turnin_deviceassignment"))
 
     def test_invalid_deviceassignment(self):
         response = self.client.get(reverse("assignments:turnin", args=[1]))
@@ -123,9 +113,7 @@ class DeviceAssignmentTurninViewAuthenticatedWithPermissionTest(TestCase):
         current_time = timezone.now()
         device_assignment = DeviceAssignmentFactory(id=1)
         response = self.client.get(reverse("assignments:turnin", args=[1]))
-        self.assertTemplateUsed(
-            response, "assignments/deviceassignment_turnin_form.html"
-        )
+        self.assertTemplateUsed(response, "assignments/deviceassignment_turnin_form.html")
         self.assertEqual(response.status_code, 200)
 
 
@@ -176,19 +164,13 @@ class DeviceAssignmentDeleteViewAuthenticatedWithPermissionTest(TestCase):
         self.user = User.objects.get(id=1)
         self.device_assignment = DeviceAssignment.objects.get(id=1)
         self.client.force_login(self.user)
-        self.user.user_permissions.add(
-            get_permission(DeviceAssignment, "delete_deviceassignment")
-        )
-        self.user.user_permissions.add(
-            get_permission(DeviceAssignment, "view_deviceassignment")
-        )
+        self.user.user_permissions.add(get_permission(DeviceAssignment, "delete_deviceassignment"))
+        self.user.user_permissions.add(get_permission(DeviceAssignment, "view_deviceassignment"))
 
     def test_delete_deviceassignment(self):
         response = self.client.get(reverse("assignments:delete", args=[1]))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(
-            response, "assignments/deviceassignment_confirm_delete.html"
-        )
+        self.assertTemplateUsed(response, "assignments/deviceassignment_confirm_delete.html")
 
     def test_delete_deviceassignment_post(self):
         response = self.client.post(reverse("assignments:delete", args=[1]))
@@ -207,21 +189,15 @@ class DeviceAssignmentQuickAssignViewAuthenticatedWithPermissionTest(TestCase):
         self.user = User.objects.get(id=1)
         self.device_assignment = DeviceAssignment.objects.get(id=1)
         self.client.force_login(self.user)
-        self.user.user_permissions.add(
-            get_permission(DeviceAssignment, "add_deviceassignment")
-        )
+        self.user.user_permissions.add(get_permission(DeviceAssignment, "add_deviceassignment"))
 
     def test_quickassign_deviceassignment(self):
         response = self.client.get(reverse("assignments:quickassign"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(
-            response, "assignments/deviceassignment_quickassign.html"
-        )
+        self.assertTemplateUsed(response, "assignments/deviceassignment_quickassign.html")
 
 
-class DeviceAssignmentDatatableServerSideProcessingViewAuthenticatedWithPermissionTest(
-    TestCase
-):
+class DeviceAssignmentDatatableServerSideProcessingViewAuthenticatedWithPermissionTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         UserFactory(id=1)
@@ -231,14 +207,10 @@ class DeviceAssignmentDatatableServerSideProcessingViewAuthenticatedWithPermissi
         self.user = User.objects.get(id=1)
         self.device_assignment = DeviceAssignment.objects.get(id=1)
         self.client.force_login(self.user)
-        self.user.user_permissions.add(
-            get_permission(DeviceAssignment, "view_deviceassignment")
-        )
+        self.user.user_permissions.add(get_permission(DeviceAssignment, "view_deviceassignment"))
 
     def test_dt_index(self):
-        response = self.client.get(
-            reverse("assignments:dt_index"), self.get_dt_querydata()
-        )
+        response = self.client.get(reverse("assignments:dt_index"), self.get_dt_querydata())
         self.assertEqual(response.status_code, 200)
 
     def test_columns_defined_correctly(self):
@@ -248,20 +220,16 @@ class DeviceAssignmentDatatableServerSideProcessingViewAuthenticatedWithPermissi
         try:
             returnable_values = view.queryset.values(*view.columns)
         except FieldError:
-            self.fail(
-                "dt_index view specifies columns not accessible from the queryset!"
-            )
+            self.fail("dt_index view specifies columns not accessible from the queryset!")
         # self.assertEqual(len(returnable_values[0].keys()], )
 
     @patch("assignments.views.render_to_string")
     def test_data_callback_adds_actions(self, mock_render_to_string):
         mock_render_to_string.return_value = "<div>mock_actions_html</div>"
-        response = self.client.get(
-            reverse("assignments:dt_index"), self.get_dt_querydata()
-        )
+        response = self.client.get(reverse("assignments:dt_index"), self.get_dt_querydata())
         json_data = json.loads(response.content)
         mock_render_to_string.assert_called_with(
-            "assignments/partials/deviceassignment_list/table_row_buttons.html",
+            "assignments/partials/list/table_row_buttons.html",
             context=ANY,
             request=ANY,
         )
